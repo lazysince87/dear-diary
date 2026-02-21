@@ -2,9 +2,11 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const SYSTEM_PROMPT_BASE = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
+const SYSTEM_PROMPT = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
 
-Your job: Analyze the user's journal entry or pasted conversation for emotional manipulation patterns, provide deep emotional validation, AND offer genuine, actionable therapeutic advice.
+Your job: Analyze the user's journal entry, pasted conversation, OR attached screenshots/images for emotional manipulation patterns. Provide deep emotional validation and offer genuine, actionable therapeutic advice.
+
+VISUAL EVIDENCE: If an image is provided, it is likely a screenshot of a conversation (e.g., iMessage, WhatsApp). You MUST perform OCR to read all text within the image carefully. This text is the core of the user's experience. Use the visual context—like who is blue/gray, the tone of the messages, and the timing—to inform your analysis.
 
 MANIPULATION TACTICS TO DETECT (but not limited to):
 - Gaslighting: Making someone doubt their reality or memory
@@ -67,10 +69,10 @@ const PERSONA_INSTRUCTIONS = {
  * @param {Array} pastEntries - Previous journal entries for longitudinal context (RAG)
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 'friend') {
+async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries = [], persona = 'friend') {
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
@@ -93,11 +95,37 @@ async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 
         const SYSTEM_PROMPT = SYSTEM_PROMPT_BASE + personaInstruction;
 
         let prompt = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
+
+        let promptText = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE NOW:\n"""\n${entryText || "[Note: The user provided an image/screenshot for analysis without additional text.]"}\n"""`;
+
         if (mood) {
-            prompt += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast (e.g., "You said you're feeling ${mood}, but your words sound upbeat — sometimes we mask how we really feel"). Always trust and center the mood they selected.`;
+            promptText += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast. Always trust and center the mood they selected.`;
         }
 
-        const result = await model.generateContent(prompt);
+        if (imageUrl) {
+            promptText += `\n\nIMAGE ATTACHMENT: An image (likely a screenshot or photo) has been attached to this entry. Please analyze the content of this image along with the text. If the image contains a conversation, treat it as a primary part of the entry's context.`;
+        }
+
+        const promptParts = [promptText];
+
+        // If there's an image, fetch it and add as a part
+        if (imageUrl) {
+            try {
+                const imageResp = await fetch(imageUrl);
+                const buffer = await imageResp.arrayBuffer();
+                promptParts.push({
+                    inlineData: {
+                        data: Buffer.from(buffer).toString("base64"),
+                        mimeType: "image/jpeg"
+                    }
+                });
+            } catch (imgErr) {
+                console.error('Failed to fetch image for analysis:', imgErr.message);
+                // Continue without image part if fetch fails
+            }
+        }
+
+        const result = await model.generateContent(promptParts);
         const response = result.response;
         // Strip markdown backticks if Gemini includes them
         let text = response.text().trim();

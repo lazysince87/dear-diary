@@ -242,111 +242,156 @@ export default function HomePage() {
             padding: 20px 10px 20px;
           }
         }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
+        }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
+        }
       `}</style>
-      <div
-        ref={pageRef}
-        style={{
-          position: "relative",
-          padding: "30px 20px 80px",
-          width: "100%",
-        }}
-      >
-        {STAR_POSITIONS.map((pos, i) => (
-          <div
-            key={pos.id}
-            ref={(el) => (starRefs.current[i] = el)}
-            className="dd-star"
-            style={{
-              position: "fixed",
-              left: pos.x,
-              top: pos.y,
-              width: "48px",
-              height: "48px",
-              cursor: "grab",
-              zIndex: 99,
-              userSelect: "none",
-            }}
-          >
-            <img
-              src={starImg}
-              alt="star"
+      <div ref={pageRef} style={{ position: "relative", padding: "30px 20px 80px", width: "100%" }}>
+        <div
+          ref={pageRef}
+          style={{
+            position: "relative",
+            padding: "30px 20px 80px",
+            width: "100%",
+          }}
+        >
+          {STAR_POSITIONS.map((pos, i) => (
+            <div
+              key={pos.id}
+              ref={(el) => (starRefs.current[i] = el)}
+              className="dd-star"
               style={{
-                width: "100%",
-                height: "100%",
-                pointerEvents: "none",
+                position: "fixed",
+                left: pos.x,
+                top: pos.y,
+                width: "48px",
+                height: "48px",
+                cursor: "grab",
+                zIndex: 99,
                 userSelect: "none",
               }}
-              draggable={false}
-            />
+            >
+              <img
+                src={starImg}
+                alt="star"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
+                draggable={false}
+              />
+            </div>
+          ))}
+          <div className="dd-page max-w-full">
+            <div className="dd-header-block">
+              <h1 className="dd-title">Dear Diary</h1>
+              {!latestEntry && entries.length === 0 && (
+                <p className="dd-subtitle">
+                  Your safe space to reflect and understand your relationships.
+                  Everything here stays between us.
+                </p>
+              )}
+            </div>
           </div>
-        ))}
-        <div className="dd-page max-w-full">
-          <div className="dd-header-block">
-            <h1 className="dd-title">Dear Diary</h1>
-            {!latestEntry && entries.length === 0 && (
-              <p className="dd-subtitle">
-                Your safe space to reflect and understand your relationships.
-                Everything here stays between us.
-              </p>
-            )}
-          </div>
-        </div>
 
-        <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
+          <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
 
-        {latestEntry && (
-          <div style={{ marginTop: "24px" }}>
-            <JournalResponse entry={latestEntry} />
-          </div>
-        )}
-        {pastEntries.length > 0 && (
-          <>
-            <hr className="dd-divider" />
-            <div className="dd-section-label">Earlier entries</div>
-            {pastEntries.map((entry, i) => (
-              <div key={entry._id || i} style={{ marginBottom: "16px" }}>
-                <div
-                  className="dd-entry-card"
-                  onClick={() =>
-                    setExpandedIndex(expandedIndex === i ? null : i)
-                  }
-                >
-                  <div className="dd-entry-date">
-                    {new Date(entry.timestamp).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+          {latestEntry && (
+            <div style={{ marginTop: "24px" }}>
+              <JournalResponse entry={latestEntry} />
+            </div>
+          )}
+          {pastEntries.length > 0 && (
+            <>
+              <hr className="dd-divider" />
+              <div className="dd-section-label">Earlier entries</div>
+              {pastEntries.map((entry, i) => (
+                <div key={entry._id || i} style={{ marginBottom: "16px" }}>
+                  <div
+                    className="dd-entry-card"
+                    onClick={() =>
+                      setExpandedIndex(expandedIndex === i ? null : i)
+                    }
+                  >
+                    <div className="dd-entry-date">
+                      {new Date(entry.timestamp).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                    <p className="dd-entry-preview">{entry.content}</p>
+                    {entry.analysis?.tactic_identified && (
+                      <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                    )}
                   </div>
-                  <p className="dd-entry-preview">{entry.content}</p>
-                  {entry.analysis?.tactic_identified && (
-                    <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                  {expandedIndex === i && entry.analysis && (
+                    <JournalResponse entry={entry} />
                   )}
                 </div>
-                {expandedIndex === i && entry.analysis && (
-                  <JournalResponse entry={entry} />
-                )}
-              </div>
-            ))}
-          </>
-        )}
-        <img
-          ref={duckRef}
-          src={duckImg}
-          alt="duck"
-          className="dd-duck"
-          style={{
-            position: "fixed",
-            right: "50px",
-            bottom: "50px",
-            top: "auto",
-            width: "250px",
-            zIndex: 50,
-            pointerEvents: "none",
-          }}
-        />
-      </div>
-    </>
-  );
+              ))}
+            </>
+          )}
+          <img
+            ref={duckRef}
+            src={duckImg}
+            alt="duck"
+            className="dd-duck"
+            style={{
+              position: "fixed",
+              right: "50px",
+              bottom: "50px",
+              top: "auto",
+              width: "250px",
+              zIndex: 50,
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+      </>
+      );
 }

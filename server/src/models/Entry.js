@@ -4,7 +4,7 @@ const entrySchema = new mongoose.Schema({
     // The raw journal entry text
     content: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
     },
     // Gemini analysis result
@@ -20,7 +20,7 @@ const entrySchema = new mongoose.Schema({
     // Supabase user ID
     userId: {
         type: String,
-        required: true,
+        required: false,
         index: true,
     },
     // Mood tag (optional, user-selected)
@@ -29,10 +29,11 @@ const entrySchema = new mongoose.Schema({
         enum: ['grateful', 'confused', 'sad', 'anxious', 'hopeful', 'angry', 'numb', null],
         default: null,
     },
-    // Image URLs (uploaded to Supabase, stored here for reference)
-    imageUrls: [{
+    // Optional attachment URL (stored in Supabase)
+    imageUrl: {
         type: String,
-    }],
+        default: null,
+    },
 }, {
     timestamps: true, // createdAt & updatedAt
 });
