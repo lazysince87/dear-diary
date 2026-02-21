@@ -144,7 +144,7 @@ export default function HomePage() {
               weekday: "long", year: "numeric", month: "long", day: "numeric",
             })} 
           </div> */}
-          <h1 className="dd-title" style={{ color: 'white' }}>Dear Diary</h1>
+          <h1 className="dd-title" style={{ color: 'white', fontFamily: "'KiwiSoda', sans-serif", fontSize: "50px" }}>Dear Diary</h1>
           {!latestEntry && entries.length === 0 && (
             <p className="dd-subtitle">
               Your safe space to reflect and understand your relationships.

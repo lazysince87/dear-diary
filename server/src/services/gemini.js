@@ -45,7 +45,7 @@ Do NOT include any text before or after the JSON. Only valid JSON.`;
  * @param {string} entryText - The journal entry or conversation to analyze
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText) {
+async function analyzeEntry(entryText, mood = null) {
     try {
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
@@ -57,7 +57,10 @@ async function analyzeEntry(entryText) {
             },
         });
 
-        const prompt = `${SYSTEM_PROMPT}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
+        let prompt = `${SYSTEM_PROMPT}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
+        if (mood) {
+            prompt += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast (e.g., "You said you're feeling ${mood}, but your words sound upbeat — sometimes we mask how we really feel"). Always trust and center the mood they selected.`;
+        }
 
         const result = await model.generateContent(prompt);
         const response = result.response;

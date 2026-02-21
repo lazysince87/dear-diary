@@ -20,7 +20,8 @@ router.post('/', requireAuth, async (req, res, next) => {
         }
 
         // Analyze with Gemini
-        const analysis = await analyzeEntry(content.trim());
+        console.log('[DEBUG] mood received:', mood);
+        const analysis = await analyzeEntry(content.trim(), mood);
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
         try {

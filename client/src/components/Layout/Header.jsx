@@ -8,7 +8,7 @@ export default function Header({ onLogoutClick }) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-cream/80 border-b border-warm-200/50">
+    <header className="sticky top-0 z-50 backdrop-blur-md border-b border-warm-200/50" style={{ backgroundColor: '#fdf7fa' }}>
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
@@ -52,7 +52,7 @@ export default function Header({ onLogoutClick }) {
           </NavLink>
 
           {/* Covert Mode Toggle */}
-          <button
+          {/* <button
             onClick={toggleCovertMode}
             className="ml-2 p-2 rounded-full transition-all duration-300 hover:bg-warm-200/50"
             title={isCovertMode ? 'Exit safe mode' : 'Enter safe mode'}
@@ -62,7 +62,7 @@ export default function Header({ onLogoutClick }) {
               size={18}
               className={isCovertMode ? 'text-sage-dark' : 'text-text-muted'}
             />
-          </button>
+          </button> */}
 
           {/* Auth Button */}
           {user ? (

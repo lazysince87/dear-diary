@@ -338,3 +338,8 @@
     padding: 1rem;
   }
 }
+
+@font-face {
+  font-family: 'KiwiSoda';
+  src: url('./assets/fonts/KiwiSoda.ttf') format('truetype');
+}
