@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef, useEffect } from "react";
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
 import { fetchEntries, getPreferences, getSpotifyStatus, generateMusic } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
-import { fetchEntries } from "../services/api";
 
 const AppContext = createContext(null);
 
