@@ -14,8 +14,8 @@ function ProtectedRoute({ children }) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-cream)' }}>
         <div className="text-center animate-fade-in">
-          <div className="text-5xl mb-3 animate-float">🌹</div>
-          <p className="text-text-muted text-sm">Loading your space...</p>
+          <div className="text-5xl mb-3 animate-float">📒</div>
+          <p className="text-text-muted text-sm" style={{ fontFamily: 'var(--font-serif)', letterSpacing: '1px' }}>Loading your diary...</p>
         </div>
       </div>
     );
