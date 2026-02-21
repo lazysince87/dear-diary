@@ -1,12 +1,91 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import { Draggable } from "gsap/draggable";
 import JournalEntry from "../components/Journal/JournalEntry";
 import JournalResponse from "../components/Journal/JournalResponse";
 import { useApp } from "../context/AppContext";
+import duckImg from "../assets/duck.png";
+import starImg from "../assets/star.png";
+
+gsap.registerPlugin(Draggable);
+
+const STAR_POSITIONS = [
+  { id: 1, x: "12%", y: "20%" },
+  { id: 2, x: "80%", y: "15%" },
+  { id: 3, x: "88%", y: "25%" },
+];
 
 export default function HomePage() {
   const { entries, addEntry } = useApp();
   const [latestEntry, setLatestEntry] = useState(null);
+  const duckRef = useRef(null);
+  const starRefs = useRef([]);
+  const pageRef = useRef(null);
   const [expandedIndex, setExpandedIndex] = useState(null);
+
+  useEffect(() => {
+    if (duckRef.current) {
+      gsap.fromTo(
+        duckRef.current,
+        { y: -800, opacity: 1 },
+        {
+          y: 0,
+          duration: 6,
+          ease: "bounce.out",
+          onComplete: () => {
+            gsap.to(duckRef.current, {
+              y: -10,
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        },
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      starRefs.current.forEach((star, i) => {
+        if (!star) {
+          return;
+        }
+        const floatAnim = gsap.to(star, {
+          y: "+=14",
+          x: "+=6",
+          rotation: gsap.utils.random(-10, 10),
+          duration: gsap.utils.random(2.2, 3.2),
+          ease: "power1.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.3,
+        });
+
+        Draggable.create(star, {
+          type: "x,y",
+          edgeResistance: 0.65,
+          onDragStart() {
+            floatAnim.kill();
+            gsap.to(star, { scale: 1.15, duration: 0.15 });
+          },
+          onRelease() {
+            gsap.to(star, { scale: 1, duration: 0.2 });
+            gsap.to(star, {
+              y: "+=12",
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        });
+      });
+    }, pageRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const handleAnalysisComplete = (entry) => {
     setLatestEntry(entry);
@@ -22,25 +101,15 @@ export default function HomePage() {
         @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
 
         .dd-page {
-          max-width: 1250px;
           margin: 0 auto;
-          padding: 48px 20px 80px;
-        }
-
-        .dd-date {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 11px;
-          color: #7a5060;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          margin-bottom: 10px;
+          padding: 30px 10px 80px;
+          width: 100%;
         }
 
         .dd-title {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 32px;
-          font-weight: 600;
-          color: #f2c4ce;
+          font-family: 'KiwiSoda', sans-serif;
+          font-size: 50px;
+          color: white;
           letter-spacing: 4px;
           text-transform: uppercase;
           margin-bottom: 6px;
@@ -55,8 +124,7 @@ export default function HomePage() {
         }
 
         .dd-header-block {
-          border-left: 3px solid #c9748a;
-          padding-left: 16px;
+          padding-left: 0;
           margin-bottom: 36px;
         }
 
@@ -76,6 +144,7 @@ export default function HomePage() {
         }
 
         .dd-entry-card {
+          position: relative;
           padding: 14px 16px;
           margin-bottom: 10px;
           cursor: pointer;
@@ -87,6 +156,21 @@ export default function HomePage() {
           border-color: #c9748a;
           background: rgba(242, 196, 206, 0.04);
         }
+
+        .dd-entry-card::before {
+          content: '';
+          position: absolute;
+          top: -1px;
+          left: -1px;
+          width: 6px;
+          height: 6px;
+          border-top: 2px solid #c9748a;
+          border-left: 2px solid #c9748a;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        .dd-entry-card:hover::before { opacity: 1; }
 
         .dd-entry-date {
           font-family: 'Pixelify Sans', sans-serif;
@@ -120,42 +204,127 @@ export default function HomePage() {
           color: #c9748a;
         }
 
-        .dd-entry-card {
-          position: relative;
-        }
-        .dd-entry-card::before {
-          content: '';
-          position: absolute;
-          top: -1px;
-          left: -1px;
-          width: 6px;
-          height: 6px;
-          border-top: 2px solid #c9748a;
-          border-left: 2px solid #c9748a;
-          opacity: 0;
-          transition: opacity 0.15s;
-        }
-        .dd-entry-card:hover::before {
-          opacity: 1;
+        /* Mobile responsive: reposition stars, reposition duck */
+        @media (max-width: 768px) {
+          .dd-star {
+            position: fixed !important;
+            width: 28px !important;
+            height: 28px !important;
+            opacity: 0.7;
+          }
+          .dd-star:nth-child(1) {
+            left: 10px !important;
+            top: auto !important;
+            bottom: 20px !important;
+          }
+          .dd-star:nth-child(2) {
+            left: auto !important;
+            right: 10px !important;
+            top: auto !important;
+            bottom: 60px !important;
+          }
+          .dd-star:nth-child(3) {
+            left: 50% !important;
+            top: auto !important;
+            bottom: 30px !important;
+          }
+          .dd-duck {
+            position: relative !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 120px !important;
+            display: block;
+            margin: 20px auto 0;
+          }
+          .dd-page {
+            padding: 20px 10px 20px;
+          }
         }
       `}</style>
-
-      <div className="dd-page">
-        {/* Header */}
-        <div className="dd-header-block">
-          {/* <div className="dd-date">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long", year: "numeric", month: "long", day: "numeric",
-            })} 
-          </div> */}
-          <h1 className="dd-title" style={{ color: 'white', fontFamily: "'KiwiSoda', sans-serif", fontSize: "50px" }}>Dear Diary</h1>
-          {!latestEntry && entries.length === 0 && (
-            <p className="dd-subtitle">
-              Your safe space to reflect and understand your relationships.
-              Everything here stays between us.
-            </p>
+        <div ref={pageRef} style={{ position: "relative", padding: "30px 20px 80px", width: "100%" }}>
+        {STAR_POSITIONS.map((pos, i) => (
+          <div
+            key={pos.id}
+            ref={(el) => (starRefs.current[i] = el)}
+            className="dd-star"
+            style={{
+              position: "fixed",
+              left: pos.x,
+              top: pos.y,
+              width: "48px",
+              height: "48px",
+              cursor: "grab",
+              zIndex: 99,
+              userSelect: "none",
+            }}
+          >
+            <img
+              src={starImg}
+              alt="star"
+              style={{
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+              draggable={false}
+            />
+          </div>
+        ))}
+        <div className="dd-page max-w-full">
+          <div className="dd-header-block">
+            <h1 className="dd-title">Dear Diary</h1>
+            {!latestEntry && entries.length === 0 && (
+              <p className="dd-subtitle">
+                Your safe space to reflect and understand your relationships.
+                Everything here stays between us.
+              </p>
+            )}
+          </div>
+          <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
+          {latestEntry && (
+            <div style={{ marginTop: "24px" }}>
+              <JournalResponse entry={latestEntry} />
+            </div>
+          )}
+          {entries.length > 1 && (
+            <>
+              <hr className="dd-divider" />
+              <div className="dd-section-label">Earlier entries</div>
+              {entries.slice(1, 4).map((entry, i) => (
+                <div key={i} className="dd-entry-card">
+                  <div className="dd-entry-date">
+                    {new Date(entry.timestamp).toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <p className="dd-entry-preview">{entry.content}</p>
+                  {entry.analysis?.tactic_identified && (
+                    <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                  )}
+                </div>
+              ))}
+            </>
           )}
         </div>
+        <img
+          ref={duckRef}
+          src={duckImg}
+          alt="duck"
+          className="dd-duck"
+          style={{
+            position: "fixed",
+            right: "50px",
+            bottom: "50px",
+            top: "auto",
+            width: "250px",
+            zIndex: 50,
+            pointerEvents: "none",
+          }}
+        />
 
         <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
 

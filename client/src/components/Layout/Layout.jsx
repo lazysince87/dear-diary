@@ -1,13 +1,23 @@
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { X, Check } from "lucide-react";
 import Header from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
+import cloudsImg from "../../assets/clouds.png";
+import greenCloudsImg from "../../assets/green-clouds.png";
+import purpleCloudsImg from "../../assets/purple-clouds.png";
 
 export default function Layout() {
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const getBackgroundImage = () => {
+    if (location.pathname === '/patterns') return greenCloudsImg;
+    if (location.pathname === '/resources') return purpleCloudsImg;
+    return cloudsImg;
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -16,7 +26,17 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${getBackgroundImage()})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        transition: 'background-image 0.5s ease',
+      }}
+    >
       {/* Background decorations */}
       <div className="bg-decoration bg-decoration-1" />
       <div className="bg-decoration bg-decoration-2" />
@@ -24,8 +44,10 @@ export default function Layout() {
 
       <Header onLogoutClick={() => setShowConfirmLogout(true)} />
 
-      <main className={`max-w-4xl mx-auto px-4 py-6 md:py-10 relative z-10 transition-all duration-300 ${showConfirmLogout ? 'blur-sm pointer-events-none' : ''}`}>
-        <Outlet />
+      <main className={`flex justify-center px-4 py-6 md:py-10 relative z-10 transition-all duration-300 ${showConfirmLogout ? 'blur-sm pointer-events-none' : ''}`}>
+        <div style={{ width: '100%', maxWidth: '1100px' }}>
+          <Outlet />
+        </div>
       </main>
       <footer className="text-center py-6 text-text-muted text-sm"></footer>
 

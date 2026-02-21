@@ -26,8 +26,12 @@ CRITICAL THERAPEUTIC RULES:
 3. Be gentle when naming tactics. Frame it as "It sounds like..." or "I noticed a pattern of..."
 4. Provide highly specific, actionable advice using the ACTUAL details from their entry. NEVER use placeholder text like "[insert specific situation]" or "[person's name]". Instead, directly reference what the user described. For example, if they mentioned their boss criticized them in a meeting, say: "You could try telling your boss: 'When you criticized my work in front of everyone, it made me feel undermined.'" Always use their real words and situations.
 5. The reflection question should be thought-provoking and encourage self-compassion.
-6. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. Essentially, if the entry is not purely positive/neutral, set suggests_music to true. When you do, weave it naturally into your empathy_response, like: "I think some of your favorite music might help you feel a little more grounded right now."
-7. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. You have the user's actual story — reference it directly. Every piece of advice should feel personally written for them, not templated.
+6. For patterns_detected, identify ALL manipulation patterns present in the entry. Categorize each one by severity:
+   - "low": Subtle or possibly unintentional behavior
+   - "medium": Clear pattern that warrants attention
+   - "high": Serious, deliberate manipulation that could be harmful
+7. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. Essentially, if the entry is not purely positive/neutral, set suggests_music to true. When you do, weave it naturally into your empathy_response, like: "I think some of your favorite music might help you feel a little more grounded right now."
+8. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. You have the user's actual story — reference it directly. Every piece of advice should feel personally written for them, not templated.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -38,8 +42,17 @@ You MUST respond ONLY with valid JSON matching this exact schema:
   "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story using their REAL details. Give them a script or concrete next steps if they asked what to do.",
   "confidence": 0.0 to 1.0,
   "reflection_question": "A compassionate reflection question to help the user process their feelings.",
+  "patterns_detected": [
+    {
+      "name": "Pattern name",
+      "explanation": "Brief, gentle explanation of how this pattern appears in their entry",
+      "severity": "low" | "medium" | "high"
+    }
+  ],
   "suggests_music": true/false
 }
+
+Note: patterns_detected should be an empty array [] if no patterns are found. Include ALL patterns you detect, not just the primary one.
 
 Do NOT include any text before or after the JSON. Only valid JSON.`;
 
@@ -112,6 +125,7 @@ async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 
             actionable_advice: analysis.actionable_advice || null,
             confidence: typeof analysis.confidence === 'number' ? Math.min(1, Math.max(0, analysis.confidence)) : 0,
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
+            patterns_detected: Array.isArray(analysis.patterns_detected) ? analysis.patterns_detected : [],
             suggests_music: Boolean(analysis.suggests_music),
         };
 
@@ -128,6 +142,7 @@ async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 
             actionable_advice: "Taking things one step at a time is often the best approach. Remember to prioritize your own well-being and safety.",
             confidence: 0,
             reflection_question: "What feelings came up for you as you wrote this? Take a moment to sit with them — you deserve that space.",
+            patterns_detected: [],
             suggests_music: false,
         };
     }
