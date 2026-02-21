@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
-import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
+import { Volume2, AlertTriangle, Sparkles, Music, ShieldAlert } from "lucide-react";
+import { textToSpeech, generateMusic, getSpotifyStatus, triggerEmergencySOS } from "../../services/api";
+import { useApp } from "../../context/AppContext";
 
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
+  const { preferences } = useApp();
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicAudio, setMusicAudio] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [sosSending, setSosSending] = useState(false);
+  const [sosSent, setSosSent] = useState(false);
+  const [sosError, setSosError] = useState(null);
 
   // Build a full narration script from all analysis sections
   const buildVoiceScript = () => {
@@ -71,6 +76,19 @@ export default function JournalResponse({ entry }) {
     hour: "numeric",
     minute: "2-digit",
   });
+
+  const handleSOS = async () => {
+    setSosSending(true);
+    setSosError(null);
+    try {
+      await triggerEmergencySOS(preferences?.displayName || '', content);
+      setSosSent(true);
+    } catch (err) {
+      setSosError(err.message);
+    } finally {
+      setSosSending(false);
+    }
+  };
 
   return (
     <>
@@ -256,6 +274,77 @@ export default function JournalResponse({ entry }) {
                     background: #fdf6f0;
                     border-radius: 2px;
                 }
+
+                .jr-sos {
+                    border: 2px solid #c9365a;
+                    border-left: 4px solid #c9365a;
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    background: #fff0f3;
+                    border-radius: 2px;
+                }
+
+                .jr-sos-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 10px;
+                }
+
+                .jr-sos-label {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    color: #c9365a;
+                }
+
+                .jr-sos-text {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 13px;
+                    color: #6b5454;
+                    line-height: 1.7;
+                    margin-bottom: 12px;
+                }
+
+                .jr-sos-btn {
+                    background: #c9365a;
+                    border: none;
+                    color: #fff;
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    padding: 10px 20px;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    transition: background 0.15s;
+                }
+
+                .jr-sos-btn:hover:not(:disabled) {
+                    background: #a82848;
+                }
+
+                .jr-sos-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .jr-sos-sent {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 12px;
+                    color: #1DB954;
+                    letter-spacing: 1px;
+                    margin-top: 8px;
+                }
+
+                .jr-sos-error {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    color: #c9365a;
+                    margin-top: 8px;
+                }
             `}</style>
 
       <div className="jr-wrap">
@@ -409,6 +498,36 @@ export default function JournalResponse({ entry }) {
             </div>
 
             {/* Music Suggestion — triggered by AI distress detection */}
+
+            {/* Emergency SOS — triggered by requires_immediate_intervention */}
+            {analysis.requires_immediate_intervention && (
+              <div className="jr-sos">
+                <div className="jr-sos-header">
+                  <ShieldAlert size={16} style={{ color: '#c9365a' }} />
+                  <span className="jr-sos-label">Are you safe?</span>
+                </div>
+                {sosSent ? (
+                  <div className="jr-sos-sent">
+                    Help is on the way. A message has been sent. You are not alone.
+                  </div>
+                ) : (
+                  <>
+                    <p className="jr-sos-text">
+                      What you described sounds serious, and I want to make sure you are okay.
+                      If you feel unsafe, I can silently text for help right now. No one will know it came from this app.
+                    </p>
+                    <button
+                      className="jr-sos-btn"
+                      onClick={handleSOS}
+                      disabled={sosSending}
+                    >
+                      {sosSending ? 'Sending...' : 'Yes, please text for help'}
+                    </button>
+                    {sosError && <div className="jr-sos-error">{sosError}</div>}
+                  </>
+                )}
+              </div>
+            )}
             {analysis.suggests_music && (
               <div style={{
                 padding: '16px',

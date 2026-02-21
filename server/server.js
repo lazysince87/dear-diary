@@ -10,6 +10,7 @@ const voiceRoutes = require('./src/routes/voice');
 const patternsRoutes = require('./src/routes/patterns');
 const spotifyRoutes = require('./src/routes/spotify');
 const preferencesRoutes = require('./src/routes/preferences');
+const emergencyRoutes = require('./src/routes/emergency');
 const { errorHandler } = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/voice', voiceRoutes);
 app.use('/api/patterns', patternsRoutes);
 app.use('/api/spotify', spotifyRoutes);
 app.use('/api/preferences', preferencesRoutes);
+app.use('/api/emergency', emergencyRoutes);
 
 // Error handling
 app.use(errorHandler);

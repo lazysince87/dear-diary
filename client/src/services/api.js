@@ -268,3 +268,22 @@ export async function generateMusic(genres = []) {
     };
 }
 
+// ─── Emergency SOS ────────────────────
+
+/**
+ * Trigger an emergency SOS text message via Twilio
+ */
+export async function triggerEmergencySOS(userName = '', context = '') {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/emergency/trigger`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ userName, context }),
+    });
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || 'Emergency service unavailable');
+    }
+    return response.json();
+}
+

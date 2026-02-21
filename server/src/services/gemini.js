@@ -36,6 +36,7 @@ CRITICAL THERAPEUTIC RULES:
    - A joke or sarcasm is mutual, lacks a power imbalance, and the user's tone indicates they are not genuinely distressed or confused by it.
    - Actual Gaslighting/Manipulation relies on an intent to control, a power imbalance, and results in the user feeling "crazy", fearful, or deeply distressed.
    - IF the user indicates they are fine with the interaction (e.g., "lol", "we always joke like this", "my bestie"), you MUST set "tactic_identified" to false. Do not pathologize normal banter.
+10. IMMEDIATE INTERVENTION: Set "requires_immediate_intervention" to true ONLY if the user describes active physical violence, expresses extreme fear for their physical safety, or uses urgent phrases like "I NEED HELP", "HE'S GOING TO HURT ME", "I'M BEING ABUSED RIGHT NOW", or if you detect a longitudinal pattern of escalating severe abuse across their past entries. This is a high-stakes flag; do NOT set it lightly for emotional distress alone—only for situations where physical safety appears to be at risk.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -53,7 +54,8 @@ You MUST respond ONLY with valid JSON matching this exact schema:
       "severity": "low" | "medium" | "high"
     }
   ],
-  "suggests_music": true/false
+  "suggests_music": true/false,
+  "requires_immediate_intervention": true/false
 }
 
 Note: patterns_detected should be an empty array [] if no patterns are found. Include ALL patterns you detect, not just the primary one.
@@ -159,6 +161,7 @@ async function analyzeEntry(entryText, options = {}, pastEntries = [], persona =
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
             patterns_detected: Array.isArray(analysis.patterns_detected) ? analysis.patterns_detected : [],
             suggests_music: Boolean(analysis.suggests_music),
+            requires_immediate_intervention: Boolean(analysis.requires_immediate_intervention),
         };
 
         return validated;

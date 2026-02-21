@@ -26,6 +26,9 @@ export default function ProfilePage() {
 
     const [displayName, setDisplayName] = useState("");
     const [persona, setPersona] = useState("friend");
+    const [defaultCyclePhase, setDefaultCyclePhase] = useState(null);
+    const [averageSleepHours, setAverageSleepHours] = useState("");
+    const [averageStressLevel, setAverageStressLevel] = useState("");
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [spotifyConnected, setSpotifyConnected] = useState(false);
@@ -35,6 +38,9 @@ export default function ProfilePage() {
         if (preferences) {
             setDisplayName(preferences.displayName || "");
             setPersona(preferences.personaPreference || "friend");
+            setDefaultCyclePhase(preferences.defaultCyclePhase || null);
+            setAverageSleepHours(preferences.averageSleepHours != null ? String(preferences.averageSleepHours) : "");
+            setAverageStressLevel(preferences.averageStressLevel != null ? String(preferences.averageStressLevel) : "");
         }
     }, [preferences]);
 
@@ -48,7 +54,13 @@ export default function ProfilePage() {
         setSaving(true);
         setSaved(false);
         try {
-            await savePreferences({ displayName: displayName.trim(), personaPreference: persona });
+            await savePreferences({
+                displayName: displayName.trim(),
+                personaPreference: persona,
+                defaultCyclePhase: defaultCyclePhase || null,
+                averageSleepHours: averageSleepHours ? Number(averageSleepHours) : null,
+                averageStressLevel: averageStressLevel ? Number(averageStressLevel) : null,
+            });
             await loadPreferences();
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
@@ -284,6 +296,56 @@ export default function ProfilePage() {
                     {saving ? "Saving..." : "Save Changes"}
                 </button>
                 {saved && <div className="pf-saved">Preferences saved</div>}
+
+                <hr className="pf-divider" />
+
+                <div className="pf-section">
+                    <div className="pf-label">Health Baseline</div>
+                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '11px', color: '#9a8282', marginBottom: '12px' }}>
+                        This helps me personalize my advice around your body's rhythms
+                    </p>
+
+                    <div className="pf-label" style={{ marginTop: '8px' }}>Cycle Phase</div>
+                    <div className="pf-persona-grid" style={{ marginBottom: '16px' }}>
+                        {[
+                            { value: 'menstrual', label: 'Menstrual' },
+                            { value: 'follicular', label: 'Follicular' },
+                            { value: 'ovulatory', label: 'Ovulatory' },
+                            { value: 'luteal', label: 'Luteal (PMS)' },
+                        ].map((phase) => (
+                            <div
+                                key={phase.value}
+                                className={`pf-persona-card ${defaultCyclePhase === phase.value ? 'selected' : ''}`}
+                                onClick={() => setDefaultCyclePhase(defaultCyclePhase === phase.value ? null : phase.value)}
+                            >
+                                <div className="pf-persona-label">{phase.label}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="pf-label">Average Sleep (hours)</div>
+                    <input
+                        className="pf-input"
+                        type="number"
+                        min="0"
+                        max="24"
+                        placeholder="e.g. 7"
+                        value={averageSleepHours}
+                        onChange={(e) => setAverageSleepHours(e.target.value)}
+                        style={{ marginBottom: '16px' }}
+                    />
+
+                    <div className="pf-label">Typical Stress Level (1-10)</div>
+                    <input
+                        className="pf-input"
+                        type="number"
+                        min="1"
+                        max="10"
+                        placeholder="e.g. 5"
+                        value={averageStressLevel}
+                        onChange={(e) => setAverageStressLevel(e.target.value)}
+                    />
+                </div>
 
                 <hr className="pf-divider" />
 
