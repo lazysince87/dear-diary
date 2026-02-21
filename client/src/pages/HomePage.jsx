@@ -143,6 +143,7 @@ export default function HomePage() {
             {new Date().toLocaleDateString("en-US", {
               weekday: "long", year: "numeric", month: "long", day: "numeric",
             })} 
+            })} 
           </div> */}
           <h1 className="dd-title" style={{ color: 'white', fontFamily: "'KiwiSoda', sans-serif", fontSize: "50px" }}>Dear Diary</h1>
           {!latestEntry && entries.length === 0 && (
