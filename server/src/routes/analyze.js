@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { analyzeEntry } = require('../services/gemini');
+const { analyzeEntry: analyzeGemini } = require('../services/gemini');
+const { analyzeEntry: analyzeOllama } = require('../services/ollama');
 const Entry = require('../models/Entry');
 const { requireAuth } = require('../middleware/authMiddleware');
 
@@ -19,8 +20,31 @@ router.post('/', requireAuth, async (req, res, next) => {
             });
         }
 
-        // Analyze with Gemini
-        const analysis = await analyzeEntry(content.trim());
+        // Retrieve last 5 entries for this user to provide longitudinal RAG context
+        let pastEntries = [];
+        try {
+            pastEntries = await Entry.find({ userId: req.user.id })
+                .sort({ createdAt: -1 })
+                .limit(5)
+                .lean();
+
+            // Reverse so they are in chronological order (oldest first) for the model context
+            pastEntries = pastEntries.reverse();
+        } catch (dbError) {
+            console.error('Failed to retrieve past entries for RAG:', dbError.message);
+            // Continue — analysis should still work even without past context
+        }
+
+        // Determine which AI provider to use
+        const aiProvider = process.env.AI_PROVIDER?.toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
+        let analysis;
+
+        // Analyze with selected AI provider
+        if (aiProvider === 'ollama') {
+            analysis = await analyzeOllama(content.trim(), pastEntries);
+        } else {
+            analysis = await analyzeGemini(content.trim(), pastEntries);
+        }
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
         try {
