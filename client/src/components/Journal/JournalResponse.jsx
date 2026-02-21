@@ -7,13 +7,36 @@ export default function JournalResponse({ entry }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
 
+  // Build a full narration script from all analysis sections
+  const buildVoiceScript = () => {
+    let script = analysis.empathy_response || "";
+
+    if (analysis.tactic_identified && analysis.tactic_name) {
+      script += ` I noticed a pattern that's worth talking about: ${analysis.tactic_name}.`;
+      if (analysis.tactic_explanation) {
+        script += ` ${analysis.tactic_explanation}`;
+      }
+    }
+
+    if (analysis.actionable_advice) {
+      script += ` Here's something you can try: ${analysis.actionable_advice}`;
+    }
+
+    if (analysis.reflection_question) {
+      script += ` And here's something to sit with: ${analysis.reflection_question}`;
+    }
+
+    return script;
+  };
+
   const handlePlayVoice = async () => {
     if (isPlaying) return;
     setIsPlaying(true);
     setAudioError(false);
 
     try {
-      const result = await textToSpeech(analysis.empathy_response);
+      const voiceScript = buildVoiceScript();
+      const result = await textToSpeech(voiceScript);
 
       if (result.usedFallback) {
         // Browser TTS already played and finished
@@ -26,7 +49,14 @@ export default function JournalResponse({ entry }) {
           setIsPlaying(false);
           setAudioError(true);
         };
-        audio.play();
+        audio.play().catch(() => {
+          setIsPlaying(false);
+          setAudioError(true);
+        });
+      } else {
+        // Neither fallback nor audio URL — speech not supported or unknown error
+        setIsPlaying(false);
+        setAudioError(true);
       }
     } catch {
       setIsPlaying(false);

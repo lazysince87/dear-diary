@@ -131,6 +131,10 @@ export async function textToSpeech(text) {
             resolve({ usedFallback: true });
         };
 
+        utterance.onerror = () => {
+            resolve({ error: 'Speech synthesis failed' });
+        };
+
         window.speechSynthesis.speak(utterance);
     });
 }

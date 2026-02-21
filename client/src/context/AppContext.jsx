@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { fetchEntries } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const AppContext = createContext(null);
 
@@ -21,8 +23,34 @@ export function AppProvider({ children }) {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCovertMode, setIsCovertMode] = useState(false);
+  const { user } = useAuth();
 
-  // Add a new analyzed entry to the local state
+  // Fetch past entries from MongoDB when the user is authenticated
+  const loadEntries = useCallback(async () => {
+    if (!user) return;
+    try {
+      const data = await fetchEntries();
+      if (data.success && data.entries) {
+        // Map MongoDB entries to frontend shape
+        const mapped = data.entries.map((e) => ({
+          content: e.content,
+          analysis: e.analysis,
+          mood: e.mood || null,
+          timestamp: e.createdAt,
+          _id: e._id,
+        }));
+        setEntries(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to load past entries:", err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadEntries();
+  }, [loadEntries]);
+
+  // Add a new analyzed entry to the local state (prepend)
   const addEntry = (entry) => {
     setEntries((prev) => [entry, ...prev]);
   };
@@ -37,6 +65,7 @@ export function AppProvider({ children }) {
     entries,
     setEntries,
     addEntry,
+    loadEntries,
     isLoading,
     setIsLoading,
     isCovertMode,
@@ -54,3 +83,4 @@ export function useApp() {
   }
   return context;
 }
+
