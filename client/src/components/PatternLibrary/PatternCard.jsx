@@ -10,10 +10,10 @@ export default function PatternCard({ pattern, onClick }) {
   return (
     <button
       onClick={() => onClick?.(pattern)}
-      className="w-full text-left p-5 md:p-6 transition-all duration-300 group cursor-pointer border-0"
+      className="w-full text-left p-3 md:p-6 transition-all duration-300 group cursor-pointer border-0 animate-fade-in"
       style={{ marginBottom: "12px" }}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 bg-cream/45 rounded-lg p-5">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h3
@@ -23,13 +23,12 @@ export default function PatternCard({ pattern, onClick }) {
               {pattern.name}
             </h3>
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                pattern.severity === "high"
-                  ? "bg-rose-100 text-rose-600"
-                  : pattern.severity === "medium"
-                    ? "bg-warm-200 text-warm-500"
-                    : "bg-sage-light text-sage-dark"
-              }`}
+              className={`text-xs px-2 py-0.5 rounded-full font-medium ${pattern.severity === "high"
+                ? "bg-rose-100 text-rose-600"
+                : pattern.severity === "medium"
+                  ? "bg-warm-200 text-warm-500"
+                  : "bg-sage-light text-sage-dark"
+                }`}
             >
               {pattern.severity}
             </span>
