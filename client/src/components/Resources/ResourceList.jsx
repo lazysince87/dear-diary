@@ -44,7 +44,7 @@ const RESOURCES = [
 ];
 
 // const SAFETY_TIPS = [
-//     'Trust your instincts — if something feels wrong, it probably is.',
+//     'Trust your instincts, if something feels wrong, it probably is.',
 //     'You deserve to be treated with kindness and respect.',
 //     'Isolation is a tactic, not a reflection of your worth.',
 //     'Keeping a journal can help you see patterns over time.',
@@ -58,7 +58,7 @@ export default function ResourceList() {
             {/* Resources */}
             <div className="space-y-4 mb-8">
                 {RESOURCES.map((resource) => (
-                    <div key={resource.id} className={`glass-card p-5 md:p-6 ${resource.color}`}>
+                    <div key={resource.id} className={`p-5 md:p-6 ${resource.color}`}>
                         <div className="flex items-start gap-4">
                             <div className={`p-2.5 rounded-full bg-white/60 ${resource.iconColor}`}>
                                 {resource.icon}
@@ -98,7 +98,7 @@ export default function ResourceList() {
             </div>
 
             {/* Safety tips */}
-            {/* <div className="glass-card p-6 md:p-8">
+            {/* <div className="p-6 md:p-8">
                 <h3
                     className="text-xl font-semibold text-text-primary mb-4"
                     style={{ fontFamily: 'var(--font-serif)' }}

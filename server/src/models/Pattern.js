@@ -29,10 +29,10 @@ const patternSchema = new mongoose.Schema({
         default: 'medium',
     },
     // Icon/emoji for display
-    icon: {
-        type: String,
-        default: '⚠️',
-    },
+    // icon: {
+    //     type: String,
+    //     default: '⚠️',
+    // },
 });
 
 module.exports = mongoose.model('Pattern', patternSchema);

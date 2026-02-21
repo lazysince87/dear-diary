@@ -10,7 +10,7 @@ export default function PatternCard({ pattern, onClick }) {
   return (
     <button
       onClick={() => onClick?.(pattern)}
-      className="glass-card w-full text-left p-5 md:p-6 transition-all duration-300 group cursor-pointer border-0"
+      className="w-full text-left p-5 md:p-6 transition-all duration-300 group cursor-pointer border-0"
       style={{ marginBottom: "12px" }}
     >
       <div className="flex items-start gap-4">

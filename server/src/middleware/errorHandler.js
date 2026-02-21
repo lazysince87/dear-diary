@@ -9,7 +9,7 @@ function errorHandler(err, req, res, _next) {
 
     // Never expose stack traces or technical errors to the user
     const message = statusCode === 500
-        ? "Something went wrong on our end, but don't worry — your thoughts are safe. Please try again in a moment. 💕"
+        ? "Something went wrong on our end, but don't worry, your thoughts are safe. Please try again in a moment."
         : err.message;
 
     res.status(statusCode).json({

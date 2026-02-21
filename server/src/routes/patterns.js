@@ -9,7 +9,7 @@ const PATTERNS = [
     {
         id: 'gaslighting',
         name: 'Gaslighting',
-        icon: '',
+        // icon: '',
         severity: 'high',
         description: 'Making someone question their own reality, memory, or perception. This is one of the most damaging forms of emotional manipulation.',
         signs: [
@@ -21,7 +21,7 @@ const PATTERNS = [
         ],
         examples: [
             '"You\'re crazy, I never did that."',
-            '"Everyone agrees with me — you\'re the problem."',
+            '"Everyone agrees with me, you\'re the problem."',
             '"You\'re overreacting as usual."',
         ],
         healthyAlternative: 'In healthy relationships, both people\'s experiences and memories are respected, even during disagreements.',
@@ -29,7 +29,7 @@ const PATTERNS = [
     {
         id: 'love-bombing',
         name: 'Love Bombing',
-        icon: '',
+        // icon: '',
         severity: 'medium',
         description: 'Overwhelming someone with excessive affection, gifts, or attention early on to gain control and create emotional dependency.',
         signs: [
@@ -40,7 +40,7 @@ const PATTERNS = [
             'Pressuring quick commitment',
         ],
         examples: [
-            '"You\'re my soulmate — I knew from the moment we met."',
+            '"You\'re my soulmate, I knew from the moment we met."',
             'Texting constantly and getting upset if you don\'t reply immediately',
             'Planning your future together within weeks of meeting',
         ],
@@ -49,7 +49,7 @@ const PATTERNS = [
     {
         id: 'darvo',
         name: 'DARVO',
-        icon: '',
+        // icon: '',
         severity: 'high',
         description: 'Deny the behavior, Attack the person confronting them, Reverse the roles of Victim and Offender.',
         signs: [
@@ -69,9 +69,9 @@ const PATTERNS = [
     {
         id: 'isolation',
         name: 'Isolation',
-        icon: '',
+        // icon: '',
         severity: 'high',
-        description: 'Gradually cutting someone off from their support network — friends, family, and other relationships.',
+        description: 'Gradually cutting someone off from their support network, friends, family, and other relationships.',
         signs: [
             'Criticizing your friends or family',
             'Making you choose between them and others',
@@ -82,14 +82,14 @@ const PATTERNS = [
         examples: [
             '"Your friends are a bad influence on you."',
             '"Your family doesn\'t understand us."',
-            '"I just want you all to myself — is that so wrong?"',
+            '"I just want you all to myself, is that so wrong?"',
         ],
         healthyAlternative: 'Healthy partners encourage you to maintain and grow your relationships with others.',
     },
     {
         id: 'minimizing',
         name: 'Minimizing',
-        icon: '',
+        // icon: '',
         severity: 'medium',
         description: 'Downplaying someone\'s feelings, experiences, or concerns to make them seem unimportant.',
         signs: [
@@ -102,14 +102,14 @@ const PATTERNS = [
         examples: [
             '"Other people have it way worse than you."',
             '"It was just a joke, don\'t be so sensitive."',
-            '"That happened ages ago — why are you still upset?"',
+            '"That happened ages ago, why are you still upset?"',
         ],
         healthyAlternative: 'In healthy relationships, your feelings are acknowledged and validated, even when someone doesn\'t fully understand them.',
     },
     {
         id: 'silent-treatment',
         name: 'Silent Treatment',
-        icon: '',
+        // icon: '',
         severity: 'medium',
         description: 'Deliberately ignoring or refusing to communicate as a form of punishment or control.',
         signs: [
@@ -129,7 +129,7 @@ const PATTERNS = [
     {
         id: 'guilt-tripping',
         name: 'Guilt Tripping',
-        icon: '',
+        // icon: '',
         severity: 'medium',
         description: 'Using guilt to manipulate someone into doing what you want or to make them feel bad about their choices.',
         signs: [
@@ -141,7 +141,7 @@ const PATTERNS = [
         ],
         examples: [
             '"I guess I\'ll just sit here alone then."',
-            '"Fine, do what you want — I don\'t matter anyway."',
+            '"Fine, do what you want, I don\'t matter anyway."',
             '"I sacrificed so much for you and this is what I get?"',
         ],
         healthyAlternative: 'Healthy relationships involve expressing needs directly rather than using guilt as leverage.',
@@ -149,7 +149,7 @@ const PATTERNS = [
     {
         id: 'future-faking',
         name: 'Future Faking',
-        icon: '',
+        // icon: '',
         severity: 'medium',
         description: 'Making grand promises about the future with no real intention of following through, used to keep someone invested.',
         signs: [
@@ -162,7 +162,7 @@ const PATTERNS = [
         examples: [
             '"Next month I\'ll change, I swear."',
             '"Once we move in together, everything will be better."',
-            '"I\'m going to get help — just give me more time."',
+            '"I\'m going to get help, just give me more time."',
         ],
         healthyAlternative: 'Healthy partners follow through on commitments and address present issues rather than deflecting to future promises.',
     },

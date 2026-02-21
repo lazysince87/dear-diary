@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { analyzeJournalEntry } from "../../services/api";
+import { Mic } from 'lucide-react';
 
 const MOODS = [
   { value: "grateful", label: "Grateful" },
@@ -262,7 +263,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 <div
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                  <span className="je-char-count">{content.length} chars</span>
+                  <Mic size={20} style={{ color: '#c9b4b4' }} />
                   <button
                     type="button"
                     className="je-submit"
