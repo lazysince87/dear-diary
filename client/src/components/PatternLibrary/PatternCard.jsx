@@ -10,9 +10,10 @@ export default function PatternCard({ pattern, onClick }) {
   return (
     <button
       onClick={() => onClick?.(pattern)}
-      className="w-full text-left p-2 md:p-2 transition-all duration-300 group cursor-pointer border-0 animate-fade-in"
+      className="w-full text-left p-3 md:p-6 transition-all duration-300 group cursor-pointer border-0 animate-fade-in"
+      style={{ marginBottom: "12px" }}
     >
-      <div className="flex items-start gap-4 bg-cream/55 rounded-lg p-5">
+      <div className="flex items-start gap-4 bg-cream/45 rounded-lg p-5">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h3
