@@ -11,8 +11,18 @@ export default function Header({ onLogoutClick }) {
   const getTitleColor = () => {
     if (location.pathname === '/patterns') return '#4a7c59';
     if (location.pathname === '/resources') return '#7b5ea7';
-    if (location.pathname === '/profile') return '#4a6fa5';
+    if (location.pathname === '/profile') return '#6a9fd8';
     return '#c9748a';
+  };
+
+  const getNavStyle = (path) => {
+    const colors = {
+      '/': { color: '#c9748a', border: '#c9748a' },
+      '/patterns': { color: '#4a7c59', border: '#4a7c59' },
+      '/resources': { color: '#7b5ea7', border: '#7b5ea7' },
+      '/profile': { color: '#6a9fd8', border: '#6a9fd8' },
+    };
+    return colors[path] || colors['/'];
   };
 
   return (
@@ -38,9 +48,11 @@ export default function Header({ onLogoutClick }) {
         <nav className="flex items-center gap-1">
           <NavLink
             to="/"
+            end
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
+            style={({ isActive }) => isActive ? { color: getNavStyle('/').color, borderBottomColor: getNavStyle('/').border } : {}}
           >
             <BookHeart size={16} />
             <span className="hidden sm:inline">Journal</span>
@@ -51,6 +63,7 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
+            style={({ isActive }) => isActive ? { color: getNavStyle('/patterns').color, borderBottomColor: getNavStyle('/patterns').border } : {}}
           >
             <Library size={16} />
             <span className="hidden sm:inline">Patterns</span>
@@ -61,6 +74,7 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
+            style={({ isActive }) => isActive ? { color: getNavStyle('/resources').color, borderBottomColor: getNavStyle('/resources').border } : {}}
           >
             <Heart size={16} />
             <span className="hidden sm:inline">Resources</span>
@@ -71,6 +85,7 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
+            style={({ isActive }) => isActive ? { color: getNavStyle('/profile').color, borderBottomColor: getNavStyle('/profile').border } : {}}
           >
             <User size={16} />
             <span className="hidden sm:inline">Profile</span>

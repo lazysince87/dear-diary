@@ -3,10 +3,10 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { X, Check } from "lucide-react";
 import Header from "./Header";
 import { useAuth } from "../../contexts/AuthContext";
-import cloudsImg from "../../assets/clouds.png";
-import greenCloudsImg from "../../assets/green-clouds.png";
-import purpleCloudsImg from "../../assets/purple-clouds.png";
-import blueCloudsImg from "../../assets/blue-clouds.png";
+import cloudsImg from "../../assets/backgrounds/clouds.png";
+import greenCloudsImg from "../../assets/backgrounds/green-clouds.png";
+import purpleCloudsImg from "../../assets/backgrounds/purple-clouds.png";
+import blueCloudsImg from "../../assets/backgrounds/blue-clouds.png";
 
 export default function Layout() {
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);

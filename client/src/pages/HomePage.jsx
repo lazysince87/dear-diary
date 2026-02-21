@@ -4,8 +4,8 @@ import { Draggable } from "gsap/draggable";
 import JournalEntry from "../components/Journal/JournalEntry";
 import JournalResponse from "../components/Journal/JournalResponse";
 import { useApp } from "../context/AppContext";
-import duckImg from "../assets/duck.png";
-import starImg from "../assets/star.png";
+import duckImg from "../assets/animations/duck.png";
+import starImg from "../assets/animations/star.png";
 
 gsap.registerPlugin(Draggable);
 

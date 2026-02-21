@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Book, ArrowLeft } from 'lucide-react';
+import cloudsImg from '../assets/backgrounds/clouds.png';
 
 export default function LoginPage() {
     const { signIn, signUp, signInWithGoogle } = useAuth();
@@ -57,7 +58,7 @@ export default function LoginPage() {
 
     if (confirmationSent) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#fffaf7' }}>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundImage: `url(${cloudsImg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
                     .lp-book {
@@ -132,7 +133,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#fffaf7' }}>
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundImage: `url(${cloudsImg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
                 

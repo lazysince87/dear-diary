@@ -19,6 +19,8 @@ export default function PatternDetail({ pattern, onClose }) {
           border: "1px solid #e8d5c4",
           boxShadow: "6px 6px 0 #e0c4c4",
           borderRadius: "16px",
+          scrollbarColor: "#4a7c59 #e8f5e8",
+          scrollbarWidth: "thin",
         }}
       >
         {/* Close button */}

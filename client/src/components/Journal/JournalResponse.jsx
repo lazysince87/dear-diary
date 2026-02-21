@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
-import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
+import {
+  textToSpeech,
+  generateMusic,
+  getSpotifyStatus,
+} from "../../services/api";
 
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
@@ -290,8 +294,17 @@ export default function JournalResponse({ entry }) {
             {analysis.tactic_identified && analysis.tactic_name && (
               <div className="jr-tactic">
                 <div className="jr-tactic-header">
-                  <AlertTriangle size={14} style={{ color: '#c9748a', flexShrink: 0, marginTop: '2px' }} />
-                  <span className="jr-tactic-name">Detected Pattern: {analysis.tactic_name}</span>
+                  <AlertTriangle
+                    size={14}
+                    style={{
+                      color: "#c9748a",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  />
+                  <span className="jr-tactic-name">
+                    Detected Pattern: {analysis.tactic_name}
+                  </span>
                   {analysis.confidence > 0 && (
                     <span className="jr-confidence">
                       {Math.round(analysis.confidence * 100)}% confidence
@@ -320,86 +333,117 @@ export default function JournalResponse({ entry }) {
             )}
 
             {/* Patterns Detected with Severity */}
-            {analysis.patterns_detected && analysis.patterns_detected.length > 0 && (
-              <div style={{
-                border: '1px solid #e8d5c4',
-                borderLeft: '3px solid #c9748a',
-                padding: '12px 14px',
-                marginBottom: '16px',
-                background: '#fff9f9',
-                borderRadius: '2px',
-              }}>
-                <div style={{
-                  fontFamily: "'Pixelify Sans', sans-serif",
-                  fontSize: '10px',
-                  letterSpacing: '2px',
-                  textTransform: 'uppercase',
-                  color: '#a67b7b',
-                  marginBottom: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}>
-                  <AlertTriangle size={12} />
-                  Patterns Detected
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {analysis.patterns_detected.map((pattern, i) => (
-                    <div key={i} style={{
-                      padding: '10px 12px',
-                      background: 'rgba(255,255,255,0.7)',
-                      border: '1px solid #f0e0d8',
-                      borderRadius: '4px',
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{
-                          fontFamily: "'Pixelify Sans', sans-serif",
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          color: '#3d2c2c',
-                          letterSpacing: '1px',
-                        }}>
-                          {pattern.name}
-                        </span>
-                        <span style={{
-                          fontFamily: "'Pixelify Sans', sans-serif",
-                          fontSize: '9px',
-                          letterSpacing: '1px',
-                          textTransform: 'uppercase',
-                          padding: '2px 8px',
-                          borderRadius: '999px',
-                          fontWeight: '600',
-                          ...(pattern.severity === 'high' ? {
-                            background: '#ffe0e0',
-                            color: '#c9365a',
-                            border: '1px solid #ffb3b3',
-                          } : pattern.severity === 'medium' ? {
-                            background: '#fff3e0',
-                            color: '#b8956a',
-                            border: '1px solid #f0dcc0',
-                          } : {
-                            background: '#e8f5e8',
-                            color: '#5a7a52',
-                            border: '1px solid #c0dcc0',
-                          }),
-                        }}>
-                          {pattern.severity}
-                        </span>
+            {analysis.patterns_detected &&
+              analysis.patterns_detected.length > 0 && (
+                <div
+                  style={{
+                    border: "1px solid #e8d5c4",
+                    borderLeft: "3px solid #c9748a",
+                    padding: "12px 14px",
+                    marginBottom: "16px",
+                    background: "#fff9f9",
+                    borderRadius: "2px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "'Pixelify Sans', sans-serif",
+                      fontSize: "10px",
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      color: "#a67b7b",
+                      marginBottom: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <AlertTriangle size={12} />
+                    Patterns Detected
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+                    {analysis.patterns_detected.map((pattern, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(255,255,255,0.7)",
+                          border: "1px solid #f0e0d8",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: "'Pixelify Sans', sans-serif",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              color: "#3d2c2c",
+                              letterSpacing: "1px",
+                            }}
+                          >
+                            {pattern.name}
+                          </span>
+                          <span
+                            style={{
+                              fontFamily: "'Pixelify Sans', sans-serif",
+                              fontSize: "9px",
+                              letterSpacing: "1px",
+                              textTransform: "uppercase",
+                              padding: "2px 8px",
+                              borderRadius: "999px",
+                              fontWeight: "600",
+                              ...(pattern.severity === "high"
+                                ? {
+                                    background: "#ffe0e0",
+                                    color: "#c9365a",
+                                    border: "1px solid #ffb3b3",
+                                  }
+                                : pattern.severity === "medium"
+                                  ? {
+                                      background: "#fff3e0",
+                                      color: "#b8956a",
+                                      border: "1px solid #f0dcc0",
+                                    }
+                                  : {
+                                      background: "#e8f5e8",
+                                      color: "#5a7a52",
+                                      border: "1px solid #c0dcc0",
+                                    }),
+                            }}
+                          >
+                            {pattern.severity}
+                          </span>
+                        </div>
+                        <p
+                          style={{
+                            fontFamily: "'Pixelify Sans', sans-serif",
+                            fontSize: "12px",
+                            color: "#6b5454",
+                            lineHeight: "1.7",
+                            margin: 0,
+                          }}
+                        >
+                          {pattern.explanation}
+                        </p>
                       </div>
-                      <p style={{
-                        fontFamily: "'Pixelify Sans', sans-serif",
-                        fontSize: '12px',
-                        color: '#6b5454',
-                        lineHeight: '1.7',
-                        margin: 0,
-                      }}>
-                        {pattern.explanation}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             <div className="jr-reflection">
               <div className="jr-reflection-label">Something to sit with</div>
@@ -410,31 +454,38 @@ export default function JournalResponse({ entry }) {
 
             {/* Music Suggestion — triggered by AI distress detection */}
             {analysis.suggests_music && (
-              <div style={{
-                padding: '16px',
-                border: '1px solid #e8d5c4',
-                borderRadius: '2px',
-                background: '#fdf6f0',
-                marginTop: '12px',
-              }}>
-                <p style={{
-                  fontFamily: "'Pixelify Sans', sans-serif",
-                  fontSize: '12px',
-                  color: '#6b5454',
-                  marginBottom: '10px',
-                  lineHeight: '1.6',
-                }}>
-                  Would you like to listen to some of your favorite songs to feel better?
+              <div
+                style={{
+                  padding: "16px",
+                  border: "1px solid #e8d5c4",
+                  borderRadius: "2px",
+                  background: "#fdf6f0",
+                  marginTop: "12px",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "'Pixelify Sans', sans-serif",
+                    fontSize: "12px",
+                    color: "#6b5454",
+                    marginBottom: "10px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  Would you like to listen to some of your favorite songs to
+                  feel better?
                 </p>
 
                 {currentTrack && isMusicPlaying && (
-                  <p style={{
-                    fontFamily: "'Pixelify Sans', sans-serif",
-                    fontSize: '10px',
-                    color: '#9a8282',
-                    marginBottom: '8px',
-                    letterSpacing: '0.5px',
-                  }}>
+                  <p
+                    style={{
+                      fontFamily: "'Pixelify Sans', sans-serif",
+                      fontSize: "10px",
+                      color: "#9a8282",
+                      marginBottom: "8px",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
                     Now playing: {currentTrack.name} - {currentTrack.artist}
                   </p>
                 )}
@@ -454,11 +505,15 @@ export default function JournalResponse({ entry }) {
                       const spotifyData = await getSpotifyStatus();
 
                       if (spotifyData.musicTaste?.topTracks?.length > 0) {
-                        const tracks = spotifyData.musicTaste.topTracks.filter(t => t.previewUrl);
+                        const tracks = spotifyData.musicTaste.topTracks.filter(
+                          (t) => t.previewUrl,
+                        );
 
                         if (tracks.length > 0) {
                           // Shuffle and play tracks as a playlist
-                          const shuffled = [...tracks].sort(() => Math.random() - 0.5);
+                          const shuffled = [...tracks].sort(
+                            () => Math.random() - 0.5,
+                          );
                           let trackIndex = 0;
 
                           const playTrack = (index) => {
@@ -469,8 +524,12 @@ export default function JournalResponse({ entry }) {
                             audio.onended = () => playTrack(index + 1);
                             audio.onerror = () => {
                               // skip broken previews
-                              if (index + 1 < shuffled.length) playTrack(index + 1);
-                              else { setIsMusicPlaying(false); setCurrentTrack(null); }
+                              if (index + 1 < shuffled.length)
+                                playTrack(index + 1);
+                              else {
+                                setIsMusicPlaying(false);
+                                setCurrentTrack(null);
+                              }
                             };
                             audio.play().catch(() => setIsMusicPlaying(false));
                             setMusicAudio(audio);
@@ -497,24 +556,24 @@ export default function JournalResponse({ entry }) {
                     }
                   }}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: 'none',
-                    border: '1px solid #c9a0a0',
-                    borderRadius: '2px',
-                    cursor: 'pointer',
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    background: "none",
+                    border: "1px solid #c9a0a0",
+                    borderRadius: "2px",
+                    cursor: "pointer",
                     fontFamily: "'Pixelify Sans', sans-serif",
-                    fontSize: '11px',
-                    letterSpacing: '1.5px',
-                    textTransform: 'uppercase',
-                    color: '#6b5454',
-                    padding: '8px 14px',
-                    transition: 'all 0.15s',
+                    fontSize: "11px",
+                    letterSpacing: "1.5px",
+                    textTransform: "uppercase",
+                    color: "#6b5454",
+                    padding: "8px 14px",
+                    transition: "all 0.15s",
                   }}
                 >
                   <Music size={14} />
-                  {isMusicPlaying ? 'Stop' : 'Play Music'}
+                  {isMusicPlaying ? "Stop" : "Play Music"}
                 </button>
               </div>
             )}

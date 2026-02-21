@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import gsap from "gsap";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../contexts/AuthContext";
 import { savePreferences, getSpotifyLoginUrl, getSpotifyStatus } from "../services/api";
+import boxDuckImg from "../assets/animations/box-duck.png";
 
 const PERSONAS = [
     {
@@ -30,6 +32,30 @@ export default function ProfilePage() {
     const [saved, setSaved] = useState(false);
     const [spotifyConnected, setSpotifyConnected] = useState(false);
     const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+    const duckRef = useRef(null);
+
+    useEffect(() => {
+        if (duckRef.current) {
+            gsap.fromTo(
+                duckRef.current,
+                { y: -800, opacity: 1 },
+                {
+                    y: 0,
+                    duration: 6,
+                    ease: "bounce.out",
+                    onComplete: () => {
+                        gsap.to(duckRef.current, {
+                            y: -10,
+                            duration: 1.8,
+                            ease: "sine.inOut",
+                            repeat: -1,
+                            yoyo: true,
+                        });
+                    },
+                },
+            );
+        }
+    }, []);
 
     useEffect(() => {
         if (preferences) {
@@ -123,7 +149,7 @@ export default function ProfilePage() {
         }
 
         .pf-input:focus {
-          border-color: #c9a0a0;
+          border-color: #6a9fd8;
         }
 
         .pf-persona-grid {
@@ -143,14 +169,14 @@ export default function ProfilePage() {
         }
 
         .pf-persona-card:hover {
-          border-color: #c9a0a0;
-          background: #fdf6f0;
+          border-color: #6a9fd8;
+          background: #f0f5ff;
         }
 
         .pf-persona-card.selected {
-          border-color: #c9748a;
-          background: #fff5f5;
-          box-shadow: 0 0 0 1px #c9748a;
+          border-color: #6a9fd8;
+          background: #f0f5ff;
+          box-shadow: 0 0 0 1px #6a9fd8;
         }
 
         .pf-persona-label {
@@ -171,7 +197,7 @@ export default function ProfilePage() {
         .pf-persona-voice {
           font-family: 'Pixelify Sans', sans-serif;
           font-size: 9px;
-          color: #c9748a;
+          color: #6a9fd8;
           margin-top: 6px;
           letter-spacing: 1px;
           text-transform: uppercase;
@@ -180,9 +206,9 @@ export default function ProfilePage() {
         .pf-btn {
           width: 100%;
           padding: 12px;
-          border: 1px solid #c9a0a0;
+          border: 1px solid #6a9fd8;
           background: transparent;
-          color: #6b5454;
+          color: #4a6fa5;
           font-family: 'Pixelify Sans', sans-serif;
           font-size: 12px;
           letter-spacing: 2px;
@@ -193,9 +219,9 @@ export default function ProfilePage() {
         }
 
         .pf-btn:hover:not(:disabled) {
-          background: #f5ebe0;
-          border-color: #a67b7b;
-          color: #3d2c2c;
+          background: #f0f5ff;
+          border-color: #4a6fa5;
+          color: #3d5a80;
         }
 
         .pf-btn:disabled {
@@ -308,6 +334,20 @@ export default function ProfilePage() {
                     Signed in as {user?.email}
                 </div>
             </div>
+            <img
+                ref={duckRef}
+                src={boxDuckImg}
+                alt="box duck"
+                style={{
+                    position: "fixed",
+                    right: "30px",
+                    bottom: "50px",
+                    top: "auto",
+                    width: "230px",
+                    zIndex: 50,
+                    pointerEvents: "none",
+                }}
+            />
         </>
     );
 }

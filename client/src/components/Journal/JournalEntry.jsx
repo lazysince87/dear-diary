@@ -88,7 +88,6 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
                     overflow: hidden;
                     width: 100%;
-                    max-width: 900px;
                     margin: 0 auto;
                 }
 
