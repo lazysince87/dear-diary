@@ -37,7 +37,6 @@ router.post('/', requireAuth, async (req, res, next) => {
 
         // Determine which AI provider to use
         const aiProvider = process.env.AI_PROVIDER?.toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
-        let analysis;
 
         console.log(`[AI Provider]: using ${aiProvider.toUpperCase()}`);
 
@@ -47,6 +46,9 @@ router.post('/', requireAuth, async (req, res, next) => {
         } else {
             analysis = await analyzeGemini(content.trim(), pastEntries);
         }
+        // Analyze with Gemini
+        console.log('[DEBUG] mood received:', mood);
+        const analysis = await analyzeEntry(content.trim(), mood);
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
         try {
