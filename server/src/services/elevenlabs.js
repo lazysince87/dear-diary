@@ -21,7 +21,7 @@ async function textToSpeech(text) {
             },
             data: {
                 text,
-                model_id: 'eleven_monolingual_v1',
+                model_id: 'eleven_multilingual_v2',
                 voice_settings: {
                     stability: 0.75,       // Higher = more consistent, calmer
                     similarity_boost: 0.75,
@@ -30,24 +30,35 @@ async function textToSpeech(text) {
                 },
             },
             responseType: 'arraybuffer',
+            timeout: 15000, // 15s timeout
         });
 
         return Buffer.from(response.data);
     } catch (error) {
-        console.error('ElevenLabs TTS error:', error.response?.data || error.message);
+        // Parse ElevenLabs error response for better logging
+        let errorMessage = error.message;
+        if (error.response?.data) {
+            try {
+                const errorBody = JSON.parse(Buffer.from(error.response.data).toString('utf-8'));
+                errorMessage = `${errorBody.detail?.type || 'unknown'}: ${errorBody.detail?.message || JSON.stringify(errorBody.detail)}`;
+                console.error('ElevenLabs TTS error:', errorMessage);
+
+                // If it's a payment/quota issue, throw a specific error
+                if (errorBody.detail?.type === 'payment_required' || errorBody.detail?.type === 'quota_exceeded') {
+                    const err = new Error('ElevenLabs quota exceeded or payment required');
+                    err.code = 'ELEVENLABS_QUOTA';
+                    throw err;
+                }
+            } catch (parseErr) {
+                if (parseErr.code === 'ELEVENLABS_QUOTA') throw parseErr;
+                console.error('ElevenLabs TTS error (raw):', error.response?.status, errorMessage);
+            }
+        } else {
+            console.error('ElevenLabs TTS error:', errorMessage);
+        }
+
         throw new Error('Voice synthesis failed');
     }
 }
 
-/**
- * Speech to text using ElevenLabs (or fallback to browser Web Speech API)
- * Note: ElevenLabs STT is handled client-side via their SDK or browser API.
- * This function is a placeholder for server-side processing if needed.
- */
-async function speechToText(audioBuffer) {
-    // For MVP, STT is handled on the client via Web Speech API
-    // This is reserved for future server-side processing
-    throw new Error('STT is handled client-side for MVP');
-}
-
-module.exports = { textToSpeech, speechToText };
+module.exports = { textToSpeech };

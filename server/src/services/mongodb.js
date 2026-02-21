@@ -11,12 +11,20 @@ async function connectDB() {
     }
 
     try {
+        console.log('Connecting to MongoDB Atlas...');
         await mongoose.connect(uri, {
             dbName: 'rosie',
+            serverSelectionTimeoutMS: 10000, // 10s timeout instead of 30s default
         });
-        console.log('🗄️  Connected to MongoDB Atlas');
+        console.log('Connected to MongoDB Atlas (database: rosie)');
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        console.error('MongoDB connection error:', error.message);
+        console.error('');
+        console.error('Common fixes:');
+        console.error('  1. Whitelist your IP at: https://cloud.mongodb.com -> Network Access');
+        console.error('  2. Check that MONGODB_URI in .env is correct');
+        console.error('  3. Check that the database user password is correct');
+        console.error('');
         throw error;
     }
 }

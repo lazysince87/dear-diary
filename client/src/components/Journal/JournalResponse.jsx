@@ -7,24 +7,32 @@ export default function JournalResponse({ entry }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [setAudioError] = useState(false);
 
-  const handlePlayVoice = async () => {
-    if (isPlaying) return;
-    setIsPlaying(true);
-    setAudioError(false);
-    try {
-      const audioUrl = await textToSpeech(analysis.empathy_response);
-      const audio = new Audio(audioUrl);
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => {
-        setIsPlaying(false);
-        setAudioError(true);
-      };
-      audio.play();
-    } catch {
-      setIsPlaying(false);
-      setAudioError(true);
-    }
-  };
+    const handlePlayVoice = async () => {
+        if (isPlaying) return;
+        setIsPlaying(true);
+        setAudioError(false);
+
+        try {
+            const result = await textToSpeech(analysis.empathy_response);
+
+            if (result.usedFallback) {
+                // Browser TTS already played and finished
+                setIsPlaying(false);
+            } else if (result.audioUrl) {
+                // ElevenLabs returned audio — play it
+                const audio = new Audio(result.audioUrl);
+                audio.onended = () => setIsPlaying(false);
+                audio.onerror = () => {
+                    setIsPlaying(false);
+                    setAudioError(true);
+                };
+                audio.play();
+            }
+        } catch {
+            setIsPlaying(false);
+            setAudioError(true);
+        }
+    };
 
   const time = new Date(timestamp).toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -256,9 +264,24 @@ export default function JournalResponse({ entry }) {
                     </span>
                   )}
                 </div>
-                <p className="jr-tactic-explanation">
+                <p className="jr-tactic-explanation mb-4">
                   {analysis.tactic_explanation}
                 </p>
+
+                        {/* Actionable Advice & Therapeutic Feedback */}
+                        {analysis.actionable_advice && (
+                            <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200/40 animate-fade-in delay-300">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Sparkles size={16} className="text-indigo-500" />
+                                    <h4 className="font-semibold text-indigo-700 text-sm">
+                                        Gentle Guidance
+                                    </h4>
+                                </div>
+                                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-wrap">
+                                    {analysis.actionable_advice}
+                                </p>
+                            </div>
+                        )}
               </div>
             )}
             <div className="jr-reflection">

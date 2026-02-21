@@ -23,7 +23,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: '🌹 Rosie is running' });
+    res.json({ status: 'ok', message: 'Rosie is running' });
 });
 
 // Routes
@@ -46,7 +46,7 @@ const startServer = async () => {
         console.error('Failed to start server:', error);
         // Start without DB in development for faster iteration
         if (process.env.NODE_ENV === 'development') {
-            console.log('⚠️  Starting without MongoDB — some features unavailable');
+            console.log('Starting without MongoDB — some features unavailable');
             app.listen(PORT, () => {
                 console.log(`Dear Diary server running on port ${PORT} (no DB)`);
             });

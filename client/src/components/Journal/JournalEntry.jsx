@@ -1,49 +1,93 @@
-import { useState } from "react";
-import { useApp } from "../../context/AppContext";
-import { analyzeJournalEntry } from "../../services/api";
-import { Mic } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Send, Mic, MicOff, Loader2 } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { analyzeJournalEntry, createSpeechRecognition } from '../../services/api';
 
 const MOODS = [
-  { value: "grateful", label: "Grateful" },
-  { value: "hopeful", label: "Hopeful" },
-  { value: "confused", label: "Confused" },
-  { value: "sad", label: "Sad" },
-  { value: "anxious", label: "Anxious" },
-  { value: "angry", label: "Angry" },
-  { value: "numb", label: "Numb" },
+    { value: 'grateful', label: 'Grateful' },
+    { value: 'hopeful', label: 'Hopeful' },
+    { value: 'confused', label: 'Confused' },
+    { value: 'sad', label: 'Sad' },
+    { value: 'anxious', label: 'Anxious' },
+    { value: 'angry', label: 'Angry' },
+    { value: 'numb', label: 'Numb' },
 ];
 
 export default function JournalEntry({ onAnalysisComplete }) {
-  const { sessionId, isLoading, setIsLoading } = useApp();
-  const [content, setContent] = useState("");
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [error, setError] = useState(null);
+    const { sessionId, isLoading, setIsLoading } = useApp();
+    const [content, setContent] = useState('');
+    const [selectedMood, setSelectedMood] = useState(null);
+    const [error, setError] = useState(null);
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!content.trim() || isLoading) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await analyzeJournalEntry(
-        content.trim(),
-        sessionId,
-        selectedMood,
-      );
-      onAnalysisComplete({
-        content: content.trim(),
-        mood: selectedMood,
-        analysis: result.analysis,
-        timestamp: new Date().toISOString(),
-      });
-      setContent("");
-      setSelectedMood(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!content.trim() || isLoading) return;
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const result = await analyzeJournalEntry(content.trim(), sessionId, selectedMood);
+            onAnalysisComplete({
+                content: content.trim(),
+                mood: selectedMood,
+                analysis: result.analysis,
+                timestamp: new Date().toISOString(),
+            });
+            setContent('');
+            setSelectedMood(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const toggleVoiceInput = useCallback(() => {
+        if (isListening) {
+            // Stop listening
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+
+        // Start listening
+        setError(null);
+        const recognition = createSpeechRecognition({
+            onResult: (transcript) => {
+                setContent(transcript);
+            },
+            onInterim: (transcript) => {
+                setContent(transcript);
+            },
+            onError: (errorMsg) => {
+                setError(errorMsg);
+                setIsListening(false);
+            },
+            onEnd: () => {
+                setIsListening(false);
+            },
+        });
+
+        if (!recognition.supported) {
+            setError('Voice input is not supported in this browser. Please try Chrome or Edge.');
+            return;
+        }
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsListening(true);
+    }, [isListening]);
+
+    // Get current date in a cozy format
+    const today = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
 
   return (
     <>
@@ -249,42 +293,70 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 ))}
               </div>
 
-              <textarea
-                className="je-textarea"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write about what happened..."
-                disabled={isLoading}
-                rows={8}
-              />
+                {/* Journal textarea */}
+                <form onSubmit={handleSubmit}>
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="Write about your day, paste a conversation, or share what's on your mind. This is your safe space..."
+                        className="journal-textarea"
+                        disabled={isLoading}
+                        rows={6}
+                    />
 
-              {error && <div className="je-error">{error}</div>}
-              <div className="je-footer">
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
-                >
-                  <Mic size={20} style={{ color: '#c9b4b4' }} />
-                  <button
-                    type="button"
-                    className="je-submit"
-                    style={{ padding: "4px 12px" }}
-                    onClick={() => {
-                      /* TODO: voice input */
-                    }}
-                  >
-                    Speak
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  className="je-submit"
-                  disabled={!content.trim() || isLoading}
-                >
-                  {isLoading ? "Reading..." : "Reflect"}
-                </button>
-              </div>
+                    {/* Listening indicator */}
+                    {isListening && (
+                        <div className="mt-2 flex items-center gap-2 text-rose-500 text-sm animate-pulse-soft">
+                            <MicOff size={14} />
+                            <span>Listening... tap the mic again to stop</span>
+                        </div>
+                    )}
+
+                    {/* Error message */}
+                    {error && (
+                        <div className="mt-3 p-3 rounded-xl bg-rose-50 text-rose-600 text-sm animate-fade-in">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center gap-2">
+                            {/* Voice input button */}
+                            <button
+                                type="button"
+                                className={`btn-secondary flex items-center gap-1.5 !px-3 !py-2 ${isListening ? '!bg-rose-100 !border-rose-300 !text-rose-600' : ''}`}
+                                title={isListening ? 'Stop listening' : 'Speak your thoughts'}
+                                onClick={toggleVoiceInput}
+                                disabled={isLoading}
+                            >
+                                {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                                <span className="hidden sm:inline text-sm">
+                                    {isListening ? 'Stop' : 'Speak'}
+                                </span>
+                            </button>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn-primary flex items-center gap-2"
+                            disabled={!content.trim() || isLoading}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" />
+                                    <span>Listening...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Send size={16} />
+                                    <span>Share with Rosie</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
         </div>
       </form>
     </>
