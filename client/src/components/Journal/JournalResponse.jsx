@@ -89,9 +89,24 @@ export default function JournalResponse({ entry }) {
                                 </span>
                             )}
                         </div>
-                        <p className="text-text-secondary text-sm leading-relaxed">
+                        <p className="text-text-secondary text-sm leading-relaxed mb-4">
                             {analysis.tactic_explanation}
                         </p>
+
+                        {/* Actionable Advice & Therapeutic Feedback */}
+                        {analysis.actionable_advice && (
+                            <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200/40 animate-fade-in delay-300">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Sparkles size={16} className="text-indigo-500" />
+                                    <h4 className="font-semibold text-indigo-700 text-sm">
+                                        Gentle Guidance
+                                    </h4>
+                                </div>
+                                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-wrap">
+                                    {analysis.actionable_advice}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 )}
 
