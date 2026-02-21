@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Book } from 'lucide-react';
+import { Loader2, Book, ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
     const { signIn, signUp, signInWithGoogle } = useAuth();
@@ -341,6 +341,16 @@ export default function LoginPage() {
                     </div>
 
                     <div className="lp-content">
+                        {/* Back Button */}
+                        <button
+                            onClick={() => navigate('/')}
+                            className="flex items-center gap-1.5 text-text-muted hover:text-text-secondary transition-colors mb-6"
+                            style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase' }}
+                        >
+                            <ArrowLeft size={14} />
+                            <span>Return</span>
+                        </button>
+
                         {/* Header */}
                         <div className="text-center">
                             <div className="text-5xl mb-4 animate-float">📒</div>
