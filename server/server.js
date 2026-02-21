@@ -40,7 +40,7 @@ const startServer = async () => {
     try {
         await connectDB();
         app.listen(PORT, () => {
-            console.log(`Rosie server running on port ${PORT}`);
+            console.log(`Dear Diary server running on port ${PORT}`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
@@ -48,7 +48,7 @@ const startServer = async () => {
         if (process.env.NODE_ENV === 'development') {
             console.log('Starting without MongoDB — some features unavailable');
             app.listen(PORT, () => {
-                console.log(`Rosie server running on port ${PORT} (no DB)`);
+                console.log(`Dear Diary server running on port ${PORT} (no DB)`);
             });
         }
     }
