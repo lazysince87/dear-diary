@@ -151,12 +151,15 @@ export default function HomePage() {
           margin-bottom: 10px;
           cursor: pointer;
           border: 1px solid #4a2535;
-          transition: border-color 0.15s, background 0.15s;
+          transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .dd-entry-card:hover {
           border-color: #c9748a;
-          background: rgba(242, 196, 206, 0.04);
+          background: rgba(253, 246, 240, 0.4);
+          transform: translateY(-2px) scale(1.015);
+          box-shadow: 0 4px 12px rgba(74, 37, 53, 0.08);
+          z-index: 10;
         }
 
         .dd-entry-card::before {
