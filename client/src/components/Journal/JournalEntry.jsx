@@ -96,7 +96,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
 
                 .je-spine {
                     width: 28px;
-                    background: #e0c4c4;
+                    background: #fcf6f9;
                     border-right: 1px solid #d4b096;
                     flex-shrink: 0;
                     display: flex;

@@ -142,9 +142,9 @@ export default function HomePage() {
           {/* <div className="dd-date">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long", year: "numeric", month: "long", day: "numeric",
-            })}
+            })} 
           </div> */}
-          <h1 className="dd-title">Dear Diary</h1>
+          <h1 className="dd-title" style={{ color: 'white' }}>Dear Diary</h1>
           {!latestEntry && entries.length === 0 && (
             <p className="dd-subtitle">
               Your safe space to reflect and understand your relationships.
