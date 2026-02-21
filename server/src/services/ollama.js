@@ -1,7 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
+// The system prompt is kept identical to Gemini to ensure consistent behavioral framing
 const SYSTEM_PROMPT = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
 
 Your job: Analyze the user's journal entry or pasted conversation for emotional manipulation patterns, provide deep emotional validation, AND offer genuine, actionable therapeutic advice.
@@ -41,23 +40,13 @@ You MUST respond ONLY with valid JSON matching this exact schema:
 Do NOT include any text before or after the JSON. Only valid JSON.`;
 
 /**
- * Analyze a journal entry for manipulation patterns using Gemini
+ * Analyze a journal entry for manipulation patterns using a local Ollama instance
  * @param {string} entryText - The journal entry or conversation to analyze
  * @param {Array} pastEntries - Previous journal entries for longitudinal context (RAG)
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText, mood = null, pastEntries = []) {
+async function analyzeEntry(entryText, pastEntries = []) {
     try {
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',
-            generationConfig: {
-                temperature: 0.7,
-                topP: 0.9,
-                maxOutputTokens: 8192,
-                responseMimeType: 'application/json',
-            },
-        });
-
         let contextBlock = "";
 
         if (pastEntries && pastEntries.length > 0) {
@@ -66,15 +55,32 @@ async function analyzeEntry(entryText, mood = null, pastEntries = []) {
                 contextBlock += `--- Past Entry ${i + 1} (${entry.createdAt}) ---\n${entry.content}\n`;
             });
         }
-        let prompt = `${SYSTEM_PROMPT}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
-        if (mood) {
-            prompt += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast (e.g., "You said you're feeling ${mood}, but your words sound upbeat — sometimes we mask how we really feel"). Always trust and center the mood they selected.`;
+
+        const prompt = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE NOW:\n"""\n${entryText}\n"""`;
+
+        const response = await fetch('http://127.0.0.1:11434/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'llama3',
+                prompt: prompt,
+                stream: false,
+                format: 'json',
+                options: {
+                    temperature: 0.7,
+                    top_p: 0.9,
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama API error: ${response.status}`);
         }
 
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        // Strip markdown backticks if Gemini includes them
-        let text = response.text().trim();
+        const result = await response.json();
+
+        let text = result.response.trim();
+        // Sometimes LLMs still wrap JSON in markdown even when format json is requested
         if (text.startsWith('\`\`\`json')) {
             text = text.substring(7);
             if (text.endsWith('\`\`\`')) {
@@ -103,7 +109,7 @@ async function analyzeEntry(entryText, mood = null, pastEntries = []) {
 
         return validated;
     } catch (error) {
-        console.error('Gemini analysis error:', error);
+        console.error('Ollama analysis error:', error);
 
         // Graceful fallback — always be supportive
         return {
