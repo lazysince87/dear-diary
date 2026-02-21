@@ -23,10 +23,29 @@ const entrySchema = new mongoose.Schema({
         required: true,
         index: true,
     },
-    // Mood tag (optional, user-selected)
     mood: {
         type: String,
         enum: ['grateful', 'confused', 'sad', 'anxious', 'hopeful', 'angry', 'numb', null],
+        default: null,
+    },
+    // Menstrual cycle phase (optional)
+    cyclePhase: {
+        type: String,
+        enum: ['menstrual', 'follicular', 'ovulatory', 'luteal', null],
+        default: null,
+    },
+    // Sleep hours (optional)
+    sleepHours: {
+        type: Number,
+        min: 0,
+        max: 24,
+        default: null,
+    },
+    // Stress level 1-10 (optional)
+    stressLevel: {
+        type: Number,
+        min: 1,
+        max: 10,
         default: null,
     },
     // Image URLs (uploaded to Supabase, stored here for reference)

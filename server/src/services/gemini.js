@@ -32,6 +32,10 @@ CRITICAL THERAPEUTIC RULES:
    - "high": Serious, deliberate manipulation that could be harmful
 7. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. Essentially, if the entry is not purely positive/neutral, set suggests_music to true. When you do, weave it naturally into your empathy_response, like: "I think some of your favorite music might help you feel a little more grounded right now."
 8. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. You have the user's actual story — reference it directly. Every piece of advice should feel personally written for them, not templated.
+9. JOKES VS. MANIPULATION: Carefully distinguish between casual banter/sarcasm between friends and actual emotional abuse.
+   - A joke or sarcasm is mutual, lacks a power imbalance, and the user's tone indicates they are not genuinely distressed or confused by it.
+   - Actual Gaslighting/Manipulation relies on an intent to control, a power imbalance, and results in the user feeling "crazy", fearful, or deeply distressed.
+   - IF the user indicates they are fine with the interaction (e.g., "lol", "we always joke like this", "my bestie"), you MUST set "tactic_identified" to false. Do not pathologize normal banter.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -64,10 +68,15 @@ const PERSONA_INSTRUCTIONS = {
 /**
  * Analyze a journal entry for manipulation patterns using Gemini
  * @param {string} entryText - The journal entry or conversation to analyze
+ * @param {Object|string} options - Options object (or legacy mood string) containing mood, cyclePhase, sleepHours, stressLevel
  * @param {Array} pastEntries - Previous journal entries for longitudinal context (RAG)
+ * @param {string} persona - The therapeutic persona to use
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 'friend') {
+async function analyzeEntry(entryText, options = {}, pastEntries = [], persona = 'friend') {
+    // Handle backwards compatibility where options was just the mood string
+    const moodOpts = typeof options === 'string' ? { mood: options } : options || {};
+    const { mood = null, cyclePhase = null, sleepHours = null, stressLevel = null } = moodOpts;
     try {
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
@@ -93,8 +102,31 @@ async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 
         const SYSTEM_PROMPT = SYSTEM_PROMPT_BASE + personaInstruction;
 
         let prompt = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
+
         if (mood) {
             prompt += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast (e.g., "You said you're feeling ${mood}, but your words sound upbeat — sometimes we mask how we really feel"). Always trust and center the mood they selected.`;
+        }
+
+        let healthContext = [];
+        if (cyclePhase) {
+            healthContext.push(`The user is currently in her ${cyclePhase.toUpperCase()} phase. Hormonal fluctuations can affect emotional resilience, perception, and susceptibility to manipulation (e.g. heightening sensitivity or self-doubt during luteal/menstrual phases). Validate her feelings while gently reminding her to give herself grace during this hormonal window if appropriate.`);
+        }
+        if (sleepHours !== null && sleepHours !== undefined) {
+            healthContext.push(`The user reported sleeping ${sleepHours} hours last night.`);
+            if (sleepHours < 6) {
+                healthContext.push(`This indicates sleep deprivation. Gentle reminder: It's harder to defend reality against gaslighting when sleep-deprived. Note this in your advice to prioritize rest.`);
+            }
+        }
+        if (stressLevel !== null && stressLevel !== undefined) {
+            healthContext.push(`The user reported a current stress level of ${stressLevel}/10.`);
+        }
+
+        if (healthContext.length > 0) {
+            prompt += `\n\nCONTEXTUAL HEALTH DATA:\n${healthContext.join('\n')}\nPlease factor this physiological context into your empathy response and actionable advice if relevant.`;
+        }
+
+        if (pastEntries && pastEntries.length > 0) {
+            prompt += `\n\nVULNERABILITY WINDOW INSIGHTS: Since you have the user's past entries above and their current health data, look for correlations. For example, if a partner frequently uses minimizing language when the user is sleep-deprived or in their luteal phase, point this out as a "Vulnerability Window" insight. Abusive partners sometimes subconsciously escalate when they sense vulnerability.`;
         }
 
         const result = await model.generateContent(prompt);

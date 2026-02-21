@@ -13,7 +13,7 @@ const { requireAuth } = require('../middleware/authMiddleware');
  */
 router.post('/', requireAuth, async (req, res, next) => {
     try {
-        const { content, mood } = req.body;
+        const { content, mood, cyclePhase, sleepHours, stressLevel } = req.body;
 
         if (!content || !content.trim()) {
             return res.status(400).json({
@@ -55,7 +55,7 @@ router.post('/', requireAuth, async (req, res, next) => {
             analysis = await analyzeOllama(content.trim(), pastEntries);
         } else {
             console.log('[DEBUG] mood received:', mood);
-            analysis = await analyzeGemini(content.trim(), mood, pastEntries, persona);
+            analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         }
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
@@ -65,6 +65,9 @@ router.post('/', requireAuth, async (req, res, next) => {
                 analysis,
                 userId: req.user.id,
                 mood: mood || null,
+                cyclePhase: cyclePhase || null,
+                sleepHours: sleepHours !== undefined ? sleepHours : null,
+                stressLevel: stressLevel !== undefined ? stressLevel : null,
             });
             await entry.save();
         } catch (dbError) {
