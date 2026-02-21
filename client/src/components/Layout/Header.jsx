@@ -12,6 +12,7 @@ export default function Header({ onLogoutClick }) {
     if (location.pathname === '/patterns') return '#4a7c59';
     if (location.pathname === '/resources') return '#7b5ea7';
     if (location.pathname === '/profile') return '#4a6fa5';
+    if (location.pathname === '/entries') return '#a5794aff';
     return '#c9748a';
   };
 
@@ -47,7 +48,7 @@ export default function Header({ onLogoutClick }) {
           </NavLink>
 
           <NavLink
-            to="/history"
+            to="/entries"
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
