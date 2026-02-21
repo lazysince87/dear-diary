@@ -21,6 +21,7 @@ export default function HomePage() {
   const duckRef = useRef(null);
   const starRefs = useRef([]);
   const pageRef = useRef(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   useEffect(() => {
     if (duckRef.current) {
@@ -90,6 +91,9 @@ export default function HomePage() {
     setLatestEntry(entry);
     addEntry(entry);
   };
+
+  // Past entries are all entries except the latest one just submitted
+  const pastEntries = latestEntry ? entries.filter((e) => e !== latestEntry) : entries;
 
   return (
     <>
@@ -321,6 +325,44 @@ export default function HomePage() {
             pointerEvents: "none",
           }}
         />
+
+        <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
+
+        {latestEntry && (
+          <div style={{ marginTop: "24px" }}>
+            <JournalResponse entry={latestEntry} />
+          </div>
+        )}
+        {pastEntries.length > 0 && (
+          <>
+            <hr className="dd-divider" />
+            <div className="dd-section-label">Earlier entries</div>
+            {pastEntries.map((entry, i) => (
+              <div key={entry._id || i}>
+                <div
+                  className="dd-entry-card"
+                  onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+                >
+                  <div className="dd-entry-date">
+                    {new Date(entry.timestamp).toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <p className="dd-entry-preview">{entry.content}</p>
+                  {entry.analysis?.tactic_identified && (
+                    <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                  )}
+                </div>
+                {expandedIndex === i && entry.analysis && (
+                  <JournalResponse entry={entry} />
+                )}
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </>
   );

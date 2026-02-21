@@ -109,7 +109,7 @@ export default function ResourceList() {
                     className="text-xl font-semibold text-text-primary mb-4"
                     style={{ fontFamily: 'var(--font-serif)' }}
                 >
-                    💕 Remember...
+                    Remember...
                 </h3>
                 <ul className="space-y-3">
                     {SAFETY_TIPS.map((tip, i) => (
@@ -118,7 +118,7 @@ export default function ResourceList() {
                             className="flex items-start gap-3 text-text-secondary text-sm leading-relaxed animate-fade-in"
                             style={{ animationDelay: `${i * 100}ms` }}
                         >
-                            <span className="text-dusty-rose mt-0.5">🌹</span>
+                            <span className="text-dusty-rose mt-0.5">*</span>
                             {tip}
                         </li>
                     ))}

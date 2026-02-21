@@ -1,10 +1,10 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { BookHeart, Library, Heart, Shield, LogOut } from "lucide-react";
-// import { useApp } from '../../context/AppContext';
-import { useAuth } from "../../contexts/AuthContext";
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { BookHeart, Library, Heart, Shield, LogOut, User, Music } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Header({ onLogoutClick }) {
-  // const { isCovertMode, toggleCovertMode } = useApp();
+  const { isCovertMode, toggleCovertMode, isMusicOn, nowPlaying, toggleMusic } = useApp();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -65,18 +65,43 @@ export default function Header({ onLogoutClick }) {
             <span className="hidden sm:inline">Resources</span>
           </NavLink>
 
-          {/* Covert Mode Toggle */}
-          {/* <button
-            onClick={toggleCovertMode}
-            className="ml-2 p-2 rounded-full transition-all duration-300 hover:bg-warm-200/50"
-            title={isCovertMode ? 'Exit safe mode' : 'Enter safe mode'}
-            aria-label="Toggle covert mode"
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
+            }
           >
-            <Shield
-              size={18}
-              className={isCovertMode ? 'text-sage-dark' : 'text-text-muted'}
-            />
-          </button> */}
+            <User size={16} />
+            <span className="hidden sm:inline">Profile</span>
+          </NavLink>
+
+          {/* Music Toggle */}
+          {user && (
+            <button
+              onClick={toggleMusic}
+              className="nav-link flex items-center gap-1.5"
+              title={isMusicOn && nowPlaying ? `Now playing: ${nowPlaying.name} - ${nowPlaying.artist}` : 'Play music'}
+              style={{
+                color: isMusicOn ? '#c9748a' : undefined,
+                position: 'relative',
+              }}
+            >
+              <Music size={16} className={isMusicOn ? 'animate-pulse-soft' : ''} />
+              <span className="hidden sm:inline">{isMusicOn ? 'Stop' : 'Music'}</span>
+              {isMusicOn && (
+                <span style={{
+                  position: 'absolute',
+                  top: '2px',
+                  right: '-2px',
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#c9748a',
+                  animation: 'pulse 1.5s ease-in-out infinite',
+                }} />
+              )}
+            </button>
+          )}
 
           {/* Auth Button */}
           {user ? (
@@ -110,6 +135,23 @@ export default function Header({ onLogoutClick }) {
           )}
         </nav>
       </div>
+
+      {/* Now Playing Bar */}
+      {isMusicOn && nowPlaying && (
+        <div style={{
+          background: 'rgba(201, 116, 138, 0.08)',
+          borderTop: '1px solid rgba(201, 116, 138, 0.15)',
+          padding: '4px 16px',
+          textAlign: 'center',
+          fontFamily: "'Pixelify Sans', sans-serif",
+          fontSize: '10px',
+          color: '#9a8282',
+          letterSpacing: '0.5px',
+        }}>
+          Now playing: {nowPlaying.name} — {nowPlaying.artist}
+        </div>
+      )}
     </header>
   );
 }
+

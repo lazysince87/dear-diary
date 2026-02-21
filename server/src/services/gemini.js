@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const SYSTEM_PROMPT = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
+const SYSTEM_PROMPT_BASE = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
 
 Your job: Analyze the user's journal entry or pasted conversation for emotional manipulation patterns, provide deep emotional validation, AND offer genuine, actionable therapeutic advice.
 
@@ -24,12 +24,14 @@ CRITICAL THERAPEUTIC RULES:
 1. ALWAYS lead with radical empathy. Validate their specific feelings and the exact situation they described. Make them feel seen and heard.
 2. If they ask a direct question (e.g., "Was he mocking me?", "What should I do?"), answer it directly and honestly, but gently.
 3. Be gentle when naming tactics. Frame it as "It sounds like..." or "I noticed a pattern of..."
-4. Provide highly specific, actionable advice. Don't just say "set boundaries." Give them examples of what to say or how to approach the exact situation they wrote about. (e.g. "You could try saying: 'I felt undermined when you said...'")
+4. Provide highly specific, actionable advice using the ACTUAL details from their entry. NEVER use placeholder text like "[insert specific situation]" or "[person's name]". Instead, directly reference what the user described. For example, if they mentioned their boss criticized them in a meeting, say: "You could try telling your boss: 'When you criticized my work in front of everyone, it made me feel undermined.'" Always use their real words and situations.
 5. The reflection question should be thought-provoking and encourage self-compassion.
 6. For patterns_detected, identify ALL manipulation patterns present in the entry. Categorize each one by severity:
    - "low": Subtle or possibly unintentional behavior
    - "medium": Clear pattern that warrants attention
    - "high": Serious, deliberate manipulation that could be harmful
+7. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. Essentially, if the entry is not purely positive/neutral, set suggests_music to true. When you do, weave it naturally into your empathy_response, like: "I think some of your favorite music might help you feel a little more grounded right now."
+8. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. You have the user's actual story — reference it directly. Every piece of advice should feel personally written for them, not templated.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -37,7 +39,7 @@ You MUST respond ONLY with valid JSON matching this exact schema:
   "tactic_identified": true/false,
   "tactic_name": "Name of the primary tactic detected, or null if none",
   "tactic_explanation": "Gentle explanation of the tactic, why it is harmful, and why it's not the user's fault (2-3 sentences). Null if none.",
-  "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story. Give them a script or concrete next steps if they asked what to do.",
+  "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story using their REAL details. Give them a script or concrete next steps if they asked what to do.",
   "confidence": 0.0 to 1.0,
   "reflection_question": "A compassionate reflection question to help the user process their feelings.",
   "patterns_detected": [
@@ -46,12 +48,18 @@ You MUST respond ONLY with valid JSON matching this exact schema:
       "explanation": "Brief, gentle explanation of how this pattern appears in their entry",
       "severity": "low" | "medium" | "high"
     }
-  ]
+  ],
+  "suggests_music": true/false
 }
 
 Note: patterns_detected should be an empty array [] if no patterns are found. Include ALL patterns you detect, not just the primary one.
 
 Do NOT include any text before or after the JSON. Only valid JSON.`;
+
+const PERSONA_INSTRUCTIONS = {
+    friend: `\n\nIMPORTANT PERSONA INSTRUCTION: You are speaking as a warm, caring best friend. Use casual language, contractions, and be conversational. Say things like "oh honey", "that's so not okay", "I'm here for you". Sound like a supportive best friend texting them, not a clinical professional.`,
+    therapist: `\n\nIMPORTANT PERSONA INSTRUCTION: You are speaking as a gentle, professional therapist. Use clear, measured language. Be solution-oriented while still deeply empathetic. Frame observations clinically but accessibly. Use phrases like "What I'm noticing is...", "A helpful reframe might be...", "Let's explore that together".`,
+};
 
 /**
  * Analyze a journal entry for manipulation patterns using Gemini
@@ -59,7 +67,7 @@ Do NOT include any text before or after the JSON. Only valid JSON.`;
  * @param {Array} pastEntries - Previous journal entries for longitudinal context (RAG)
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText, mood = null, pastEntries = []) {
+async function analyzeEntry(entryText, mood = null, pastEntries = [], persona = 'friend') {
     try {
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
@@ -79,7 +87,12 @@ async function analyzeEntry(entryText, mood = null, pastEntries = []) {
                 contextBlock += `--- Past Entry ${i + 1} (${entry.createdAt}) ---\n${entry.content}\n`;
             });
         }
-        let prompt = `${SYSTEM_PROMPT}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
+
+        // Build the full system prompt with persona instructions
+        const personaInstruction = PERSONA_INSTRUCTIONS[persona] || PERSONA_INSTRUCTIONS.friend;
+        const SYSTEM_PROMPT = SYSTEM_PROMPT_BASE + personaInstruction;
+
+        let prompt = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
         if (mood) {
             prompt += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast (e.g., "You said you're feeling ${mood}, but your words sound upbeat — sometimes we mask how we really feel"). Always trust and center the mood they selected.`;
         }
@@ -113,6 +126,7 @@ async function analyzeEntry(entryText, mood = null, pastEntries = []) {
             confidence: typeof analysis.confidence === 'number' ? Math.min(1, Math.max(0, analysis.confidence)) : 0,
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
             patterns_detected: Array.isArray(analysis.patterns_detected) ? analysis.patterns_detected : [],
+            suggests_music: Boolean(analysis.suggests_music),
         };
 
         return validated;
@@ -129,6 +143,7 @@ async function analyzeEntry(entryText, mood = null, pastEntries = []) {
             confidence: 0,
             reflection_question: "What feelings came up for you as you wrote this? Take a moment to sit with them — you deserve that space.",
             patterns_detected: [],
+            suggests_music: false,
         };
     }
 }

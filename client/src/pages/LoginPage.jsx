@@ -111,7 +111,7 @@ export default function LoginPage() {
                             {[...Array(8)].map((_, i) => <div key={i} className="lp-spine-dot" />)}
                         </div>
                         <div className="lp-content text-center">
-                            <div className="text-5xl mb-4">💌</div>
+                            <div className="text-5xl mb-4"></div>
                             <h2 className="lp-title">Check your email</h2>
                             <p className="lp-subtitle" style={{ textTransform: 'none', fontSize: '14px' }}>
                                 We sent a link to <strong>{email}</strong>.<br />
@@ -353,7 +353,7 @@ export default function LoginPage() {
 
                         {/* Header */}
                         <div className="text-center">
-                            <div className="text-5xl mb-4 animate-float">📒</div>
+                            <div className="text-5xl mb-4 animate-float"></div>
                             <h1 className="lp-title">
                                 {isSignUp ? 'New Diary' : 'Open Diary'}
                             </h1>
