@@ -24,7 +24,11 @@ export default function JournalEntry({ onAnalysisComplete }) {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await analyzeJournalEntry(content.trim(), sessionId, selectedMood);
+      const result = await analyzeJournalEntry(
+        content.trim(),
+        sessionId,
+        selectedMood,
+      );
       onAnalysisComplete({
         content: content.trim(),
         mood: selectedMood,
@@ -212,12 +216,17 @@ export default function JournalEntry({ onAnalysisComplete }) {
         <div className="je-book">
           <div className="je-inner">
             <div className="je-spine">
-              {[...Array(6)].map((_, i) => <div key={i} className="je-spine-dot" />)}
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="je-spine-dot" />
+              ))}
             </div>
             <div className="je-content">
               <div className="je-date">
                 {new Date().toLocaleDateString("en-US", {
-                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </div>
 
@@ -228,7 +237,11 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     key={mood.value}
                     type="button"
                     className={`je-mood-chip ${selectedMood === mood.value ? "active" : ""}`}
-                    onClick={() => setSelectedMood(selectedMood === mood.value ? null : mood.value)}
+                    onClick={() =>
+                      setSelectedMood(
+                        selectedMood === mood.value ? null : mood.value,
+                      )
+                    }
                   >
                     {mood.label}
                   </button>
@@ -245,9 +258,22 @@ export default function JournalEntry({ onAnalysisComplete }) {
               />
 
               {error && <div className="je-error">{error}</div>}
-
               <div className="je-footer">
-                <span className="je-char-count">{content.length} chars</span>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <span className="je-char-count">{content.length} chars</span>
+                  <button
+                    type="button"
+                    className="je-submit"
+                    style={{ padding: "4px 12px" }}
+                    onClick={() => {
+                      /* TODO: voice input */
+                    }}
+                  >
+                    Speak
+                  </button>
+                </div>
                 <button
                   type="submit"
                   className="je-submit"
@@ -257,7 +283,6 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       </form>
