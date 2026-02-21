@@ -16,7 +16,7 @@ async function getAuthHeaders() {
 /**
  * Analyze a journal entry via the Express backend → Gemini
  */
-export async function analyzeJournalEntry(content, mood = null, imageUrl = null) {
+export async function analyzeJournalEntry(content, mood = null, imageUrl = null, cyclePhase = null, sleepHours = null, stressLevel = null) {
     const authHeaders = await getAuthHeaders();
 
     const response = await fetch(`${API_BASE}/analyze`, {
@@ -25,7 +25,7 @@ export async function analyzeJournalEntry(content, mood = null, imageUrl = null)
             'Content-Type': 'application/json',
             ...authHeaders,
         },
-        body: JSON.stringify({ content, mood, imageUrl }),
+        body: JSON.stringify({ content, mood, imageUrl, cyclePhase, sleepHours, stressLevel }),
     });
 
     if (!response.ok) {
