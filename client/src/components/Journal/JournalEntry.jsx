@@ -32,7 +32,6 @@ export default function JournalEntry({ onAnalysisComplete }) {
         try {
             const result = await analyzeJournalEntry(
                 content.trim(),
-                sessionId,
                 selectedMood,
             );
             onAnalysisComplete({
@@ -121,7 +120,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
 
                 .je-date {
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 10px;
+                    font-size: 14px;
                     letter-spacing: 2px;
                     text-transform: uppercase;
                     color: #9a8282;
@@ -130,7 +129,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
 
                 .je-mood-label {
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 10px;
+                    font-size: 14px;
                     letter-spacing: 2px;
                     text-transform: uppercase;
                     color: #9a8282;
