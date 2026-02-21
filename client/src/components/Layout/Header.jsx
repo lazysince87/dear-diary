@@ -3,25 +3,20 @@ import { BookHeart, Library, Heart, Shield, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function Header() {
+export default function Header({ onLogoutClick }) {
   const { isCovertMode, toggleCovertMode } = useApp();
-  const { signOut } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-cream/80 border-b border-warm-200/50">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         <NavLink to="/" className="flex items-center gap-2 no-underline">
-          {/* <span className="text-2xl"></span> */}
           <h1
             className="text-xl font-semibold text-text-primary"
             style={{ fontFamily: "var(--font-serif)" }}
-          ></h1>
+          >
+            {isCovertMode ? "My Recipes" : "Rosie"}
+          </h1>
         </NavLink>
 
         {/* Navigation */}
@@ -69,15 +64,26 @@ export default function Header() {
             />
           </button>
 
-          {/* Sign Out */}
-          <button
-            onClick={handleSignOut}
-            className="p-2 rounded-full transition-all duration-300 hover:bg-rose-50"
-            title="Sign out"
-            aria-label="Sign out"
-          >
-            <LogOut size={18} className="text-text-muted" />
-          </button>
+          {/* Auth Button */}
+          {user ? (
+            <button
+              onClick={onLogoutClick}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-rose-600"
+              title="Sign out"
+            >
+              <LogOut size={18} />
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider" style={{ fontFamily: 'var(--font-serif)' }}>Logout</span>
+            </button>
+          ) : (
+            <NavLink
+              to="/login"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-dusty-rose-dark"
+              title="Sign in"
+            >
+              <LogOut size={18} className="rotate-180" />
+              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider" style={{ fontFamily: 'var(--font-serif)' }}>Login</span>
+            </NavLink>
+          )}
         </nav>
       </div>
     </header>

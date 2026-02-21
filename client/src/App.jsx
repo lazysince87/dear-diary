@@ -27,25 +27,25 @@ function ProtectedRoute({ children }) {
 
   return children;
 }
-
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+      </Route>
+
       <Route
-        path="/*"
         element={
           <ProtectedRoute>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/patterns" element={<PatternLibraryPage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-              </Routes>
-            </Layout>
+            <Layout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="/patterns" element={<PatternLibraryPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+      </Route>
     </Routes>
   );
 }
