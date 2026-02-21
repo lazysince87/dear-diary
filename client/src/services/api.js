@@ -1,28 +1,50 @@
+import { supabase } from '../lib/supabase';
+
 const API_BASE = '/api';
 
 /**
- * Analyze a journal entry via the Express backend -> Gemini
+ * Get the current auth token for API requests
  */
-export async function analyzeJournalEntry(content, sessionId, mood = null) {
+async function getAuthHeaders() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+        return { 'Authorization': `Bearer ${session.access_token}` };
+    }
+    return {};
+}
+
+/**
+ * Analyze a journal entry via the Express backend → Gemini
+ */
+export async function analyzeJournalEntry(content, mood = null) {
+    const authHeaders = await getAuthHeaders();
+
     const response = await fetch(`${API_BASE}/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, sessionId, mood }),
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+        },
+        body: JSON.stringify({ content, mood }),
     });
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || 'Something went wrong. Please try again.');
+        throw new Error(error.error || 'Something went wrong. Please try again. 💕');
     }
 
     return response.json();
 }
 
 /**
- * Fetch all entries for the current session
+ * Fetch all entries for the current user
  */
-export async function fetchEntries(sessionId) {
-    const response = await fetch(`${API_BASE}/entries/${sessionId}`);
+export async function fetchEntries() {
+    const authHeaders = await getAuthHeaders();
+
+    const response = await fetch(`${API_BASE}/entries`, {
+        headers: authHeaders,
+    });
     if (!response.ok) throw new Error('Could not load your entries');
     return response.json();
 }
@@ -30,8 +52,12 @@ export async function fetchEntries(sessionId) {
 /**
  * Fetch entry summary / pattern stats
  */
-export async function fetchEntrySummary(sessionId) {
-    const response = await fetch(`${API_BASE}/entries/${sessionId}/summary`);
+export async function fetchEntrySummary() {
+    const authHeaders = await getAuthHeaders();
+
+    const response = await fetch(`${API_BASE}/entries/summary`, {
+        headers: authHeaders,
+    });
     if (!response.ok) throw new Error('Could not load summary');
     return response.json();
 }
@@ -55,87 +81,68 @@ export async function fetchPattern(id) {
 }
 
 /**
- * Use the browser's built-in Web Speech API as a free TTS fallback.
- * Returns a promise that resolves when speech finishes.
+ * Convert text to speech via ElevenLabs (returns audio blob)
+ * Falls back to browser SpeechSynthesis if API fails
  */
-function browserTTS(text) {
-    return new Promise((resolve, reject) => {
-        if (!('speechSynthesis' in window)) {
-            reject(new Error('Browser does not support speech synthesis'));
+export async function textToSpeech(text) {
+    try {
+        const authHeaders = await getAuthHeaders();
+
+        const response = await fetch(`${API_BASE}/voice/tts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...authHeaders,
+            },
+            body: JSON.stringify({ text }),
+        });
+
+        if (response.ok) {
+            const audioBlob = await response.blob();
+            return {
+                audioUrl: URL.createObjectURL(audioBlob),
+                usedFallback: false
+            };
+        }
+    } catch (e) {
+        console.warn('ElevenLabs TTS failed, falling back to browser speech:', e);
+    }
+
+    // Browser Fallback
+    return new Promise((resolve) => {
+        if (!window.speechSynthesis) {
+            resolve({ error: 'Speech synthesis not supported' });
             return;
         }
 
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;   // Slightly slower for a calm feel
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1; // Make it a bit higher/cozier
 
-        // Try to pick a softer/female voice if available
+        // Find a nice female voice if available
         const voices = window.speechSynthesis.getVoices();
-        const preferred = voices.find(v =>
-            v.name.includes('Samantha') ||
-            v.name.includes('Karen') ||
-            v.name.includes('Victoria') ||
-            v.name.includes('Google US English')
-        );
-        if (preferred) utterance.voice = preferred;
+        const roseVoice = voices.find(v => v.name.includes('Google') && v.name.includes('UK') && v.name.includes('Female'))
+            || voices.find(v => v.name.includes('Female'))
+            || voices[0];
 
-        utterance.onend = () => resolve();
-        utterance.onerror = (e) => reject(e);
+        if (roseVoice) utterance.voice = roseVoice;
+
+        utterance.onend = () => {
+            resolve({ usedFallback: true });
+        };
+
         window.speechSynthesis.speak(utterance);
     });
 }
 
 /**
- * Convert text to speech -- tries ElevenLabs first, then falls back to browser TTS.
- * Returns { audioUrl, usedFallback } or plays via browser directly.
- */
-export async function textToSpeech(text) {
-    try {
-        const response = await fetch(`${API_BASE}/voice/tts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
-        });
-
-        // If the server says to use fallback, do browser TTS
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            if (errorData.fallback || response.status === 503) {
-                await browserTTS(text);
-                return { usedFallback: true };
-            }
-            throw new Error(errorData.message || 'Voice feature unavailable');
-        }
-
-        const audioBlob = await response.blob();
-        return { audioUrl: URL.createObjectURL(audioBlob), usedFallback: false };
-    } catch (error) {
-        // Network error or any other failure -- fall back to browser TTS
-        console.warn('ElevenLabs unavailable, using browser speech:', error.message);
-        await browserTTS(text);
-        return { usedFallback: true };
-    }
-}
-
-/**
- * Start speech-to-text using the browser's Web Speech API.
- * Returns an object with { start, stop } methods.
- * Calls onResult(transcript) with the final recognized text.
- * Calls onInterim(transcript) with intermediate results.
+ * Creates a speech recognition wrapper
  */
 export function createSpeechRecognition({ onResult, onInterim, onError, onEnd }) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        return {
-            supported: false,
-            start: () => onError?.('Speech recognition is not supported in this browser'),
-            stop: () => { },
-        };
+        return { supported: false };
     }
 
     const recognition = new SpeechRecognition();
@@ -143,41 +150,33 @@ export function createSpeechRecognition({ onResult, onInterim, onError, onEnd })
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    let finalTranscript = '';
-
     recognition.onresult = (event) => {
-        let interim = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
-                onResult?.(finalTranscript.trim());
+                finalTranscript += event.results[i][0].transcript;
             } else {
-                interim += transcript;
-                onInterim?.(finalTranscript + interim);
+                interimTranscript += event.results[i][0].transcript;
             }
         }
+
+        if (finalTranscript && onResult) onResult(finalTranscript);
+        if (interimTranscript && onInterim) onInterim(interimTranscript);
     };
 
     recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        onError?.(event.error === 'not-allowed'
-            ? 'Microphone access was denied. Please allow microphone access to use voice input.'
-            : 'Voice input encountered an error. Please try again.');
+        if (onError) onError(event.error);
     };
 
     recognition.onend = () => {
-        onEnd?.(finalTranscript.trim());
+        if (onEnd) onEnd();
     };
 
     return {
         supported: true,
-        start: () => {
-            finalTranscript = '';
-            recognition.start();
-        },
-        stop: () => {
-            recognition.stop();
-        },
+        start: () => recognition.start(),
+        stop: () => recognition.stop(),
     };
 }

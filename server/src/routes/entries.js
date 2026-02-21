@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const Entry = require('../models/Entry');
+const { requireAuth } = require('../middleware/authMiddleware');
 
 /**
- * GET /api/entries/:sessionId
- * Get all entries for a session (for history/longitudinal view)
+ * GET /api/entries
+ * Get all entries for the authenticated user
  */
-router.get('/:sessionId', async (req, res, next) => {
+router.get('/', requireAuth, async (req, res, next) => {
     try {
-        const { sessionId } = req.params;
-        const entries = await Entry.find({ sessionId })
+        const entries = await Entry.find({ userId: req.user.id })
             .sort({ createdAt: -1 })
             .limit(50)
             .lean();
@@ -21,14 +21,13 @@ router.get('/:sessionId', async (req, res, next) => {
 });
 
 /**
- * GET /api/entries/:sessionId/summary
- * Get a summary of patterns detected across all entries (stretch: longitudinal)
+ * GET /api/entries/summary
+ * Get a summary of patterns detected across all entries
  */
-router.get('/:sessionId/summary', async (req, res, next) => {
+router.get('/summary', requireAuth, async (req, res, next) => {
     try {
-        const { sessionId } = req.params;
         const entries = await Entry.find({
-            sessionId,
+            userId: req.user.id,
             'analysis.tactic_identified': true
         }).lean();
 

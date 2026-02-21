@@ -17,8 +17,8 @@ const entrySchema = new mongoose.Schema({
         confidence: { type: Number, default: 0 },
         reflection_question: { type: String },
     },
-    // Session identifier (anonymous — no accounts needed for MVP)
-    sessionId: {
+    // Supabase user ID
+    userId: {
         type: String,
         required: true,
         index: true,
@@ -34,6 +34,6 @@ const entrySchema = new mongoose.Schema({
 });
 
 // Index for longitudinal pattern queries
-entrySchema.index({ sessionId: 1, createdAt: -1 });
+entrySchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Entry', entrySchema);
