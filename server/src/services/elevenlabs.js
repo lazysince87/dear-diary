@@ -5,15 +5,16 @@ const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
 /**
  * Convert text to speech using ElevenLabs API
  * @param {string} text - Text to convert to speech
+ * @param {string} [voiceId] - Optional ElevenLabs voice ID (defaults to env var)
  * @returns {Buffer} Audio buffer (MP3)
  */
-async function textToSpeech(text) {
-    const voiceId = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM'; // Rachel - calm, warm voice
+async function textToSpeech(text, voiceId) {
+    const finalVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM';
 
     try {
         const response = await axios({
             method: 'POST',
-            url: `${ELEVENLABS_API_URL}/text-to-speech/${voiceId}`,
+            url: `${ELEVENLABS_API_URL}/text-to-speech/${finalVoiceId}`,
             headers: {
                 'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',

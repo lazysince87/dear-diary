@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { fetchEntries } from "../services/api";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { fetchEntries, getPreferences, getSpotifyStatus, generateMusic } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
 const AppContext = createContext(null);
@@ -21,9 +21,34 @@ function getSessionId() {
 export function AppProvider({ children }) {
   const [sessionId] = useState(getSessionId);
   const [entries, setEntries] = useState([]);
+  const [preferences, setPreferences] = useState(null);
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCovertMode, setIsCovertMode] = useState(false);
+  const [isMusicOn, setIsMusicOn] = useState(false);
+  const [nowPlaying, setNowPlaying] = useState(null);
+  const musicAudioRef = useRef(null);
+  const spotifyTracksRef = useRef(null);
+  const trackIndexRef = useRef(0);
   const { user } = useAuth();
+
+  // Fetch user preferences on mount
+  const loadPreferences = useCallback(async () => {
+    if (!user) {
+      setPreferences(null);
+      setPreferencesLoaded(true);
+      return;
+    }
+    try {
+      const data = await getPreferences();
+      setPreferences(data.preferences || null);
+    } catch (err) {
+      console.error("Failed to load preferences:", err);
+      setPreferences(null);
+    } finally {
+      setPreferencesLoaded(true);
+    }
+  }, [user]);
 
   // Fetch past entries from MongoDB when the user is authenticated
   const loadEntries = useCallback(async () => {
@@ -31,7 +56,6 @@ export function AppProvider({ children }) {
     try {
       const data = await fetchEntries();
       if (data.success && data.entries) {
-        // Map MongoDB entries to frontend shape
         const mapped = data.entries.map((e) => ({
           content: e.content,
           analysis: e.analysis,
@@ -47,15 +71,110 @@ export function AppProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
+    loadPreferences();
     loadEntries();
-  }, [loadEntries]);
+  }, [loadPreferences, loadEntries]);
 
-  // Add a new analyzed entry to the local state (prepend)
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      if (musicAudioRef.current) {
+        musicAudioRef.current.pause();
+        musicAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  const isMusicOnRef = useRef(false);
+
+  const playSpotifyTrack = useCallback((tracks, index) => {
+    if (!isMusicOnRef.current) return; // stopped — don't advance
+    if (index >= tracks.length) index = 0;
+    const track = tracks[index];
+    trackIndexRef.current = index;
+    setNowPlaying({ name: track.name, artist: track.artist });
+
+    if (musicAudioRef.current) {
+      musicAudioRef.current.onended = null;
+      musicAudioRef.current.onerror = null;
+      musicAudioRef.current.pause();
+    }
+
+    const audio = new Audio(track.previewUrl);
+    audio.onended = () => {
+      if (isMusicOnRef.current) playSpotifyTrack(tracks, index + 1);
+    };
+    audio.onerror = () => {
+      if (!isMusicOnRef.current) return;
+      if (index + 1 < tracks.length) playSpotifyTrack(tracks, index + 1);
+      else { isMusicOnRef.current = false; setIsMusicOn(false); setNowPlaying(null); }
+    };
+    audio.play().catch(() => { isMusicOnRef.current = false; setIsMusicOn(false); setNowPlaying(null); });
+    musicAudioRef.current = audio;
+  }, []);
+
+  const toggleMusic = useCallback(async () => {
+    if (isMusicOn) {
+      // Stop music
+      isMusicOnRef.current = false;
+      if (musicAudioRef.current) {
+        musicAudioRef.current.onended = null;
+        musicAudioRef.current.onerror = null;
+        musicAudioRef.current.pause();
+        musicAudioRef.current = null;
+      }
+      setIsMusicOn(false);
+      setNowPlaying(null);
+      return;
+    }
+
+    setIsMusicOn(true);
+    isMusicOnRef.current = true;
+
+    try {
+      // Try Spotify tracks first
+      if (!spotifyTracksRef.current) {
+        try {
+          const spotifyData = await getSpotifyStatus();
+          if (spotifyData.musicTaste?.topTracks?.length > 0) {
+            const withPreviews = spotifyData.musicTaste.topTracks.filter(t => t.previewUrl);
+            if (withPreviews.length > 0) {
+              spotifyTracksRef.current = [...withPreviews].sort(() => Math.random() - 0.5);
+            }
+          }
+        } catch (_) {
+          // No spotify — will fall back
+        }
+      }
+
+      if (spotifyTracksRef.current && spotifyTracksRef.current.length > 0) {
+        playSpotifyTrack(spotifyTracksRef.current, 0);
+        return;
+      }
+
+      // Fallback: ElevenLabs ambient music
+      setNowPlaying({ name: "Ambient Music", artist: "Generated" });
+      const result = await generateMusic();
+      if (result.audioUrl) {
+        const audio = new Audio(result.audioUrl);
+        audio.loop = true;
+        audio.onerror = () => { setIsMusicOn(false); setNowPlaying(null); };
+        audio.play().catch(() => { setIsMusicOn(false); setNowPlaying(null); });
+        musicAudioRef.current = audio;
+      } else {
+        setIsMusicOn(false);
+        setNowPlaying(null);
+      }
+    } catch {
+      setIsMusicOn(false);
+      setNowPlaying(null);
+    }
+  }, [isMusicOn, playSpotifyTrack]);
+
   const addEntry = (entry) => {
     setEntries((prev) => [entry, ...prev]);
   };
 
-  // Toggle covert mode
   const toggleCovertMode = () => {
     setIsCovertMode((prev) => !prev);
   };
@@ -66,10 +185,16 @@ export function AppProvider({ children }) {
     setEntries,
     addEntry,
     loadEntries,
+    preferences,
+    preferencesLoaded,
+    loadPreferences,
     isLoading,
     setIsLoading,
     isCovertMode,
     toggleCovertMode,
+    isMusicOn,
+    nowPlaying,
+    toggleMusic,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -83,4 +208,5 @@ export function useApp() {
   }
   return context;
 }
+
 
