@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { Send, Mic, Loader2 } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Send, Mic, MicOff, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { analyzeJournalEntry } from '../../services/api';
+import { analyzeJournalEntry, createSpeechRecognition } from '../../services/api';
 
 const MOODS = [
-    { value: 'grateful', label: '🌸 Grateful' },
-    { value: 'hopeful', label: '✨ Hopeful' },
-    { value: 'confused', label: '😶‍🌫️ Confused' },
-    { value: 'sad', label: '💧 Sad' },
-    { value: 'anxious', label: '🦋 Anxious' },
-    { value: 'angry', label: '🔥 Angry' },
-    { value: 'numb', label: '🫥 Numb' },
+    { value: 'grateful', label: 'Grateful' },
+    { value: 'hopeful', label: 'Hopeful' },
+    { value: 'confused', label: 'Confused' },
+    { value: 'sad', label: 'Sad' },
+    { value: 'anxious', label: 'Anxious' },
+    { value: 'angry', label: 'Angry' },
+    { value: 'numb', label: 'Numb' },
 ];
 
 export default function JournalEntry({ onAnalysisComplete }) {
@@ -18,6 +18,8 @@ export default function JournalEntry({ onAnalysisComplete }) {
     const [content, setContent] = useState('');
     const [selectedMood, setSelectedMood] = useState(null);
     const [error, setError] = useState(null);
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -42,6 +44,42 @@ export default function JournalEntry({ onAnalysisComplete }) {
             setIsLoading(false);
         }
     };
+
+    const toggleVoiceInput = useCallback(() => {
+        if (isListening) {
+            // Stop listening
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+
+        // Start listening
+        setError(null);
+        const recognition = createSpeechRecognition({
+            onResult: (transcript) => {
+                setContent(transcript);
+            },
+            onInterim: (transcript) => {
+                setContent(transcript);
+            },
+            onError: (errorMsg) => {
+                setError(errorMsg);
+                setIsListening(false);
+            },
+            onEnd: () => {
+                setIsListening(false);
+            },
+        });
+
+        if (!recognition.supported) {
+            setError('Voice input is not supported in this browser. Please try Chrome or Edge.');
+            return;
+        }
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsListening(true);
+    }, [isListening]);
 
     // Get current date in a cozy format
     const today = new Date().toLocaleDateString('en-US', {
@@ -86,11 +124,19 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="Write about your day, paste a conversation, or share what's on your mind. This is your safe space... 💕"
+                        placeholder="Write about your day, paste a conversation, or share what's on your mind. This is your safe space..."
                         className="journal-textarea"
                         disabled={isLoading}
                         rows={6}
                     />
+
+                    {/* Listening indicator */}
+                    {isListening && (
+                        <div className="mt-2 flex items-center gap-2 text-rose-500 text-sm animate-pulse-soft">
+                            <MicOff size={14} />
+                            <span>Listening... tap the mic again to stop</span>
+                        </div>
+                    )}
 
                     {/* Error message */}
                     {error && (
@@ -102,15 +148,18 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     {/* Actions */}
                     <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-2">
-                            {/* Voice input button (stretch goal) */}
+                            {/* Voice input button */}
                             <button
                                 type="button"
-                                className="btn-secondary flex items-center gap-1.5 !px-3 !py-2"
-                                title="Voice input (coming soon)"
-                                onClick={() => {/* TODO: Voice input */ }}
+                                className={`btn-secondary flex items-center gap-1.5 !px-3 !py-2 ${isListening ? '!bg-rose-100 !border-rose-300 !text-rose-600' : ''}`}
+                                title={isListening ? 'Stop listening' : 'Speak your thoughts'}
+                                onClick={toggleVoiceInput}
+                                disabled={isLoading}
                             >
-                                <Mic size={16} />
-                                <span className="hidden sm:inline text-sm">Speak</span>
+                                {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                                <span className="hidden sm:inline text-sm">
+                                    {isListening ? 'Stop' : 'Speak'}
+                                </span>
                             </button>
                         </div>
 

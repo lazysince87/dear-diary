@@ -13,14 +13,21 @@ export default function JournalResponse({ entry }) {
         setAudioError(false);
 
         try {
-            const audioUrl = await textToSpeech(analysis.empathy_response);
-            const audio = new Audio(audioUrl);
-            audio.onended = () => setIsPlaying(false);
-            audio.onerror = () => {
+            const result = await textToSpeech(analysis.empathy_response);
+
+            if (result.usedFallback) {
+                // Browser TTS already played and finished
                 setIsPlaying(false);
-                setAudioError(true);
-            };
-            audio.play();
+            } else if (result.audioUrl) {
+                // ElevenLabs returned audio — play it
+                const audio = new Audio(result.audioUrl);
+                audio.onended = () => setIsPlaying(false);
+                audio.onerror = () => {
+                    setIsPlaying(false);
+                    setAudioError(true);
+                };
+                audio.play();
+            }
         } catch {
             setIsPlaying(false);
             setAudioError(true);
