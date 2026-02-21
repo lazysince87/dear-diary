@@ -3,102 +3,110 @@ import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../contexts/AuthContext";
-import { savePreferences, getSpotifyLoginUrl, getSpotifyStatus } from "../services/api";
+import {
+  savePreferences,
+  getSpotifyLoginUrl,
+  getSpotifyStatus,
+} from "../services/api";
 import boxDuckImg from "../assets/animations/box-duck.png";
 
 const PERSONAS = [
-    {
-        value: "friend",
-        label: "A Friend",
-        description: "Just someone to talk to — casual, warm, and supportive.",
-        voice: "Stacy",
-    },
-    {
-        value: "therapist",
-        label: "A Therapist",
-        description: "Help me process my feelings with gentle, actionable guidance.",
-        voice: "Sapphire",
-    },
+  {
+    value: "friend",
+    label: "A Friend",
+    description: "Just someone to talk to — casual, warm, and supportive.",
+    voice: "Stacy",
+  },
+  {
+    value: "therapist",
+    label: "A Therapist",
+    description:
+      "Help me process my feelings with gentle, actionable guidance.",
+    voice: "Sapphire",
+  },
 ];
 
 export default function ProfilePage() {
-    const { preferences, loadPreferences } = useApp();
-    const { user, signOut } = useAuth();
-    const navigate = useNavigate();
+  const { preferences, loadPreferences } = useApp();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
-    const [displayName, setDisplayName] = useState("");
-    const [persona, setPersona] = useState("friend");
-    const [saving, setSaving] = useState(false);
-    const [saved, setSaved] = useState(false);
-    const [spotifyConnected, setSpotifyConnected] = useState(false);
-    const [spotifyConnecting, setSpotifyConnecting] = useState(false);
-    const duckRef = useRef(null);
+  const [displayName, setDisplayName] = useState("");
+  const [persona, setPersona] = useState("friend");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [spotifyConnected, setSpotifyConnected] = useState(false);
+  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  const duckRef = useRef(null);
 
-    useEffect(() => {
-        if (duckRef.current) {
-            gsap.fromTo(
-                duckRef.current,
-                { y: -800, opacity: 1 },
-                {
-                    y: 0,
-                    duration: 6,
-                    ease: "bounce.out",
-                    onComplete: () => {
-                        gsap.to(duckRef.current, {
-                            y: -10,
-                            duration: 1.8,
-                            ease: "sine.inOut",
-                            repeat: -1,
-                            yoyo: true,
-                        });
-                    },
-                },
-            );
-        }
-    }, []);
+  useEffect(() => {
+    if (duckRef.current) {
+      gsap.fromTo(
+        duckRef.current,
+        { y: -800, opacity: 1 },
+        {
+          y: 0,
+          duration: 6,
+          ease: "bounce.out",
+          onComplete: () => {
+            gsap.to(duckRef.current, {
+              y: -10,
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        },
+      );
+    }
+  }, []);
 
-    useEffect(() => {
-        if (preferences) {
-            setDisplayName(preferences.displayName || "");
-            setPersona(preferences.personaPreference || "friend");
-        }
-    }, [preferences]);
+  useEffect(() => {
+    if (preferences) {
+      setDisplayName(preferences.displayName || "");
+      setPersona(preferences.personaPreference || "friend");
+    }
+  }, [preferences]);
 
-    useEffect(() => {
-        getSpotifyStatus()
-            .then((data) => setSpotifyConnected(data.connected))
-            .catch(() => { });
-    }, []);
+  useEffect(() => {
+    getSpotifyStatus()
+      .then((data) => setSpotifyConnected(data.connected))
+      .catch(() => {});
+  }, []);
 
-    const handleSave = async () => {
-        setSaving(true);
-        setSaved(false);
-        try {
-            await savePreferences({ displayName: displayName.trim(), personaPreference: persona });
-            await loadPreferences();
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-        } catch (err) {
-            console.error("Failed to save:", err);
-        } finally {
-            setSaving(false);
-        }
-    };
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      await savePreferences({
+        displayName: displayName.trim(),
+        personaPreference: persona,
+      });
+      await loadPreferences();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error("Failed to save:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-    const handleConnectSpotify = async () => {
-        setSpotifyConnecting(true);
-        try {
-            const { url } = await getSpotifyLoginUrl();
-            window.location.href = url;
-        } catch (err) {
-            console.error("Spotify login failed:", err);
-            setSpotifyConnecting(false);
-        }
-    };
+  const handleConnectSpotify = async () => {
+    setSpotifyConnecting(true);
+    try {
+      const { url } = await getSpotifyLoginUrl();
+      window.location.href = url;
+    } catch (err) {
+      console.error("Spotify login failed:", err);
+      setSpotifyConnecting(false);
+    }
+  };
 
-    return (
-        <>
-            <style>{`
+  return (
+    <>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
 
         .pf-page {
@@ -271,83 +279,81 @@ export default function ProfilePage() {
         }
       `}</style>
 
-            <div className="pf-page">
-                <h1 className="pf-title">Profile</h1>
-                <p className="pf-subtitle">Manage your preferences and connections</p>
+      <div className="pf-page">
+        <h1 className="pf-title">Profile</h1>
+        <p className="pf-subtitle">Manage your preferences and connections</p>
 
-                <div className="pf-section">
-                    <div className="pf-label">Display Name</div>
-                    <input
-                        className="pf-input"
-                        type="text"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="Your name..."
-                    />
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">Display Name</div>
+          <input
+            className="pf-input"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your name..."
+          />
+        </div>
 
-                <div className="pf-section">
-                    <div className="pf-label">AI Persona</div>
-                    <div className="pf-persona-grid">
-                        {PERSONAS.map((p) => (
-                            <div
-                                key={p.value}
-                                className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
-                                onClick={() => setPersona(p.value)}
-                            >
-                                <div className="pf-persona-label">{p.label}</div>
-                                <div className="pf-persona-desc">{p.description}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">AI Persona</div>
+          <div className="pf-persona-grid">
+            {PERSONAS.map((p) => (
+              <div
+                key={p.value}
+                className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
+                onClick={() => setPersona(p.value)}
+              >
+                <div className="pf-persona-label">{p.label}</div>
+                <div className="pf-persona-desc">{p.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-                <button
-                    className="pf-btn"
-                    onClick={handleSave}
-                    disabled={!displayName.trim() || saving}
-                >
-                    {saving ? "Saving..." : "Save Changes"}
-                </button>
-                {saved && <div className="pf-saved">Preferences saved</div>}
+        <button
+          className="pf-btn"
+          onClick={handleSave}
+          disabled={!displayName.trim() || saving}
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+        {saved && <div className="pf-saved">Preferences saved</div>}
 
-                <hr className="pf-divider" />
+        <hr className="pf-divider" />
 
-                <div className="pf-section">
-                    <div className="pf-label">Spotify</div>
-                    {spotifyConnected ? (
-                        <div className="pf-connected">Connected</div>
-                    ) : (
-                        <button
-                            className="pf-btn pf-btn-spotify"
-                            onClick={handleConnectSpotify}
-                            disabled={spotifyConnecting}
-                        >
-                            {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
-                        </button>
-                    )}
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">Spotify</div>
+          {spotifyConnected ? (
+            <div className="pf-connected">Connected</div>
+          ) : (
+            <button
+              className="pf-btn pf-btn-spotify"
+              onClick={handleConnectSpotify}
+              disabled={spotifyConnecting}
+            >
+              {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
+            </button>
+          )}
+        </div>
 
-                <hr className="pf-divider" />
+        <hr className="pf-divider" />
 
-                <div className="pf-email">
-                    Signed in as {user?.email}
-                </div>
-            </div>
-            <img
-                ref={duckRef}
-                src={boxDuckImg}
-                alt="box duck"
-                style={{
-                    position: "fixed",
-                    right: "30px",
-                    bottom: "50px",
-                    top: "auto",
-                    width: "230px",
-                    zIndex: 50,
-                    pointerEvents: "none",
-                }}
-            />
-        </>
-    );
+        <div className="pf-email">Signed in as {user?.email}</div>
+      </div>
+      <img
+        ref={duckRef}
+        src={boxDuckImg}
+        alt="box duck"
+        style={{
+          position: "fixed",
+          right: "30px",
+          bottom: "50px",
+          top: "auto",
+          width: "230px",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      />
+    </>
+  );
 }

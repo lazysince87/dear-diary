@@ -93,7 +93,9 @@ export default function HomePage() {
   };
 
   // Past entries are all entries except the latest one just submitted
-  const pastEntries = latestEntry ? entries.filter((e) => e !== latestEntry) : entries;
+  const pastEntries = latestEntry
+    ? entries.filter((e) => e !== latestEntry)
+    : entries;
 
   return (
     <>
@@ -241,7 +243,14 @@ export default function HomePage() {
           }
         }
       `}</style>
-        <div ref={pageRef} style={{ position: "relative", padding: "30px 20px 80px", width: "100%" }}>
+      <div
+        ref={pageRef}
+        style={{
+          position: "relative",
+          padding: "30px 20px 80px",
+          width: "100%",
+        }}
+      >
         {STAR_POSITIONS.map((pos, i) => (
           <div
             key={pos.id}
@@ -295,10 +304,12 @@ export default function HomePage() {
             <hr className="dd-divider" />
             <div className="dd-section-label">Earlier entries</div>
             {pastEntries.map((entry, i) => (
-              <div key={entry._id || i} style={{ marginBottom: '16px' }}>
+              <div key={entry._id || i} style={{ marginBottom: "16px" }}>
                 <div
                   className="dd-entry-card"
-                  onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+                  onClick={() =>
+                    setExpandedIndex(expandedIndex === i ? null : i)
+                  }
                 >
                   <div className="dd-entry-date">
                     {new Date(entry.timestamp).toLocaleString("en-US", {

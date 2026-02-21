@@ -1,28 +1,37 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { BookHeart, Library, Heart, Shield, LogOut, User, Music } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import {
+  BookHeart,
+  Library,
+  Heart,
+  Shield,
+  LogOut,
+  User,
+  Music,
+} from "lucide-react";
+import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Header({ onLogoutClick }) {
-  const { isCovertMode, toggleCovertMode, isMusicOn, nowPlaying, toggleMusic } = useApp();
+  const { isCovertMode, toggleCovertMode, isMusicOn, nowPlaying, toggleMusic } =
+    useApp();
   const { user } = useAuth();
   const location = useLocation();
 
   const getTitleColor = () => {
-    if (location.pathname === '/patterns') return '#4a7c59';
-    if (location.pathname === '/resources') return '#7b5ea7';
-    if (location.pathname === '/profile') return '#6a9fd8';
-    return '#c9748a';
+    if (location.pathname === "/patterns") return "#4a7c59";
+    if (location.pathname === "/resources") return "#7b5ea7";
+    if (location.pathname === "/profile") return "#6a9fd8";
+    return "#c9748a";
   };
 
   const getNavStyle = (path) => {
     const colors = {
-      '/': { color: '#c9748a', border: '#c9748a' },
-      '/patterns': { color: '#4a7c59', border: '#4a7c59' },
-      '/resources': { color: '#7b5ea7', border: '#7b5ea7' },
-      '/profile': { color: '#6a9fd8', border: '#6a9fd8' },
+      "/": { color: "#c9748a", border: "#c9748a" },
+      "/patterns": { color: "#4a7c59", border: "#4a7c59" },
+      "/resources": { color: "#7b5ea7", border: "#7b5ea7" },
+      "/profile": { color: "#6a9fd8", border: "#6a9fd8" },
     };
-    return colors[path] || colors['/'];
+    return colors[path] || colors["/"];
   };
 
   return (
@@ -38,7 +47,11 @@ export default function Header({ onLogoutClick }) {
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
             className="text-left text-xl font-semibold"
-            style={{ fontFamily: "var(--font-serif)", color: getTitleColor(), transition: "color 0.3s ease" }}
+            style={{
+              fontFamily: "var(--font-serif)",
+              color: getTitleColor(),
+              transition: "color 0.3s ease",
+            }}
           >
             Dear Diary
           </h1>
@@ -52,7 +65,14 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
-            style={({ isActive }) => isActive ? { color: getNavStyle('/').color, borderBottomColor: getNavStyle('/').border } : {}}
+            style={({ isActive }) =>
+              isActive
+                ? {
+                    color: getNavStyle("/").color,
+                    borderBottomColor: getNavStyle("/").border,
+                  }
+                : {}
+            }
           >
             <BookHeart size={16} />
             <span className="hidden sm:inline">Journal</span>
@@ -63,7 +83,14 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
-            style={({ isActive }) => isActive ? { color: getNavStyle('/patterns').color, borderBottomColor: getNavStyle('/patterns').border } : {}}
+            style={({ isActive }) =>
+              isActive
+                ? {
+                    color: getNavStyle("/patterns").color,
+                    borderBottomColor: getNavStyle("/patterns").border,
+                  }
+                : {}
+            }
           >
             <Library size={16} />
             <span className="hidden sm:inline">Patterns</span>
@@ -74,7 +101,14 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
-            style={({ isActive }) => isActive ? { color: getNavStyle('/resources').color, borderBottomColor: getNavStyle('/resources').border } : {}}
+            style={({ isActive }) =>
+              isActive
+                ? {
+                    color: getNavStyle("/resources").color,
+                    borderBottomColor: getNavStyle("/resources").border,
+                  }
+                : {}
+            }
           >
             <Heart size={16} />
             <span className="hidden sm:inline">Resources</span>
@@ -85,7 +119,14 @@ export default function Header({ onLogoutClick }) {
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
-            style={({ isActive }) => isActive ? { color: getNavStyle('/profile').color, borderBottomColor: getNavStyle('/profile').border } : {}}
+            style={({ isActive }) =>
+              isActive
+                ? {
+                    color: getNavStyle("/profile").color,
+                    borderBottomColor: getNavStyle("/profile").border,
+                  }
+                : {}
+            }
           >
             <User size={16} />
             <span className="hidden sm:inline">Profile</span>
@@ -96,25 +137,36 @@ export default function Header({ onLogoutClick }) {
             <button
               onClick={toggleMusic}
               className="nav-link flex items-center gap-1.5"
-              title={isMusicOn && nowPlaying ? `Now playing: ${nowPlaying.name} - ${nowPlaying.artist}` : 'Play music'}
+              title={
+                isMusicOn && nowPlaying
+                  ? `Now playing: ${nowPlaying.name} - ${nowPlaying.artist}`
+                  : "Play music"
+              }
               style={{
-                color: isMusicOn ? '#c9748a' : undefined,
-                position: 'relative',
+                color: isMusicOn ? "#c9748a" : undefined,
+                position: "relative",
               }}
             >
-              <Music size={16} className={isMusicOn ? 'animate-pulse-soft' : ''} />
-              <span className="hidden sm:inline">{isMusicOn ? 'Stop' : 'Music'}</span>
+              <Music
+                size={16}
+                className={isMusicOn ? "animate-pulse-soft" : ""}
+              />
+              <span className="hidden sm:inline">
+                {isMusicOn ? "Stop" : "Music"}
+              </span>
               {isMusicOn && (
-                <span style={{
-                  position: 'absolute',
-                  top: '2px',
-                  right: '-2px',
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#c9748a',
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }} />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "2px",
+                    right: "-2px",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: "#c9748a",
+                    animation: "pulse 1.5s ease-in-out infinite",
+                  }}
+                />
               )}
             </button>
           )}
@@ -154,20 +206,21 @@ export default function Header({ onLogoutClick }) {
 
       {/* Now Playing Bar */}
       {isMusicOn && nowPlaying && (
-        <div style={{
-          background: 'rgba(201, 116, 138, 0.08)',
-          borderTop: '1px solid rgba(201, 116, 138, 0.15)',
-          padding: '4px 16px',
-          textAlign: 'center',
-          fontFamily: "'Pixelify Sans', sans-serif",
-          fontSize: '10px',
-          color: '#9a8282',
-          letterSpacing: '0.5px',
-        }}>
+        <div
+          style={{
+            background: "rgba(201, 116, 138, 0.08)",
+            borderTop: "1px solid rgba(201, 116, 138, 0.15)",
+            padding: "4px 16px",
+            textAlign: "center",
+            fontFamily: "'Pixelify Sans', sans-serif",
+            fontSize: "10px",
+            color: "#9a8282",
+            letterSpacing: "0.5px",
+          }}
+        >
           Now playing: {nowPlaying.name} — {nowPlaying.artist}
         </div>
       )}
     </header>
   );
 }
-
