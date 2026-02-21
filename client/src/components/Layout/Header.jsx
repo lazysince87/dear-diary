@@ -8,14 +8,13 @@ export default function Header({ onLogoutClick }) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md border-b border-warm-200/50" style={{ backgroundColor: '#fdf7fa' }}>
+    <header className="sticky top-0 z-50 backdrop-blur-md border-b border-warm-200/50" style={{ backgroundColor: 'white' }}>
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
             className="text-xl font-semibold text-text-primary"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            {isCovertMode ? "My Recipes" : "Rosie"}
           </h1>
         </NavLink>
 

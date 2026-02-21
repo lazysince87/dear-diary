@@ -1,11 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import JournalEntry from "../components/Journal/JournalEntry";
 import JournalResponse from "../components/Journal/JournalResponse";
 import { useApp } from "../context/AppContext";
+import duckImg from "../assets/duck.png";
 
 export default function HomePage() {
   const { entries, addEntry } = useApp();
   const [latestEntry, setLatestEntry] = useState(null);
+  const duckRef = useRef(null);
+
+  useEffect(() => {
+    if (duckRef.current) {
+      gsap.fromTo(
+        duckRef.current,
+        { y: -800, opacity: 1 },
+        {
+          y: 0,
+          duration: 6,
+          ease: "bounce.out",
+          onComplete: () => {
+            gsap.to(duckRef.current, {
+              y: -10,
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        },
+      );
+    }
+  }, []);
 
   const handleAnalysisComplete = (entry) => {
     setLatestEntry(entry);
@@ -144,7 +170,16 @@ export default function HomePage() {
               weekday: "long", year: "numeric", month: "long", day: "numeric",
             })} 
           </div> */}
-          <h1 className="dd-title" style={{ color: 'white', fontFamily: "'KiwiSoda', sans-serif", fontSize: "50px" }}>Dear Diary</h1>
+          <h1
+            className="dd-title"
+            style={{
+              color: "white",
+              fontFamily: "'KiwiSoda', sans-serif",
+              fontSize: "50px",
+            }}
+          >
+            Dear Diary
+          </h1>
           {!latestEntry && entries.length === 0 && (
             <p className="dd-subtitle">
               Your safe space to reflect and understand your relationships.
@@ -183,6 +218,20 @@ export default function HomePage() {
           </>
         )}
       </div>
+      <img
+        ref={duckRef}
+        src={duckImg}
+        alt="duck"
+        style={{
+          position: "fixed",
+          right: "50px",
+          bottom: "50px",
+          top: "auto",
+          width: "250px",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      />
     </>
   );
 }
