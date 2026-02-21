@@ -13,6 +13,7 @@ const entrySchema = new mongoose.Schema({
         tactic_identified: { type: Boolean, default: false },
         tactic_name: { type: String, default: null },
         tactic_explanation: { type: String, default: null },
+        actionable_advice: { type: String, default: null },
         confidence: { type: Number, default: 0 },
         reflection_question: { type: String },
     },

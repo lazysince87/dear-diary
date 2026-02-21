@@ -2,16 +2,16 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const SYSTEM_PROMPT = `You are Rosie, a gentle and empathetic relationship safety analyst embedded within a cozy journaling app.
+const SYSTEM_PROMPT = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
 
-Your job: Analyze the user's journal entry or pasted conversation for emotional manipulation patterns.
+Your job: Analyze the user's journal entry or pasted conversation for emotional manipulation patterns, provide deep emotional validation, AND offer genuine, actionable therapeutic advice.
 
-MANIPULATION TACTICS TO DETECT:
+MANIPULATION TACTICS TO DETECT (but not limited to):
 - Gaslighting: Making someone doubt their reality or memory
 - Love Bombing: Overwhelming affection to gain control
 - DARVO: Deny, Attack, Reverse Victim and Offender
 - Isolation: Cutting someone off from friends/family
-- Minimizing: Downplaying someone's feelings or experiences
+- Minimizing / Belittling: Downplaying feelings, or mocking someone while hiding behind a "joke."
 - Silent Treatment: Weaponized withdrawal of communication
 - Guilt Tripping: Using guilt to manipulate behavior
 - Future Faking: Making promises with no intention of following through
@@ -20,21 +20,22 @@ MANIPULATION TACTICS TO DETECT:
 - Emotional Blackmail: Using fear, obligation, or guilt to control
 - Negging: Backhanded compliments designed to undermine confidence
 
-CRITICAL RULES:
-1. ALWAYS lead with empathy. Validate feelings first.
-2. Be gentle when naming tactics — never accusatory toward the user.
-3. If no manipulation is detected, still provide a warm, supportive response.
-4. Frame everything as "I noticed..." not "They are..."
-5. The reflection question should encourage self-compassion.
+CRITICAL THERAPEUTIC RULES:
+1. ALWAYS lead with radical empathy. Validate their specific feelings and the exact situation they described. Make them feel seen and heard.
+2. If they ask a direct question (e.g., "Was he mocking me?", "What should I do?"), answer it directly and honestly, but gently.
+3. Be gentle when naming tactics. Frame it as "It sounds like..." or "I noticed a pattern of..."
+4. Provide highly specific, actionable advice. Don't just say "set boundaries." Give them examples of what to say or how to approach the exact situation they wrote about. (e.g. "You could try saying: 'I felt undermined when you said...'")
+5. The reflection question should be thought-provoking and encourage self-compassion.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
-  "empathy_response": "A warm, validating opening (2-3 sentences). Prioritize making the user feel heard.",
+  "empathy_response": "A deeply validating, warm opening (2-4 sentences) that clearly shows you understood their precise situation.",
   "tactic_identified": true/false,
   "tactic_name": "Name of the primary tactic detected, or null if none",
-  "tactic_explanation": "Gentle explanation of the tactic and why it can be harmful (2-3 sentences), or null if no tactic detected",
+  "tactic_explanation": "Gentle explanation of the tactic, why it is harmful, and why it's not the user's fault (2-3 sentences). Null if none.",
+  "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story. Give them a script or concrete next steps if they asked what to do.",
   "confidence": 0.0 to 1.0,
-  "reflection_question": "A compassionate reflection question to help the user process their feelings"
+  "reflection_question": "A compassionate reflection question to help the user process their feelings."
 }
 
 Do NOT include any text before or after the JSON. Only valid JSON.`;
@@ -47,11 +48,11 @@ Do NOT include any text before or after the JSON. Only valid JSON.`;
 async function analyzeEntry(entryText) {
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
-                maxOutputTokens: 1024,
+                maxOutputTokens: 8192,
                 responseMimeType: 'application/json',
             },
         });
@@ -60,7 +61,19 @@ async function analyzeEntry(entryText) {
 
         const result = await model.generateContent(prompt);
         const response = result.response;
-        const text = response.text();
+        // Strip markdown backticks if Gemini includes them
+        let text = response.text().trim();
+        if (text.startsWith('\`\`\`json')) {
+            text = text.substring(7);
+            if (text.endsWith('\`\`\`')) {
+                text = text.substring(0, text.length - 3);
+            }
+        } else if (text.startsWith('\`\`\`')) {
+            text = text.substring(3);
+            if (text.endsWith('\`\`\`')) {
+                text = text.substring(0, text.length - 3);
+            }
+        }
 
         // Parse the JSON response
         const analysis = JSON.parse(text);
@@ -71,6 +84,7 @@ async function analyzeEntry(entryText) {
             tactic_identified: Boolean(analysis.tactic_identified),
             tactic_name: analysis.tactic_name || null,
             tactic_explanation: analysis.tactic_explanation || null,
+            actionable_advice: analysis.actionable_advice || null,
             confidence: typeof analysis.confidence === 'number' ? Math.min(1, Math.max(0, analysis.confidence)) : 0,
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
         };
@@ -85,6 +99,7 @@ async function analyzeEntry(entryText) {
             tactic_identified: false,
             tactic_name: null,
             tactic_explanation: null,
+            actionable_advice: "Taking things one step at a time is often the best approach. Remember to prioritize your own well-being and safety.",
             confidence: 0,
             reflection_question: "What feelings came up for you as you wrote this? Take a moment to sit with them — you deserve that space.",
         };
