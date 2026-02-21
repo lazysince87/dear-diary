@@ -9,7 +9,7 @@ const PATTERNS = [
     {
         id: 'gaslighting',
         name: 'Gaslighting',
-        icon: '🔥',
+        icon: '',
         severity: 'high',
         description: 'Making someone question their own reality, memory, or perception. This is one of the most damaging forms of emotional manipulation.',
         signs: [
@@ -29,7 +29,7 @@ const PATTERNS = [
     {
         id: 'love-bombing',
         name: 'Love Bombing',
-        icon: '💣',
+        icon: '',
         severity: 'medium',
         description: 'Overwhelming someone with excessive affection, gifts, or attention early on to gain control and create emotional dependency.',
         signs: [
@@ -49,7 +49,7 @@ const PATTERNS = [
     {
         id: 'darvo',
         name: 'DARVO',
-        icon: '🔄',
+        icon: '',
         severity: 'high',
         description: 'Deny the behavior, Attack the person confronting them, Reverse the roles of Victim and Offender.',
         signs: [
@@ -69,7 +69,7 @@ const PATTERNS = [
     {
         id: 'isolation',
         name: 'Isolation',
-        icon: '🏝️',
+        icon: '',
         severity: 'high',
         description: 'Gradually cutting someone off from their support network — friends, family, and other relationships.',
         signs: [
@@ -89,7 +89,7 @@ const PATTERNS = [
     {
         id: 'minimizing',
         name: 'Minimizing',
-        icon: '📉',
+        icon: '',
         severity: 'medium',
         description: 'Downplaying someone\'s feelings, experiences, or concerns to make them seem unimportant.',
         signs: [
@@ -109,7 +109,7 @@ const PATTERNS = [
     {
         id: 'silent-treatment',
         name: 'Silent Treatment',
-        icon: '🤐',
+        icon: '',
         severity: 'medium',
         description: 'Deliberately ignoring or refusing to communicate as a form of punishment or control.',
         signs: [
@@ -129,7 +129,7 @@ const PATTERNS = [
     {
         id: 'guilt-tripping',
         name: 'Guilt Tripping',
-        icon: '😔',
+        icon: '',
         severity: 'medium',
         description: 'Using guilt to manipulate someone into doing what you want or to make them feel bad about their choices.',
         signs: [
@@ -149,7 +149,7 @@ const PATTERNS = [
     {
         id: 'future-faking',
         name: 'Future Faking',
-        icon: '🌈',
+        icon: '',
         severity: 'medium',
         description: 'Making grand promises about the future with no real intention of following through, used to keep someone invested.',
         signs: [
