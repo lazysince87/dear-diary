@@ -29,6 +29,10 @@ const entrySchema = new mongoose.Schema({
         enum: ['grateful', 'confused', 'sad', 'anxious', 'hopeful', 'angry', 'numb', null],
         default: null,
     },
+    // Image URLs (uploaded to Supabase, stored here for reference)
+    imageUrls: [{
+        type: String,
+    }],
 }, {
     timestamps: true, // createdAt & updatedAt
 });

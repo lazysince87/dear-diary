@@ -6,11 +6,15 @@ import { useApp } from "../context/AppContext";
 export default function HomePage() {
   const { entries, addEntry } = useApp();
   const [latestEntry, setLatestEntry] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleAnalysisComplete = (entry) => {
     setLatestEntry(entry);
     addEntry(entry);
   };
+
+  // Past entries are all entries except the latest one just submitted
+  const pastEntries = latestEntry ? entries.filter((e) => e !== latestEntry) : entries;
 
   return (
     <>
@@ -160,23 +164,31 @@ export default function HomePage() {
             <JournalResponse entry={latestEntry} />
           </div>
         )}
-        {entries.length > 1 && (
+        {pastEntries.length > 0 && (
           <>
             <hr className="dd-divider" />
             <div className="dd-section-label">Earlier entries</div>
-            {entries.slice(1, 4).map((entry, i) => (
-              <div key={i} className="dd-entry-card">
-                <div className="dd-entry-date">
-                  {new Date(entry.timestamp).toLocaleString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+            {pastEntries.map((entry, i) => (
+              <div key={entry._id || i}>
+                <div
+                  className="dd-entry-card"
+                  onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+                >
+                  <div className="dd-entry-date">
+                    {new Date(entry.timestamp).toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <p className="dd-entry-preview">{entry.content}</p>
+                  {entry.analysis?.tactic_identified && (
+                    <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                  )}
                 </div>
-                <p className="dd-entry-preview">{entry.content}</p>
-                {entry.analysis?.tactic_identified && (
-                  <span className="dd-tag">{entry.analysis.tactic_name}</span>
+                {expandedIndex === i && entry.analysis && (
+                  <JournalResponse entry={entry} />
                 )}
               </div>
             ))}

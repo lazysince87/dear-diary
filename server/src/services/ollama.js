@@ -23,8 +23,10 @@ CRITICAL THERAPEUTIC RULES:
 1. ALWAYS lead with radical empathy. Validate their specific feelings and the exact situation they described. Make them feel seen and heard.
 2. If they ask a direct question (e.g., "Was he mocking me?", "What should I do?"), answer it directly and honestly, but gently.
 3. Be gentle when naming tactics. Frame it as "It sounds like..." or "I noticed a pattern of..."
-4. Provide highly specific, actionable advice. Don't just say "set boundaries." Give them examples of what to say or how to approach the exact situation they wrote about. (e.g. "You could try saying: 'I felt undermined when you said...'")
+4. Provide highly specific, actionable advice using the ACTUAL details from their entry. NEVER use placeholder text like "[insert specific situation]" or "[person's name]". Instead, directly reference what the user described. Always use their real words and situations.
 5. The reflection question should be thought-provoking and encourage self-compassion.
+6. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. If the entry is not purely positive/neutral, set suggests_music to true.
+7. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. Reference their actual story directly.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -32,9 +34,10 @@ You MUST respond ONLY with valid JSON matching this exact schema:
   "tactic_identified": true/false,
   "tactic_name": "Name of the primary tactic detected, or null if none",
   "tactic_explanation": "Gentle explanation of the tactic, why it is harmful, and why it's not the user's fault (2-3 sentences). Null if none.",
-  "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story. Give them a script or concrete next steps if they asked what to do.",
+  "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story using their REAL details.",
   "confidence": 0.0 to 1.0,
-  "reflection_question": "A compassionate reflection question to help the user process their feelings."
+  "reflection_question": "A compassionate reflection question to help the user process their feelings.",
+  "suggests_music": true/false
 }
 
 Do NOT include any text before or after the JSON. Only valid JSON.`;
@@ -105,6 +108,7 @@ async function analyzeEntry(entryText, pastEntries = []) {
             actionable_advice: analysis.actionable_advice || null,
             confidence: typeof analysis.confidence === 'number' ? Math.min(1, Math.max(0, analysis.confidence)) : 0,
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
+            suggests_music: Boolean(analysis.suggests_music),
         };
 
         return validated;
@@ -120,6 +124,7 @@ async function analyzeEntry(entryText, pastEntries = []) {
             actionable_advice: "Taking things one step at a time is often the best approach. Remember to prioritize your own well-being and safety.",
             confidence: 0,
             reflection_question: "What feelings came up for you as you wrote this? Take a moment to sit with them — you deserve that space.",
+            suggests_music: false,
         };
     }
 }

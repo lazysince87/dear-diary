@@ -30,7 +30,7 @@ export async function analyzeJournalEntry(content, mood = null) {
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || 'Something went wrong. Please try again. 💕');
+        throw new Error(error.error || 'Something went wrong. Please try again.');
     }
 
     return response.json();
@@ -131,6 +131,10 @@ export async function textToSpeech(text) {
             resolve({ usedFallback: true });
         };
 
+        utterance.onerror = () => {
+            resolve({ error: 'Speech synthesis failed' });
+        };
+
         window.speechSynthesis.speak(utterance);
     });
 }
@@ -180,3 +184,87 @@ export function createSpeechRecognition({ onResult, onInterim, onError, onEnd })
         stop: () => recognition.stop(),
     };
 }
+
+// ─── Preferences ─────────────────────
+
+/**
+ * Get user preferences (persona, display name, etc.)
+ */
+export async function getPreferences() {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/preferences`, { headers: authHeaders });
+    if (!response.ok) throw new Error('Could not load preferences');
+    return response.json();
+}
+
+/**
+ * Save user preferences (onboarding)
+ */
+export async function savePreferences(data) {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/preferences`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Could not save preferences');
+    return response.json();
+}
+
+// ─── Spotify ─────────────────────────
+
+/**
+ * Get the Spotify login URL
+ */
+export async function getSpotifyLoginUrl() {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/spotify/login`, { headers: authHeaders });
+    if (!response.ok) throw new Error('Could not get Spotify login URL');
+    return response.json();
+}
+
+/**
+ * Exchange Spotify authorization code for tokens
+ */
+export async function spotifyCallback(code) {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/spotify/callback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ code }),
+    });
+    if (!response.ok) throw new Error('Spotify connection failed');
+    return response.json();
+}
+
+/**
+ * Check Spotify connection status
+ */
+export async function getSpotifyStatus() {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/spotify/status`, { headers: authHeaders });
+    if (!response.ok) throw new Error('Could not check Spotify status');
+    return response.json();
+}
+
+// ─── Music ───────────────────────────
+
+/**
+ * Generate ambient music using ElevenLabs Sound Effects API
+ */
+export async function generateMusic(genres = []) {
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE}/voice/music`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ genres }),
+    });
+
+    if (!response.ok) throw new Error('Music generation failed');
+
+    const audioBlob = await response.blob();
+    return {
+        audioUrl: URL.createObjectURL(audioBlob),
+    };
+}
+

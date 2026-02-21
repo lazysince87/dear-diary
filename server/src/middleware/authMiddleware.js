@@ -8,7 +8,7 @@ async function requireAuth(req, res, next) {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({
-                error: 'Please sign in to continue. 💕'
+                error: 'Please sign in to continue.'
             });
         }
 
@@ -18,7 +18,7 @@ async function requireAuth(req, res, next) {
 
         if (error || !user) {
             return res.status(401).json({
-                error: 'Your session has expired. Please sign in again. 💕'
+                error: 'Your session has expired. Please sign in again.'
             });
         }
 
@@ -27,7 +27,7 @@ async function requireAuth(req, res, next) {
     } catch (error) {
         console.error('Auth middleware error:', error);
         return res.status(401).json({
-            error: 'Authentication failed. Please try signing in again. 💕'
+            error: 'Authentication failed. Please try signing in again.'
         });
     }
 }

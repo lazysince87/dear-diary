@@ -37,7 +37,7 @@ export default function Layout() {
             style={{ borderRadius: '2px' }}
           >
             <div className="text-center">
-              <div className="text-4xl mb-4">🚪</div>
+              <div className="text-4xl mb-4"></div>
               <h2 className="text-xl font-bold mb-2 uppercase tracking-wide" style={{ fontFamily: 'var(--font-serif)', color: '#3d2c2c' }}>
                 Sign out?
               </h2>

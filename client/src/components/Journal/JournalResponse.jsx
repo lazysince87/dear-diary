@@ -1,11 +1,36 @@
 import { useState } from "react";
-import { Volume2, AlertTriangle, Sparkles } from "lucide-react";
-import { textToSpeech } from "../../services/api";
+import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
+import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
 
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [musicAudio, setMusicAudio] = useState(null);
+  const [currentTrack, setCurrentTrack] = useState(null);
+
+  // Build a full narration script from all analysis sections
+  const buildVoiceScript = () => {
+    let script = analysis.empathy_response || "";
+
+    if (analysis.tactic_identified && analysis.tactic_name) {
+      script += ` I noticed a pattern that's worth talking about: ${analysis.tactic_name}.`;
+      if (analysis.tactic_explanation) {
+        script += ` ${analysis.tactic_explanation}`;
+      }
+    }
+
+    if (analysis.actionable_advice) {
+      script += ` Here's something you can try: ${analysis.actionable_advice}`;
+    }
+
+    if (analysis.reflection_question) {
+      script += ` And here's something to sit with: ${analysis.reflection_question}`;
+    }
+
+    return script;
+  };
 
   const handlePlayVoice = async () => {
     if (isPlaying) return;
@@ -13,7 +38,8 @@ export default function JournalResponse({ entry }) {
     setAudioError(false);
 
     try {
-      const result = await textToSpeech(analysis.empathy_response);
+      const voiceScript = buildVoiceScript();
+      const result = await textToSpeech(voiceScript);
 
       if (result.usedFallback) {
         // Browser TTS already played and finished
@@ -26,7 +52,14 @@ export default function JournalResponse({ entry }) {
           setIsPlaying(false);
           setAudioError(true);
         };
-        audio.play();
+        audio.play().catch(() => {
+          setIsPlaying(false);
+          setAudioError(true);
+        });
+      } else {
+        // Neither fallback nor audio URL — speech not supported or unknown error
+        setIsPlaying(false);
+        setAudioError(true);
       }
     } catch {
       setIsPlaying(false);
@@ -257,7 +290,8 @@ export default function JournalResponse({ entry }) {
             {analysis.tactic_identified && analysis.tactic_name && (
               <div className="jr-tactic">
                 <div className="jr-tactic-header">
-                  <span className="jr-tactic-name">{analysis.tactic_name}</span>
+                  <AlertTriangle size={14} style={{ color: '#c9748a', flexShrink: 0, marginTop: '2px' }} />
+                  <span className="jr-tactic-name">Detected Pattern: {analysis.tactic_name}</span>
                   {analysis.confidence > 0 && (
                     <span className="jr-confidence">
                       {Math.round(analysis.confidence * 100)}% confidence
@@ -290,6 +324,117 @@ export default function JournalResponse({ entry }) {
                 {analysis.reflection_question}
               </p>
             </div>
+
+            {/* Music Suggestion — triggered by AI distress detection */}
+            {analysis.suggests_music && (
+              <div style={{
+                padding: '16px',
+                border: '1px solid #e8d5c4',
+                borderRadius: '2px',
+                background: '#fdf6f0',
+                marginTop: '12px',
+              }}>
+                <p style={{
+                  fontFamily: "'Pixelify Sans', sans-serif",
+                  fontSize: '12px',
+                  color: '#6b5454',
+                  marginBottom: '10px',
+                  lineHeight: '1.6',
+                }}>
+                  Would you like to listen to some of your favorite songs to feel better?
+                </p>
+
+                {currentTrack && isMusicPlaying && (
+                  <p style={{
+                    fontFamily: "'Pixelify Sans', sans-serif",
+                    fontSize: '10px',
+                    color: '#9a8282',
+                    marginBottom: '8px',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Now playing: {currentTrack.name} - {currentTrack.artist}
+                  </p>
+                )}
+
+                <button
+                  onClick={async () => {
+                    if (isMusicPlaying && musicAudio) {
+                      musicAudio.pause();
+                      setIsMusicPlaying(false);
+                      setCurrentTrack(null);
+                      return;
+                    }
+                    setIsMusicPlaying(true);
+
+                    try {
+                      // Try Spotify tracks first
+                      const spotifyData = await getSpotifyStatus();
+
+                      if (spotifyData.musicTaste?.topTracks?.length > 0) {
+                        const tracks = spotifyData.musicTaste.topTracks.filter(t => t.previewUrl);
+
+                        if (tracks.length > 0) {
+                          // Shuffle and play tracks as a playlist
+                          const shuffled = [...tracks].sort(() => Math.random() - 0.5);
+                          let trackIndex = 0;
+
+                          const playTrack = (index) => {
+                            if (index >= shuffled.length) index = 0; // loop
+                            const track = shuffled[index];
+                            setCurrentTrack(track);
+                            const audio = new Audio(track.previewUrl);
+                            audio.onended = () => playTrack(index + 1);
+                            audio.onerror = () => {
+                              // skip broken previews
+                              if (index + 1 < shuffled.length) playTrack(index + 1);
+                              else { setIsMusicPlaying(false); setCurrentTrack(null); }
+                            };
+                            audio.play().catch(() => setIsMusicPlaying(false));
+                            setMusicAudio(audio);
+                          };
+
+                          playTrack(0);
+                          return;
+                        }
+                      }
+
+                      // Fallback: ElevenLabs generated music
+                      const result = await generateMusic();
+                      if (result.audioUrl) {
+                        const audio = new Audio(result.audioUrl);
+                        audio.loop = true;
+                        audio.onerror = () => setIsMusicPlaying(false);
+                        audio.play().catch(() => setIsMusicPlaying(false));
+                        setMusicAudio(audio);
+                      } else {
+                        setIsMusicPlaying(false);
+                      }
+                    } catch {
+                      setIsMusicPlaying(false);
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'none',
+                    border: '1px solid #c9a0a0',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    fontFamily: "'Pixelify Sans', sans-serif",
+                    fontSize: '11px',
+                    letterSpacing: '1.5px',
+                    textTransform: 'uppercase',
+                    color: '#6b5454',
+                    padding: '8px 14px',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <Music size={14} />
+                  {isMusicPlaying ? 'Stop' : 'Play Music'}
+                </button>
+              </div>
+            )}
             <details className="jr-details">
               <summary>What you shared</summary>
               <p className="jr-what-you-wrote">

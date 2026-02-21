@@ -8,6 +8,8 @@ const analyzeRoutes = require('./src/routes/analyze');
 const entriesRoutes = require('./src/routes/entries');
 const voiceRoutes = require('./src/routes/voice');
 const patternsRoutes = require('./src/routes/patterns');
+const spotifyRoutes = require('./src/routes/spotify');
+const preferencesRoutes = require('./src/routes/preferences');
 const { errorHandler } = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -31,6 +33,8 @@ app.use('/api/analyze', analyzeRoutes);
 app.use('/api/entries', entriesRoutes);
 app.use('/api/voice', voiceRoutes);
 app.use('/api/patterns', patternsRoutes);
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api/preferences', preferencesRoutes);
 
 // Error handling
 app.use(errorHandler);
