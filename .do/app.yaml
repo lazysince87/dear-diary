@@ -1,10 +1,10 @@
-name: rosie
+name: dear-diary
 region: nyc
 services:
   # Backend API
-  - name: rosie-api
+  - name: dear-diary-api
     github:
-      repo: YOUR_GITHUB_REPO_HERE
+      repo: https://github.com/lazysince87/winghacks-2026.git
       branch: main
       deploy_on_push: true
     source_dir: server
@@ -31,9 +31,9 @@ services:
       - path: /api
 
   # Frontend (Static Site)
-  - name: rosie-client
+  - name: dear-diary-client
     github:
-      repo: YOUR_GITHUB_REPO_HERE
+      repo: https://github.com/lazysince87/winghacks-2026.git
       branch: main
       deploy_on_push: true
     source_dir: client
