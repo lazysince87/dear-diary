@@ -5,7 +5,7 @@ import { textToSpeech } from "../../services/api";
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
   const [isPlaying, setIsPlaying] = useState(false);
-  const [setAudioError] = useState(false);
+  const [audioError, setAudioError] = useState(false);
 
   const handlePlayVoice = async () => {
     if (isPlaying) return;
