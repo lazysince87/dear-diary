@@ -63,7 +63,7 @@ function App() {
         <Route path="/patterns" element={<PatternLibraryPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/entries" element={<EntriesPage />} />
+        <Route path="/entries" element={<Entries />} />
       </Route>
     </Routes>
   );

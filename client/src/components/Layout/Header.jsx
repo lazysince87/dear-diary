@@ -79,7 +79,7 @@ export default function Header({ onLogoutClick }) {
           </NavLink>
 
           <NavLink
-            to="/history"
+            to="/entries"
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
             }
