@@ -209,4 +209,4 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
     }
 }
 
-module.exports = { analyzeEntry };
+module.exports = { analyzeEntry, SYSTEM_PROMPT_BASE, PERSONA_INSTRUCTIONS };

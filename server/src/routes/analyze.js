@@ -52,7 +52,7 @@ router.post('/', requireAuth, async (req, res, next) => {
 
         // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
-            analysis = await analyzeOllama(content.trim(), mood, pastEntries);
+            analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
             console.log('[DEBUG] image received for analysis:', !!imageUrl, 'mood:', mood);
             analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
