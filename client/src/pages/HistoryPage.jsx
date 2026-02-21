@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { fetchEntries } from "../services/api";
 import { Calendar, Heart, AlertCircle, Search, Image as ImageIcon, Sparkles } from "lucide-react";
 
-export default function HistoryPage() {
+export default function EntriesPage() {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -313,16 +313,16 @@ export default function HistoryPage() {
                                             <div className="nb-tab-body">
                                                 <div className="nb-paper-content">
                                                     {(entry.imageUrl || entry.image_url) && (
-                                                        <div className="mb-6 border-b border-dashed border-[#f0ddd5] pb-6 flex justify-center">
+                                                        <div className="mb-6 border-b border-dashed border-[#f0ddd5] pb-6 flex justify-center pl-10 pr-4">
                                                             <img
                                                                 src={entry.imageUrl || entry.image_url}
                                                                 alt="Preserved moment"
-                                                                className="max-w-full md:max-w-md h-auto rounded shadow-sm border border-[#e8d5c4] object-contain"
+                                                                className="max-w-full h-auto rounded shadow-sm border border-[#e8d5c4] object-contain"
                                                             />
                                                         </div>
                                                     )}
 
-                                                    <div className="mb-8">
+                                                    <div className="mb-8 p-2">
                                                         <span className="nb-label">Your words</span>
                                                         <p className="text-sm italic">"{entry.content}"</p>
                                                     </div>
@@ -330,10 +330,10 @@ export default function HistoryPage() {
                                                     {entry.analysis && (
                                                         <div className="space-y-6 pt-4 border-t border-dashed border-[#f0ddd5]">
                                                             <div>
-                                                                <span className="nb-label flex items-center gap-1.5">
-                                                                    <Heart size={10} /> Rosie's Reflection
+                                                                <span className="nb-label p-2 flex items-center gap-1.5">
+                                                                    <Heart size={10} /> Reflection
                                                                 </span>
-                                                                <p className="text-sm">{entry.analysis.empathy_response}</p>
+                                                                <p className="text-sm p-2">{entry.analysis.empathy_response}</p>
                                                             </div>
 
                                                             {entry.analysis.tactic_identified && (
@@ -346,7 +346,7 @@ export default function HistoryPage() {
 
                                                             {entry.analysis.actionable_advice && (
                                                                 <div>
-                                                                    <span className="nb-label flex items-center gap-1.5">
+                                                                    <span className="nb-label p-2 flex items-center gap-1.5">
                                                                         <Sparkles size={10} /> Guidance
                                                                     </span>
                                                                     <p className="text-xs italic text-center text-text-muted">
