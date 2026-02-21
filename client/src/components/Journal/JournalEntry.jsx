@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Send, Mic, Loader2 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { analyzeJournalEntry } from "../../services/api";
 
@@ -22,16 +21,10 @@ export default function JournalEntry({ onAnalysisComplete }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim() || isLoading) return;
-
     setIsLoading(true);
     setError(null);
-
     try {
-      const result = await analyzeJournalEntry(
-        content.trim(),
-        sessionId,
-        selectedMood,
-      );
+      const result = await analyzeJournalEntry(content.trim(), sessionId, selectedMood);
       onAnalysisComplete({
         content: content.trim(),
         mood: selectedMood,
@@ -50,195 +43,224 @@ export default function JournalEntry({ onAnalysisComplete }) {
   return (
     <>
       <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Special+Elite&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
 
-                .dd-page {
-                    max-width: 640px;
-                    margin: 0 auto;
-                    padding: 48px 20px 80px;
-                }
+        .je-book {
+          background: #fffaf7;
+          border: 1px solid #e8d5c4;
+          border-radius: 2px;
+          box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
+          overflow: hidden;
+        }
 
-                .dd-date {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 12px;
-                    color: #7a5060;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    margin-bottom: 12px;
-                }
+        .je-inner {
+          display: flex;
+        }
 
-                .dd-title {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 28px;
-                    font-weight: 600;
-                    color: #f2c4ce;
-                    letter-spacing: 3px;
-                    text-transform: uppercase;
-                    margin-bottom: 10px;
-                }
+        .je-spine {
+          width: 28px;
+          background: #e0c4c4;
+          border-right: 1px solid #d4b096;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 16px 0;
+          gap: 10px;
+        }
 
-                .dd-subtitle {
-                    font-family: 'Special Elite', serif;
-                    font-size: 14px;
-                    color: #a0788a;
-                    line-height: 1.7;
-                    margin-bottom: 32px;
-                }
+        .je-spine-dot {
+          width: 6px;
+          height: 6px;
+          background: #fffaf7;
+          border: 1px solid #c9a0a0;
+          border-radius: 1px;
+        }
 
-                .dd-divider {
-                    border: none;
-                    border-top: 1px solid #4a2535;
-                    margin: 36px 0;
-                }
+        .je-content {
+          flex: 1;
+          padding: 20px 20px 16px;
+        }
 
-                .dd-section-label {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 11px;
-                    letter-spacing: 3px;
-                    text-transform: uppercase;
-                    color: #7a5060;
-                    margin-bottom: 16px;
-                }
+        .je-date {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #9a8282;
+          margin-bottom: 14px;
+        }
 
-                .dd-entry-card {
-                    border-left: 3px solid #4a2535;
-                    padding: 12px 16px;
-                    margin-bottom: 12px;
-                    cursor: pointer;
-                    transition: border-color 0.15s;
-                }
+        .je-mood-label {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #9a8282;
+          margin-bottom: 8px;
+        }
 
-                .dd-entry-card:hover {
-                    border-color: #c9748a;
-                }
+        .je-moods {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 16px;
+        }
 
-                .dd-entry-date {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 11px;
-                    color: #7a5060;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    margin-bottom: 6px;
-                }
+        .je-mood-chip {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 11px;
+          letter-spacing: 1px;
+          padding: 4px 12px;
+          border: 1px solid #e8d5c4;
+          background: transparent;
+          color: #9a8282;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: all 0.1s;
+        }
 
-                .dd-entry-preview {
-                    font-family: 'Special Elite', serif;
-                    font-size: 14px;
-                    color: #a0788a;
-                    line-height: 1.6;
-                    overflow: hidden;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                }
+        .je-mood-chip:hover {
+          border-color: #c9a0a0;
+          color: #6b5454;
+        }
 
-                .dd-tag {
-                    display: inline-block;
-                    margin-top: 8px;
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 10px;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    padding: 2px 8px;
-                    border: 1px solid #c9748a;
-                    color: #c9748a;
-                }
-            `}</style>
-      <div className="animate-fade-in">
-        <div className="glass-card p-6 md:p-8">
-          <div className="mb-4">
-            <div className="dd-date">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+        .je-mood-chip.active {
+          border-color: #c9a0a0;
+          background: #f5ebe0;
+          color: #3d2c2c;
+        }
+
+        .je-textarea {
+          width: 100%;
+          min-height: 200px;
+          background: transparent;
+          border: none;
+          outline: none;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 14px;
+          color: #3d2c2c;
+          line-height: 28px;
+          resize: none;
+          caret-color: #c9a0a0;
+          background-image: repeating-linear-gradient(
+            transparent,
+            transparent 27px,
+            #f0ddd5 27px,
+            #f0ddd5 28px
+          );
+          background-attachment: local;
+          padding: 0 0 4px 0;
+          margin-bottom: 16px;
+        }
+
+        .je-textarea::placeholder {
+          color: #c9b4b4;
+          font-style: italic;
+        }
+
+        .je-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: 12px;
+          border-top: 1px dashed #e8d5c4;
+        }
+
+        .je-char-count {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          color: #c9b4b4;
+          letter-spacing: 1px;
+        }
+
+        .je-submit {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          padding: 8px 22px;
+          border: 1px solid #c9a0a0;
+          background: transparent;
+          color: #6b5454;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: all 0.15s;
+        }
+
+        .je-submit:hover:not(:disabled) {
+          background: #f5ebe0;
+          border-color: #a67b7b;
+          color: #3d2c2c;
+        }
+
+        .je-submit:disabled {
+          opacity: 0.35;
+          cursor: not-allowed;
+        }
+
+        .je-error {
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 11px;
+          color: #c9365a;
+          margin-top: 10px;
+          letter-spacing: 1px;
+        }
+      `}</style>
+
+      <form onSubmit={handleSubmit}>
+        <div className="je-book">
+          <div className="je-inner">
+            <div className="je-spine">
+              {[...Array(6)].map((_, i) => <div key={i} className="je-spine-dot" />)}
             </div>
-            <h2
-              className="text-2xl md:text-3xl font-semibold text-text-primary mt-1"
-              style={{ fontFamily: "var(--font-serif)" }}
-            ></h2>
-          </div>
-
-          {/* Mood selector */}
-          <div className="mb-4">
-            <p className="text-sm text-text-secondary mb-2">
-              How are you feeling?
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {MOODS.map((mood) => (
-                <button
-                  key={mood.value}
-                  onClick={() =>
-                    setSelectedMood(
-                      selectedMood === mood.value ? null : mood.value,
-                    )
-                  }
-                  className={`mood-badge ${selectedMood === mood.value ? "active" : ""}`}
-                >
-                  {mood.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Journal textarea */}
-          <form onSubmit={handleSubmit}>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Write about your day, paste a conversation, or share what's on your mind"
-              className="journal-textarea"
-              disabled={isLoading}
-              rows={6}
-            />
-
-            {/* Error message */}
-            {error && (
-              <div className="mt-3 p-3 rounded-xl bg-rose-50 text-rose-600 text-sm animate-fade-in">
-                {error}
+            <div className="je-content">
+              <div className="je-date">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                })}
               </div>
-            )}
 
-            {/* Actions */}
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center gap-2">
-                {/* Voice input button (stretch goal) */}
-                <button
-                  type="button"
-                  className="btn-secondary flex items-center gap-1.5 !px-3 !py-2"
-                  title="Voice input (coming soon)"
-                  onClick={() => {
-                    /* TODO: Voice input */
-                  }}
-                >
-                  <Mic size={16} />
-                  <span className="hidden sm:inline text-sm">Speak</span>
-                </button>
+              <div className="je-mood-label">How are you feeling?</div>
+              <div className="je-moods">
+                {MOODS.map((mood) => (
+                  <button
+                    key={mood.value}
+                    type="button"
+                    className={`je-mood-chip ${selectedMood === mood.value ? "active" : ""}`}
+                    onClick={() => setSelectedMood(selectedMood === mood.value ? null : mood.value)}
+                  >
+                    {mood.label}
+                  </button>
+                ))}
               </div>
 
-              <button
-                type="submit"
-                className="btn-primary flex items-center gap-2"
-                disabled={!content.trim() || isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>Listening...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send size={16} />
-                    <span>Share</span>
-                  </>
-                )}
-              </button>
+              <textarea
+                className="je-textarea"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write about what happened..."
+                disabled={isLoading}
+                rows={8}
+              />
+
+              {error && <div className="je-error">{error}</div>}
+
+              <div className="je-footer">
+                <span className="je-char-count">{content.length} chars</span>
+                <button
+                  type="submit"
+                  className="je-submit"
+                  disabled={!content.trim() || isLoading}
+                >
+                  {isLoading ? "Reading..." : "Reflect"}
+                </button>
+              </div>
             </div>
-          </form>
+
+          </div>
         </div>
-      </div>
+      </form>
     </>
   );
 }
