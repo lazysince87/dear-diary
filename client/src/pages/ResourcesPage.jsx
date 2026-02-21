@@ -1,6 +1,34 @@
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import ResourceList from "../components/Resources/ResourceList";
+import heartDuckImg from "../assets/animations/heart-duck.png";
 
 export default function ResourcesPage() {
+  const duckRef = useRef(null);
+
+  useEffect(() => {
+    if (duckRef.current) {
+      gsap.fromTo(
+        duckRef.current,
+        { y: -800, opacity: 1 },
+        {
+          y: 0,
+          duration: 6,
+          ease: "bounce.out",
+          onComplete: () => {
+            gsap.to(duckRef.current, {
+              y: -10,
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        },
+      );
+    }
+  }, []);
+
   return (
     <>
       <style>{`
@@ -40,6 +68,20 @@ export default function ResourcesPage() {
         </p> */}
         <ResourceList />
       </div>
+      <img
+        ref={duckRef}
+        src={heartDuckImg}
+        alt="heart duck"
+        style={{
+          position: "fixed",
+          right: "35px",
+          bottom: "50px",
+          top: "auto",
+          width: "230px",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      />
     </>
   );
 }

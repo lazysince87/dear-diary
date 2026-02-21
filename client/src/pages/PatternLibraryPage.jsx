@@ -1,12 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import PatternCard from "../components/PatternLibrary/PatternCard";
 import PatternDetail from "../components/PatternLibrary/PatternDetail";
 import { fetchPatterns } from "../services/api";
+import waveDuckImg from "../assets/animations/wave-duck.png";
 
 export default function PatternLibraryPage() {
   const [patterns, setPatterns] = useState([]);
   const [selectedPattern, setSelectedPattern] = useState(null);
   const [loading, setLoading] = useState(true);
+  const duckRef = useRef(null);
+
+  useEffect(() => {
+    if (duckRef.current) {
+      gsap.fromTo(
+        duckRef.current,
+        { y: -800, opacity: 1 },
+        {
+          y: 0,
+          duration: 6,
+          ease: "bounce.out",
+          onComplete: () => {
+            gsap.to(duckRef.current, {
+              y: -10,
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        },
+      );
+    }
+  }, []);
 
   useEffect(() => {
     loadPatterns();
@@ -96,6 +122,20 @@ export default function PatternLibraryPage() {
           />
         )}
       </div>
+      <img
+        ref={duckRef}
+        src={waveDuckImg}
+        alt="wave duck"
+        style={{
+          position: "fixed",
+          left: "67px",
+          bottom: "50px",
+          top: "auto",
+          width: "200px",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      />
     </>
   );
 }
