@@ -68,9 +68,11 @@
   ::-webkit-scrollbar {
     width: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     background: var(--color-dusty-rose-light);
     border-radius: 999px;
@@ -78,38 +80,81 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInSlow {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes typing {
-  0% { width: 0; }
-  100% { width: 100%; }
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .animate-fade-in {
@@ -132,65 +177,81 @@
   animation: float 3s ease-in-out infinite;
 }
 
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-dusty-rose) 0%, var(--color-rose-500) 100%);
-  color: white;
-  border: none;
-  border-radius: 999px;
-  padding: 0.75rem 2rem;
-  font-weight: 600;
-  font-size: 0.925rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px -3px rgba(232, 76, 106, 0.35);
-  letter-spacing: 0.01em;
+.delay-100 {
+  animation-delay: 100ms;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px -3px rgba(232, 76, 106, 0.45);
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+.btn-primary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-dusty-rose);
+  border-radius: 2px;
+  padding: 0.75rem 2rem;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 0.925rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-cream-dark);
+  color: var(--color-text-primary);
+  border-color: var(--color-dusty-rose-dark);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(1px);
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--color-text-primary);
-  border: 1.5px solid var(--color-dusty-rose-light);
-  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-warm-200);
+  border-radius: 2px;
   padding: 0.65rem 1.75rem;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: var(--color-dusty-rose-light);
-  border-color: var(--color-dusty-rose);
+  background: var(--color-warm-100);
+  border-color: var(--color-dusty-rose-light);
+  color: var(--color-text-secondary);
 }
 
 .shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--color-cream) 25%,
-    var(--color-cream-dark) 50%,
-    var(--color-cream) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--color-cream) 25%,
+      var(--color-cream-dark) 50%,
+      var(--color-cream) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 0.5rem;
@@ -256,12 +317,14 @@
 
 .nav-link:hover {
   color: var(--color-text-primary);
-  background: rgba(201, 160, 160, 0.15);
+  background: var(--color-warm-100);
 }
 
 .nav-link.active {
-  color: var(--color-rose-500);
-  background: rgba(232, 76, 106, 0.08);
+  color: var(--color-dusty-rose-dark);
+  background: transparent;
+  border-bottom: 2px dashed var(--color-dusty-rose);
+  border-radius: 0;
   font-weight: 600;
 }
 
