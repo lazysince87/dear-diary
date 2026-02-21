@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const AppContext = createContext(null);
 
@@ -42,6 +42,7 @@ export function AppProvider({ children }) {
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {
     const context = useContext(AppContext);
     if (!context) {

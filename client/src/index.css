@@ -34,7 +34,7 @@
   --color-text-muted: #9a8282;
 
   --font-sans: 'DM Sans', 'Inter', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', 'Georgia', serif;
+  --font-serif: 'Pixelify Sans', sans-serif;
 }
 
 @layer base {

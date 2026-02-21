@@ -13,13 +13,7 @@ export default function Layout({ children }) {
             <main className="max-w-4xl mx-auto px-4 py-6 md:py-10 relative z-10">
                 {children}
             </main>
-
-            {/* Footer */}
             <footer className="text-center py-6 text-text-muted text-sm">
-                <p>
-                    Made with 💕 at SASEHacks 2026 •{' '}
-                    <span className="text-dusty-rose">You are not alone.</span>
-                </p>
             </footer>
         </div>
     );
