@@ -18,7 +18,7 @@ export default function HomePage() {
         @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
 
         .dd-page {
-          max-width: 620px;
+          max-width: 1250px;
           margin: 0 auto;
           padding: 48px 20px 80px;
         }

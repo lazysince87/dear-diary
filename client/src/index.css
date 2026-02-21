@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-/* ===== Rosie Design System ===== */
-/* Warm, safe, "like a warm hug" */
-
 @theme {
   --color-rose-50: #fff5f5;
   --color-rose-100: #ffe0e0;
@@ -63,7 +60,6 @@
     color: var(--color-text-primary);
   }
 
-  /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -76,7 +72,6 @@
   }
 }
 
-/* ===== Animations ===== */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -132,14 +127,12 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Staggered animation delays */
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* ===== Button base styles ===== */
 .btn-primary {
   background: linear-gradient(135deg, var(--color-dusty-rose) 0%, var(--color-rose-500) 100%);
   color: white;
@@ -186,7 +179,6 @@
   border-color: var(--color-dusty-rose);
 }
 
-/* ===== Shimmer loading ===== */
 .shimmer {
   background: linear-gradient(
     90deg,
@@ -199,7 +191,6 @@
   border-radius: 0.5rem;
 }
 
-/* ===== Mood badge ===== */
 .mood-badge {
   display: inline-flex;
   align-items: center;
@@ -222,7 +213,6 @@
   color: var(--color-text-primary);
 }
 
-/* ===== Textarea ===== */
 .journal-textarea {
   width: 100%;
   min-height: 180px;
@@ -249,7 +239,6 @@
   font-style: italic;
 }
 
-/* ===== Navigation ===== */
 .nav-link {
   color: var(--color-text-secondary);
   text-decoration: none;
@@ -271,41 +260,6 @@
   font-weight: 600;
 }
 
-/* ===== Background decoration ===== */
-.bg-decoration {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.bg-decoration-1 {
-  width: 400px;
-  height: 400px;
-  background: var(--color-rose-300);
-  top: -100px;
-  right: -100px;
-}
-
-.bg-decoration-2 {
-  width: 300px;
-  height: 300px;
-  background: var(--color-dusty-rose-light);
-  bottom: -50px;
-  left: -50px;
-}
-
-.bg-decoration-3 {
-  width: 250px;
-  height: 250px;
-  background: var(--color-sage-light);
-  top: 50%;
-  left: 60%;
-}
-
-/* ===== Responsive helpers ===== */
 @media (max-width: 640px) {
   .journal-textarea {
     min-height: 140px;
