@@ -39,6 +39,8 @@ router.post('/', requireAuth, async (req, res, next) => {
         const aiProvider = process.env.AI_PROVIDER?.toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
         let analysis;
 
+        console.log(`[AI Provider]: using ${aiProvider.toUpperCase()}`);
+
         // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
             analysis = await analyzeOllama(content.trim(), pastEntries);
