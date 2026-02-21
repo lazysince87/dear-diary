@@ -13,8 +13,7 @@ export default function Header() {
           <h1
             className="text-xl font-semibold text-text-primary"
             style={{ fontFamily: "var(--font-serif)" }}
-          >
-          </h1>
+          ></h1>
         </NavLink>
 
         {/* Navigation */}

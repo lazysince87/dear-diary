@@ -137,7 +137,6 @@ export default function HomePage() {
       `}</style>
 
       <div className="dd-page">
-
         {/* Header */}
         <div className="dd-header-block">
           {/* <div className="dd-date">
@@ -169,8 +168,10 @@ export default function HomePage() {
               <div key={i} className="dd-entry-card">
                 <div className="dd-entry-date">
                   {new Date(entry.timestamp).toLocaleString("en-US", {
-                    month: "short", day: "numeric",
-                    hour: "numeric", minute: "2-digit",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
                   })}
                 </div>
                 <p className="dd-entry-preview">{entry.content}</p>
