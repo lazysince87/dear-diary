@@ -22,12 +22,21 @@ router.get('/', requireAuth, async (req, res, next) => {
  */
 router.post('/', requireAuth, async (req, res, next) => {
     try {
-        const { displayName, personaPreference } = req.body;
+        const { displayName, personaPreference, defaultCyclePhase, averageSleepHours, averageStressLevel } = req.body;
 
         const update = {};
         if (displayName) update.displayName = displayName.trim();
         if (personaPreference && ['friend', 'therapist'].includes(personaPreference)) {
             update.personaPreference = personaPreference;
+        }
+        if (defaultCyclePhase !== undefined) {
+            update.defaultCyclePhase = ['menstrual', 'follicular', 'ovulatory', 'luteal'].includes(defaultCyclePhase) ? defaultCyclePhase : null;
+        }
+        if (averageSleepHours !== undefined) {
+            update.averageSleepHours = averageSleepHours !== null ? Number(averageSleepHours) : null;
+        }
+        if (averageStressLevel !== undefined) {
+            update.averageStressLevel = averageStressLevel !== null ? Number(averageStressLevel) : null;
         }
         update.onboardingComplete = true;
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Mic, MicOff, Image as ImageIcon, X, Paperclip } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import {
@@ -18,7 +18,7 @@ const MOODS = [
 ];
 
 export default function JournalEntry({ onAnalysisComplete }) {
-    const { isLoading, setIsLoading } = useApp();
+    const { isLoading, setIsLoading, preferences } = useApp();
     const [content, setContent] = useState("");
     const [selectedMood, setSelectedMood] = useState(null);
     const [cyclePhase, setCyclePhase] = useState(null);
@@ -52,6 +52,15 @@ export default function JournalEntry({ onAnalysisComplete }) {
         setImagePreview(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
+
+    // Auto-fill health inputs from user preferences baseline
+    useEffect(() => {
+        if (preferences) {
+            if (preferences.defaultCyclePhase && !cyclePhase) setCyclePhase(preferences.defaultCyclePhase);
+            if (preferences.averageSleepHours != null && !sleepHours) setSleepHours(String(preferences.averageSleepHours));
+            if (preferences.averageStressLevel != null && !stressLevel) setStressLevel(String(preferences.averageStressLevel));
+        }
+    }, [preferences]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

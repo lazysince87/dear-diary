@@ -48,6 +48,24 @@ const userPreferencesSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    // Health baseline fields
+    defaultCyclePhase: {
+        type: String,
+        enum: ['menstrual', 'follicular', 'ovulatory', 'luteal', null],
+        default: null,
+    },
+    averageSleepHours: {
+        type: Number,
+        min: 0,
+        max: 24,
+        default: null,
+    },
+    averageStressLevel: {
+        type: Number,
+        min: 1,
+        max: 10,
+        default: null,
+    },
 }, {
     timestamps: true,
 });
