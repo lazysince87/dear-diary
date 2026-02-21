@@ -183,4 +183,4 @@ async function analyzeEntry(entryText, options = {}, pastEntries = [], persona =
     }
 }
 
-module.exports = { analyzeEntry };
+module.exports = { analyzeEntry, SYSTEM_PROMPT_BASE, PERSONA_INSTRUCTIONS };

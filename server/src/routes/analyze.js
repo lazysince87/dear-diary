@@ -52,7 +52,7 @@ router.post('/', requireAuth, async (req, res, next) => {
 
         // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
-            analysis = await analyzeOllama(content.trim(), pastEntries);
+            analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
             console.log('[DEBUG] mood received:', mood);
             analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
