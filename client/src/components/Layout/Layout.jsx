@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import cloudsImg from "../../assets/clouds.png";
 import greenCloudsImg from "../../assets/green-clouds.png";
 import purpleCloudsImg from "../../assets/purple-clouds.png";
+import blueCloudsImg from "../../assets/blue-clouds.png";
 
 export default function Layout() {
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
@@ -16,6 +17,7 @@ export default function Layout() {
   const getBackgroundImage = () => {
     if (location.pathname === '/patterns') return greenCloudsImg;
     if (location.pathname === '/resources') return purpleCloudsImg;
+    if (location.pathname === '/profile') return blueCloudsImg;
     return cloudsImg;
   };
 

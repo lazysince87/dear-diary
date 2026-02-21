@@ -11,6 +11,7 @@ export default function Header({ onLogoutClick }) {
   const getTitleColor = () => {
     if (location.pathname === '/patterns') return '#4a7c59';
     if (location.pathname === '/resources') return '#7b5ea7';
+    if (location.pathname === '/profile') return '#4a6fa5';
     return '#c9748a';
   };
 

@@ -125,7 +125,7 @@ export default function HomePage() {
 
         .dd-header-block {
           padding-left: 0;
-          margin-bottom: 36px;
+          margin-bottom: 14px;
         }
 
         .dd-divider {
@@ -281,50 +281,7 @@ export default function HomePage() {
               </p>
             )}
           </div>
-          <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
-          {latestEntry && (
-            <div style={{ marginTop: "24px" }}>
-              <JournalResponse entry={latestEntry} />
-            </div>
-          )}
-          {entries.length > 1 && (
-            <>
-              <hr className="dd-divider" />
-              <div className="dd-section-label">Earlier entries</div>
-              {entries.slice(1, 4).map((entry, i) => (
-                <div key={i} className="dd-entry-card">
-                  <div className="dd-entry-date">
-                    {new Date(entry.timestamp).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                  <p className="dd-entry-preview">{entry.content}</p>
-                  {entry.analysis?.tactic_identified && (
-                    <span className="dd-tag">{entry.analysis.tactic_name}</span>
-                  )}
-                </div>
-              ))}
-            </>
-          )}
         </div>
-        <img
-          ref={duckRef}
-          src={duckImg}
-          alt="duck"
-          className="dd-duck"
-          style={{
-            position: "fixed",
-            right: "50px",
-            bottom: "50px",
-            top: "auto",
-            width: "250px",
-            zIndex: 50,
-            pointerEvents: "none",
-          }}
-        />
 
         <JournalEntry onAnalysisComplete={handleAnalysisComplete} />
 
@@ -338,7 +295,7 @@ export default function HomePage() {
             <hr className="dd-divider" />
             <div className="dd-section-label">Earlier entries</div>
             {pastEntries.map((entry, i) => (
-              <div key={entry._id || i}>
+              <div key={entry._id || i} style={{ marginBottom: '16px' }}>
                 <div
                   className="dd-entry-card"
                   onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
@@ -363,6 +320,21 @@ export default function HomePage() {
             ))}
           </>
         )}
+        <img
+          ref={duckRef}
+          src={duckImg}
+          alt="duck"
+          className="dd-duck"
+          style={{
+            position: "fixed",
+            right: "50px",
+            bottom: "50px",
+            top: "auto",
+            width: "250px",
+            zIndex: 50,
+            pointerEvents: "none",
+          }}
+        />
       </div>
     </>
   );
