@@ -82,12 +82,12 @@ export default function JournalEntry({ onAnalysisComplete }) {
     }, [isListening]);
 
     // Get current date in a cozy format
-    const today = new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
+    // const today = new Date().toLocaleDateString('en-US', {
+    //     weekday: 'long',
+    //     year: 'numeric',
+    //     month: 'long',
+    //     day: 'numeric',
+    // });
 
   return (
     <>
@@ -350,7 +350,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                             ) : (
                                 <>
                                     <Send size={16} />
-                                    <span>Share with Rosie</span>
+                                    <span>Share</span>
                                 </>
                             )}
                         </button>
@@ -358,6 +358,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 </form>
             </div>
         </div>
+                </div>
       </form>
     </>
   );
