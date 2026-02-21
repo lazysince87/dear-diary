@@ -75,7 +75,7 @@ export default function Header({ onLogoutClick }) {
             }
           >
             <BookHeart size={16} />
-            <span className="hidden sm:inline">Journal</span>
+            <span className="hidden sm:inline">Write</span>
           </NavLink>
 
           <NavLink
@@ -85,7 +85,7 @@ export default function Header({ onLogoutClick }) {
             }
           >
             <History size={16} />
-            <span className="hidden sm:inline">History</span>
+            <span className="hidden sm:inline">Entries</span>
           </NavLink>
 
           <NavLink
@@ -103,7 +103,7 @@ export default function Header({ onLogoutClick }) {
             }
           >
             <Library size={16} />
-            <span className="hidden sm:inline">Patterns</span>
+            <span className="hidden sm:inline">Learn</span>
           </NavLink>
 
           <NavLink
