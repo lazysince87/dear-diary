@@ -1,0 +1,45 @@
+name: rosie
+region: nyc
+services:
+  # Backend API
+  - name: rosie-api
+    github:
+      repo: YOUR_GITHUB_REPO_HERE
+      branch: main
+      deploy_on_push: true
+    source_dir: server
+    run_command: npm start
+    build_command: npm install
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    http_port: 5000
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        type: SECRET
+      - key: GEMINI_API_KEY
+        type: SECRET
+      - key: ELEVENLABS_API_KEY
+        type: SECRET
+      - key: ELEVENLABS_VOICE_ID
+        type: SECRET
+      - key: CLIENT_URL
+        value: ${APP_URL}
+    routes:
+      - path: /api
+
+  # Frontend (Static Site)
+  - name: rosie-client
+    github:
+      repo: YOUR_GITHUB_REPO_HERE
+      branch: main
+      deploy_on_push: true
+    source_dir: client
+    build_command: npm install && npm run build
+    environment_slug: node-js
+    output_dir: dist
+    routes:
+      - path: /
+    catchall_document: index.html
