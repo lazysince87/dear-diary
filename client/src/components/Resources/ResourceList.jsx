@@ -62,7 +62,7 @@ export default function ResourceList() {
       {/* Resources */}
       <div className="space-y-4 mb-8">
         {RESOURCES.map((resource) => (
-          <div key={resource.id} className={`p-5 md:p-6 ${resource.color}`}>
+          <div key={resource.id} className={`p-5 md:p-6 rounded-lg bg-cream/55 `}>
             <div className="flex items-start gap-4">
               <div
                 className={`p-2.5 rounded-full bg-white/60 ${resource.iconColor}`}
