@@ -267,6 +267,13 @@ export default function JournalResponse({ entry }) {
           </div>
 
           <div className="jr-content">
+            <div className="jr-reflection" style={{ borderLeft: '3px solid #e8d5c4', background: '#fdf6f0', marginBottom: '20px' }}>
+              <div className="jr-reflection-label">What you shared</div>
+              <p className="jr-reflection-text" style={{ fontStyle: 'normal' }}>
+                {content}
+              </p>
+            </div>
+
             <div className="jr-header">
               <span className="jr-label">A reflection for you</span>
               <div

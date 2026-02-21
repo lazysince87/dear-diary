@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { BookHeart, Library, Heart, Shield, LogOut, User, Music } from 'lucide-react';
+import { BookHeart, Library, Heart, Shield, LogOut, User, Music, History } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -44,6 +44,16 @@ export default function Header({ onLogoutClick }) {
           >
             <BookHeart size={16} />
             <span className="hidden sm:inline">Journal</span>
+          </NavLink>
+
+          <NavLink
+            to="/history"
+            className={({ isActive }) =>
+              `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
+            }
+          >
+            <History size={16} />
+            <span className="hidden sm:inline">History</span>
           </NavLink>
 
           <NavLink

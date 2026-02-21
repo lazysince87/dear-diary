@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from "react";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff, Image as ImageIcon, X, Paperclip } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import {
     analyzeJournalEntry,
     createSpeechRecognition,
+    uploadJournalImage,
 } from "../../services/api";
 
 const MOODS = [
@@ -22,7 +23,32 @@ export default function JournalEntry({ onAnalysisComplete }) {
     const [selectedMood, setSelectedMood] = useState(null);
     const [error, setError] = useState(null);
     const [isListening, setIsListening] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const recognitionRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                setError("Image must be smaller than 5MB");
+                return;
+            }
+            setSelectedImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setSelectedImage(null);
+        setImagePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,18 +56,26 @@ export default function JournalEntry({ onAnalysisComplete }) {
         setIsLoading(true);
         setError(null);
         try {
+            let imageUrl = null;
+            if (selectedImage) {
+                imageUrl = await uploadJournalImage(selectedImage);
+            }
+
             const result = await analyzeJournalEntry(
                 content.trim(),
                 selectedMood,
+                imageUrl
             );
             onAnalysisComplete({
                 content: content.trim(),
                 mood: selectedMood,
                 analysis: result.analysis,
+                imageUrl: imageUrl,
                 timestamp: new Date().toISOString(),
             });
             setContent("");
             setSelectedMood(null);
+            removeImage();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -282,6 +316,36 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     letter-spacing: 1px;
                     margin-bottom: 8px;
                 }
+
+                .je-image-preview {
+                    position: relative;
+                    margin-bottom: 16px;
+                    border: 1px solid #e8d5c4;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    max-width: 200px;
+                }
+
+                .je-preview-img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+
+                .je-remove-img {
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    background: rgba(255,255,255,0.9);
+                    border: 1px solid #c9a0a0;
+                    border-radius: 2px;
+                    padding: 2px;
+                    cursor: pointer;
+                    color: #a67b7b;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
             `}</style>
 
             <form onSubmit={handleSubmit}>
@@ -336,6 +400,20 @@ export default function JournalEntry({ onAnalysisComplete }) {
                                 rows={5}
                             />
 
+                            {imagePreview && (
+                                <div className="je-image-preview">
+                                    <img src={imagePreview} alt="Preview" className="je-preview-img" />
+                                    <button
+                                        type="button"
+                                        className="je-remove-img"
+                                        onClick={removeImage}
+                                        title="Remove image"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            )}
+
                             {error && <div className="je-error">{error}</div>}
 
                             <div className="je-footer">
@@ -351,11 +429,28 @@ export default function JournalEntry({ onAnalysisComplete }) {
                                     >
                                         {isListening ? <MicOff size={14} /> : <Mic size={14} />}
                                     </button>
+
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="je-mic"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isLoading}
+                                        title="Attach screenshot or photo"
+                                    >
+                                        <Paperclip size={14} />
+                                    </button>
                                 </div>
                                 <button
                                     type="submit"
                                     className="je-submit"
-                                    disabled={!content.trim() || isLoading}
+                                    disabled={(!content.trim() && !selectedImage) || isLoading}
                                 >
                                     {isLoading ? "Reading..." : "Reflect"}
                                 </button>

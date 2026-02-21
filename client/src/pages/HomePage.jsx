@@ -240,8 +240,52 @@ export default function HomePage() {
             padding: 20px 10px 20px;
           }
         }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
+        }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
+        }
       `}</style>
-        <div ref={pageRef} style={{ position: "relative", padding: "30px 20px 80px", width: "100%" }}>
+      <div ref={pageRef} style={{ position: "relative", padding: "30px 20px 80px", width: "100%" }}>
         {STAR_POSITIONS.map((pos, i) => (
           <div
             key={pos.id}
