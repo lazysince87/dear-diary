@@ -1,11 +1,5 @@
 import { ChevronRight } from "lucide-react";
 
-const SEVERITY_COLORS = {
-  low: "bg-sage-light/30 border-sage/30",
-  medium: "bg-warm-100 border-warm-300",
-  high: "bg-rose-50/60 border-rose-200/40",
-};
-
 export default function PatternCard({ pattern, onClick }) {
   return (
     <button
@@ -21,16 +15,6 @@ export default function PatternCard({ pattern, onClick }) {
             >
               {pattern.name}
             </h3>
-            <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium ${pattern.severity === "high"
-                ? "bg-rose-100 text-rose-600"
-                : pattern.severity === "medium"
-                  ? "bg-warm-200 text-warm-500"
-                  : "bg-sage-light text-sage-dark"
-                }`}
-            >
-              {pattern.severity}
-            </span>
           </div>
           <p className="text-text-secondary text-sm leading-relaxed line-clamp-2">
             {pattern.description}

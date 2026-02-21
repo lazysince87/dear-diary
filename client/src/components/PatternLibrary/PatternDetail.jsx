@@ -4,7 +4,7 @@ export default function PatternDetail({ pattern, onClose }) {
   if (!pattern) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fade-in">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-text-primary/20 backdrop-blur-sm"
@@ -13,11 +13,12 @@ export default function PatternDetail({ pattern, onClose }) {
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto p-6 md:p-8 animate-slide-up"
+        className="relative w-full max-w-lg max-h-[75vh] overflow-y-auto p-6 md:p-8 animate-slide-up"
         style={{
           background: "#fffaf7",
           border: "1px solid #e8d5c4",
           boxShadow: "6px 6px 0 #e0c4c4",
+          borderRadius: "16px",
         }}
       >
         {/* Close button */}
@@ -38,17 +39,6 @@ export default function PatternDetail({ pattern, onClose }) {
             >
               {pattern.name}
             </h2>
-            <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium inline-block mt-1 ${
-                pattern.severity === "high"
-                  ? "bg-rose-100 text-rose-600"
-                  : pattern.severity === "medium"
-                    ? "bg-warm-200 text-warm-500"
-                    : "bg-sage-light text-sage-dark"
-              }`}
-            >
-              {pattern.severity} severity
-            </span>
           </div>
         </div>
 

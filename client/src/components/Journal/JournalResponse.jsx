@@ -284,6 +284,89 @@ export default function JournalResponse({ entry }) {
                 )}
               </div>
             )}
+
+            {/* Patterns Detected with Severity */}
+            {analysis.patterns_detected && analysis.patterns_detected.length > 0 && (
+              <div style={{
+                border: '1px solid #e8d5c4',
+                borderLeft: '3px solid #c9748a',
+                padding: '12px 14px',
+                marginBottom: '16px',
+                background: '#fff9f9',
+                borderRadius: '2px',
+              }}>
+                <div style={{
+                  fontFamily: "'Pixelify Sans', sans-serif",
+                  fontSize: '10px',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  color: '#a67b7b',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}>
+                  <AlertTriangle size={12} />
+                  Patterns Detected
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {analysis.patterns_detected.map((pattern, i) => (
+                    <div key={i} style={{
+                      padding: '10px 12px',
+                      background: 'rgba(255,255,255,0.7)',
+                      border: '1px solid #f0e0d8',
+                      borderRadius: '4px',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span style={{
+                          fontFamily: "'Pixelify Sans', sans-serif",
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#3d2c2c',
+                          letterSpacing: '1px',
+                        }}>
+                          {pattern.name}
+                        </span>
+                        <span style={{
+                          fontFamily: "'Pixelify Sans', sans-serif",
+                          fontSize: '9px',
+                          letterSpacing: '1px',
+                          textTransform: 'uppercase',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontWeight: '600',
+                          ...(pattern.severity === 'high' ? {
+                            background: '#ffe0e0',
+                            color: '#c9365a',
+                            border: '1px solid #ffb3b3',
+                          } : pattern.severity === 'medium' ? {
+                            background: '#fff3e0',
+                            color: '#b8956a',
+                            border: '1px solid #f0dcc0',
+                          } : {
+                            background: '#e8f5e8',
+                            color: '#5a7a52',
+                            border: '1px solid #c0dcc0',
+                          }),
+                        }}>
+                          {pattern.severity}
+                        </span>
+                      </div>
+                      <p style={{
+                        fontFamily: "'Pixelify Sans', sans-serif",
+                        fontSize: '12px',
+                        color: '#6b5454',
+                        lineHeight: '1.7',
+                        margin: 0,
+                      }}>
+                        {pattern.explanation}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="jr-reflection">
               <div className="jr-reflection-label">Something to sit with</div>
               <p className="jr-reflection-text">

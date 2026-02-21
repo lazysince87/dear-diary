@@ -1,20 +1,35 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { BookHeart, Library, Heart, Shield, LogOut } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { NavLink, useLocation } from "react-router-dom";
+import { BookHeart, Library, Heart, Shield, LogOut } from "lucide-react";
+// import { useApp } from '../../context/AppContext';
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Header({ onLogoutClick }) {
-  const { isCovertMode, toggleCovertMode } = useApp();
+  // const { isCovertMode, toggleCovertMode } = useApp();
   const { user } = useAuth();
+  const location = useLocation();
+
+  const getTitleColor = () => {
+    if (location.pathname === '/patterns') return '#4a7c59';
+    if (location.pathname === '/resources') return '#7b5ea7';
+    return '#c9748a';
+  };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md border-b border-warm-200/50" style={{ backgroundColor: 'white' }}>
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+    <header
+      className="sticky top-0 z-50 mt-3 ml-3 mr-3 backdrop-blur-md border-warm-200/50"
+      style={{
+        backgroundColor: "white",
+        borderRadius: "20px",
+        padding: "0px 0px",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between">
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
-            className="text-xl font-semibold text-text-primary"
-            style={{ fontFamily: "var(--font-serif)" }}
+            className="text-left text-xl font-semibold"
+            style={{ fontFamily: "var(--font-serif)", color: getTitleColor(), transition: "color 0.3s ease" }}
           >
+            Dear Diary
           </h1>
         </NavLink>
 
@@ -71,7 +86,12 @@ export default function Header({ onLogoutClick }) {
               title="Sign out"
             >
               <LogOut size={18} />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider" style={{ fontFamily: 'var(--font-serif)' }}>Logout</span>
+              <span
+                className="hidden sm:inline text-xs font-medium uppercase tracking-wider"
+                style={{ fontFamily: "var(--font-serif)" }}
+              >
+                Logout
+              </span>
             </button>
           ) : (
             <NavLink
@@ -80,7 +100,12 @@ export default function Header({ onLogoutClick }) {
               title="Sign in"
             >
               <LogOut size={18} className="rotate-180" />
-              <span className="hidden sm:inline text-xs font-medium uppercase tracking-wider" style={{ fontFamily: 'var(--font-serif)' }}>Login</span>
+              <span
+                className="hidden sm:inline text-xs font-medium uppercase tracking-wider"
+                style={{ fontFamily: "var(--font-serif)" }}
+              >
+                Login
+              </span>
             </NavLink>
           )}
         </nav>

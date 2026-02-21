@@ -16,7 +16,7 @@ export default function ResourcesPage() {
                     font-family: 'Pixelify Sans', sans-serif;
                     font-size: 28px;
                     font-weight: 600;
-                    color: #f2c4ce;
+                    color: #1a1a1a;
                     letter-spacing: 3px;
                     text-transform: uppercase;
                     margin-bottom: 10px;

@@ -17,7 +17,7 @@ const MOODS = [
 ];
 
 export default function JournalEntry({ onAnalysisComplete }) {
-    const { sessionId, isLoading, setIsLoading } = useApp();
+    const { isLoading, setIsLoading } = useApp();
     const [content, setContent] = useState("");
     const [selectedMood, setSelectedMood] = useState(null);
     const [error, setError] = useState(null);
@@ -84,9 +84,12 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 .je-book {
                     background: #fffaf7;
                     border: 1px solid #e8d5c4;
-                    border-radius: 2px;
+                    border-radius: 16px;
                     box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
                     overflow: hidden;
+                    width: 100%;
+                    max-width: 900px;
+                    margin: 0 auto;
                 }
 
                 .je-inner {
@@ -97,6 +100,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     width: 28px;
                     background: #fcf6f9;
                     border-right: 1px solid #d4b096;
+                    border-radius: 16px 0 0 16px;
                     flex-shrink: 0;
                     display: flex;
                     flex-direction: column;
@@ -115,7 +119,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
 
                 .je-content {
                     flex: 1;
-                    padding: 20px 20px 16px;
+                    padding: 30px 20px 16px;
                 }
 
                 .je-date {
@@ -169,21 +173,21 @@ export default function JournalEntry({ onAnalysisComplete }) {
 
                 .je-textarea {
                     width: 100%;
-                    min-height: 200px;
+                    min-height: 140px;
                     background: transparent;
                     border: none;
                     outline: none;
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 14px;
+                    font-size: 17px;
                     color: #3d2c2c;
-                    line-height: 28px;
+                    line-height: 32px;
                     resize: none;
                     caret-color: #c9a0a0;
                     background-image: repeating-linear-gradient(
                         transparent,
-                        transparent 27px,
-                        #f0ddd5 27px,
-                        #f0ddd5 28px
+                        transparent 31px,
+                        #f0ddd5 31px,
+                        #f0ddd5 32px
                     );
                     background-attachment: local;
                     padding: 0 0 4px 0;
@@ -329,7 +333,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                                 onChange={(e) => setContent(e.target.value)}
                                 placeholder="Write about what happened..."
                                 disabled={isLoading}
-                                rows={8}
+                                rows={5}
                             />
 
                             {error && <div className="je-error">{error}</div>}

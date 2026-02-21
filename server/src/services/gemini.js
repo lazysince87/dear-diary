@@ -26,6 +26,10 @@ CRITICAL THERAPEUTIC RULES:
 3. Be gentle when naming tactics. Frame it as "It sounds like..." or "I noticed a pattern of..."
 4. Provide highly specific, actionable advice. Don't just say "set boundaries." Give them examples of what to say or how to approach the exact situation they wrote about. (e.g. "You could try saying: 'I felt undermined when you said...'")
 5. The reflection question should be thought-provoking and encourage self-compassion.
+6. For patterns_detected, identify ALL manipulation patterns present in the entry. Categorize each one by severity:
+   - "low": Subtle or possibly unintentional behavior
+   - "medium": Clear pattern that warrants attention
+   - "high": Serious, deliberate manipulation that could be harmful
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -35,8 +39,17 @@ You MUST respond ONLY with valid JSON matching this exact schema:
   "tactic_explanation": "Gentle explanation of the tactic, why it is harmful, and why it's not the user's fault (2-3 sentences). Null if none.",
   "actionable_advice": "Specific, practical, and therapeutic advice tailored to their exact story. Give them a script or concrete next steps if they asked what to do.",
   "confidence": 0.0 to 1.0,
-  "reflection_question": "A compassionate reflection question to help the user process their feelings."
+  "reflection_question": "A compassionate reflection question to help the user process their feelings.",
+  "patterns_detected": [
+    {
+      "name": "Pattern name",
+      "explanation": "Brief, gentle explanation of how this pattern appears in their entry",
+      "severity": "low" | "medium" | "high"
+    }
+  ]
 }
+
+Note: patterns_detected should be an empty array [] if no patterns are found. Include ALL patterns you detect, not just the primary one.
 
 Do NOT include any text before or after the JSON. Only valid JSON.`;
 
@@ -90,6 +103,7 @@ async function analyzeEntry(entryText, mood = null) {
             actionable_advice: analysis.actionable_advice || null,
             confidence: typeof analysis.confidence === 'number' ? Math.min(1, Math.max(0, analysis.confidence)) : 0,
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
+            patterns_detected: Array.isArray(analysis.patterns_detected) ? analysis.patterns_detected : [],
         };
 
         return validated;
@@ -105,6 +119,7 @@ async function analyzeEntry(entryText, mood = null) {
             actionable_advice: "Taking things one step at a time is often the best approach. Remember to prioritize your own well-being and safety.",
             confidence: 0,
             reflection_question: "What feelings came up for you as you wrote this? Take a moment to sit with them — you deserve that space.",
+            patterns_detected: [],
         };
     }
 }
