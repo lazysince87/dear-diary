@@ -50,6 +50,11 @@
   body {
     font-family: var(--font-sans);
     background-color: var(--color-cream);
+    background-image: url('./assets/clouds.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--color-text-primary);
     min-height: 100vh;
     line-height: 1.6;

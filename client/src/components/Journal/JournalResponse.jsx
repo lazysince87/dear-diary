@@ -59,7 +59,7 @@ export default function JournalResponse({ entry }) {
 
                 .jr-spine {
                     width: 28px;
-                    background: #d4b8e0;
+                    background: #fcf6f9;
                     border-right: 1px solid #c4a8d4;
                     flex-shrink: 0;
                     display: flex;
