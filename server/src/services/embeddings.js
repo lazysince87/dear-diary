@@ -14,7 +14,7 @@ async function generateEmbedding(text) {
 
     try {
         const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
-        const result = await model.embedContent(text.trim());
+        const result = await model.embedContent({ content: text.trim() });
         return result.embedding.values; // number[]
     } catch (error) {
         console.error('[Embeddings] Failed to generate embedding:', error.message);
