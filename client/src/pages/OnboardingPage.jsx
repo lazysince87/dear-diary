@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useApp } from "../context/AppContext";
 import { savePreferences, getSpotifyLoginUrl } from "../services/api";
 
 const PERSONAS = [
@@ -21,6 +22,7 @@ const PERSONAS = [
 
 export default function OnboardingPage() {
   const { user } = useAuth();
+  const { loadPreferences } = useApp();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
   const [persona, setPersona] = useState(null);
@@ -30,6 +32,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (user?.user_metadata?.full_name) {
@@ -40,6 +43,7 @@ export default function OnboardingPage() {
   const handleSaveAndContinue = async () => {
     if (!displayName.trim() || !persona) return;
     setSaving(true);
+    setErrorMessage("");
     try {
       await savePreferences({
         displayName: displayName.trim(),
@@ -55,6 +59,7 @@ export default function OnboardingPage() {
 
   const handleHealthContinue = async () => {
     setSaving(true);
+    setErrorMessage("");
     try {
       await savePreferences({
         defaultCyclePhase: defaultCyclePhase || null,
@@ -71,6 +76,7 @@ export default function OnboardingPage() {
 
   const handleConnectSpotify = async () => {
     setSpotifyConnecting(true);
+    setErrorMessage("");
     try {
       const { url } = await getSpotifyLoginUrl();
       window.location.href = url;
@@ -81,14 +87,16 @@ export default function OnboardingPage() {
   };
 
   const handleSkipSpotify = async () => {
-    setSpotifyConnecting(true); // Re-use this state to show loading on skip
+    setSpotifyConnecting(true);
+    setErrorMessage("");
     try {
       await savePreferences({ onboardingComplete: true });
-      // Force a full window reload so App.jsx re-fetches preferences and kicks us out of the onboarding loop
-      window.location.href = "/";
+      await loadPreferences();
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Failed to skip:", err);
-      window.location.href = "/";
+      setErrorMessage("Couldn’t finish onboarding right now. Please try again.");
+      setSpotifyConnecting(false);
     }
   };
 
@@ -415,9 +423,16 @@ export default function OnboardingPage() {
               <button
                 className="ob-btn ob-btn-skip"
                 onClick={handleSkipSpotify}
+                disabled={spotifyConnecting}
               >
-                Skip for now
+                {spotifyConnecting ? "Finishing..." : "Skip for now"}
               </button>
+
+              {errorMessage && (
+                <p className="ob-subtitle" style={{ marginTop: "12px", marginBottom: 0 }}>
+                  {errorMessage}
+                </p>
+              )}
             </>
           )}
         </div>

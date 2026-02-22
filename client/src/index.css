@@ -334,6 +334,29 @@ html {
 }
 
 @media (max-width: 640px) {
+  .mobile-header {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .mobile-header-inner {
+    padding-left: 0.5rem;
+    padding-right: calc(0.5rem + env(safe-area-inset-right));
+  }
+
+  .header-title {
+    font-size: 1rem;
+  }
+
+  .header-nav {
+    gap: 0.15rem;
+  }
+
+  .header-auth-btn {
+    padding: 0.35rem 0.45rem;
+    margin-right: 2px;
+  }
+
   .journal-textarea {
     min-height: 140px;
     padding: 1rem;
