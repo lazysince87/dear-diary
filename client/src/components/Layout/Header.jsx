@@ -1,9 +1,8 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   BookHeart,
   Library,
   Heart,
-  Shield,
   LogOut,
   User,
   Music,
@@ -13,7 +12,7 @@ import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Header({ onLogoutClick }) {
-  const { isCovertMode, toggleCovertMode, isMusicOn, nowPlaying, toggleMusic } =
+  const { isMusicOn, nowPlaying, toggleMusic } =
     useApp();
   const { user } = useAuth();
   const location = useLocation();
@@ -39,7 +38,7 @@ export default function Header({ onLogoutClick }) {
 
   return (
     <header
-      className="sticky top-0 z-50 mt-3 ml-3 mr-3 backdrop-blur-md border-warm-200/50"
+      className="mobile-header sticky top-0 z-50 mt-3 ml-3 mr-3 backdrop-blur-md border-warm-200/50"
       style={{
         backgroundColor: "white",
         borderRadius: "20px",
@@ -47,17 +46,16 @@ export default function Header({ onLogoutClick }) {
       }}
     >
       <div
-        className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center"
+        className="mobile-header-inner max-w-6xl mx-auto px-4 py-3 flex justify-between items-center"
         style={{ height: "48px" }}
       >
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
-            className="text-left text-xl font-semibold"
+            className="header-title text-left text-xl font-semibold"
             style={{
               fontFamily: "var(--font-serif)",
               color: getTitleColor(),
               transition: "color 0.3s ease",
-              minWidth: "120px",
             }}
           >
             Dear Diary
@@ -65,7 +63,7 @@ export default function Header({ onLogoutClick }) {
         </NavLink>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-1">
+        <nav className="header-nav flex items-center gap-1">
           <NavLink
             to="/"
             end
@@ -200,7 +198,7 @@ export default function Header({ onLogoutClick }) {
           {user ? (
             <button
               onClick={onLogoutClick}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-rose-600"
+              className="header-auth-btn flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-rose-600"
               title="Sign out"
             >
               <LogOut size={18} />
@@ -214,7 +212,7 @@ export default function Header({ onLogoutClick }) {
           ) : (
             <NavLink
               to="/login"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-dusty-rose-dark"
+              className="header-auth-btn flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 hover:bg-rose-50 text-text-muted hover:text-dusty-rose-dark"
               title="Sign in"
             >
               <LogOut size={18} className="rotate-180" />

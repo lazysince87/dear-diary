@@ -4,6 +4,11 @@ import { supabase } from '../lib/supabase';
 // In prod: VITE_API_URL points to the Cloud Run backend
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
+function normalizePattern(pattern) {
+    if (!pattern || pattern.id !== 'darvo') return pattern;
+    return { ...pattern, name: 'D.A.R.V.O.' };
+}
+
 /**
  * Get the current auth token for API requests
  */
@@ -97,7 +102,16 @@ export async function fetchEntrySummary() {
 export async function fetchPatterns() {
     const response = await fetch(`${API_BASE}/patterns`);
     if (!response.ok) throw new Error('Could not load patterns');
-    return response.json();
+    const data = await response.json();
+
+    if (!Array.isArray(data?.patterns)) {
+        return data;
+    }
+
+    return {
+        ...data,
+        patterns: data.patterns.map(normalizePattern),
+    };
 }
 
 /**
@@ -106,7 +120,16 @@ export async function fetchPatterns() {
 export async function fetchPattern(id) {
     const response = await fetch(`${API_BASE}/patterns/${id}`);
     if (!response.ok) throw new Error('Pattern not found');
-    return response.json();
+    const data = await response.json();
+
+    if (!data?.pattern) {
+        return data;
+    }
+
+    return {
+        ...data,
+        pattern: normalizePattern(data.pattern),
+    };
 }
 
 /**
