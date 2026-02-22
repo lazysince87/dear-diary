@@ -2,14 +2,17 @@ const express = require('express');
 const router = express.Router();
 const { analyzeEntry: analyzeGemini } = require('../services/gemini');
 const { analyzeEntry: analyzeOllama } = require('../services/ollama');
+const { generateEmbedding } = require('../services/embeddings');
 const Entry = require('../models/Entry');
 const UserPreferences = require('../models/UserPreferences');
 const { requireAuth } = require('../middleware/authMiddleware');
 
 /**
  * POST /api/analyze
- * Analyze a journal entry for manipulation patterns
- * Body: { content: string, mood?: string }
+ * Analyze a journal entry for manipulation patterns.
+ * Uses Semantic RAG: embeds the current entry and performs a
+ * MongoDB Atlas Vector Search to find the most relevant past entries.
+ * Body: { content: string, mood?: string, imageUrl?: string, cyclePhase?: string, sleepHours?: number, stressLevel?: number }
  */
 router.post('/', requireAuth, async (req, res, next) => {
     try {
@@ -21,22 +24,70 @@ router.post('/', requireAuth, async (req, res, next) => {
             });
         }
 
-        // Retrieve last 5 entries for this user to provide longitudinal RAG context
-        let pastEntries = [];
+        // ─── Step 1: Generate embedding for the current entry (non-blocking) ───
+        const textForEmbedding = content?.trim() || '';
+        let currentEmbedding = null;
         try {
-            pastEntries = await Entry.find({ userId: req.user.id })
-                .sort({ createdAt: -1 })
-                .limit(5)
-                .lean();
-
-            // Reverse so they are in chronological order (oldest first) for the model context
-            pastEntries = pastEntries.reverse();
-        } catch (dbError) {
-            console.error('Failed to retrieve past entries for RAG:', dbError.message);
-            // Continue — analysis should still work even without past context
+            if (textForEmbedding) {
+                currentEmbedding = await generateEmbedding(textForEmbedding);
+                console.log('[RAG] Generated embedding for current entry:', currentEmbedding ? `${currentEmbedding.length}-dim vector` : 'null');
+            }
+        } catch (embError) {
+            console.error('[RAG] Embedding generation failed, falling back to chronological:', embError.message);
         }
 
-        // Fetch user persona preference
+        // ─── Step 2: Retrieve past entries via Semantic Vector Search (or fallback) ───
+        let pastEntries = [];
+        try {
+            if (currentEmbedding && currentEmbedding.length > 0) {
+                // MongoDB Atlas Vector Search — finds the 5 most semantically similar past entries
+                pastEntries = await Entry.aggregate([
+                    {
+                        $vectorSearch: {
+                            index: 'entry_embedding_index',
+                            path: 'embedding',
+                            queryVector: currentEmbedding,
+                            numCandidates: 50,
+                            limit: 5,
+                            filter: { userId: req.user.id },
+                        },
+                    },
+                    {
+                        $project: {
+                            content: 1,
+                            mood: 1,
+                            createdAt: 1,
+                            score: { $meta: 'vectorSearchScore' },
+                        },
+                    },
+                ]);
+                console.log(`[RAG] Semantic search returned ${pastEntries.length} relevant entries (vector search)`);
+            }
+
+            // Fallback: if vector search returned nothing (no index, no embeddings yet), use chronological
+            if (pastEntries.length === 0) {
+                pastEntries = await Entry.find({ userId: req.user.id })
+                    .sort({ createdAt: -1 })
+                    .limit(5)
+                    .select('content mood createdAt')
+                    .lean();
+                pastEntries = pastEntries.reverse();
+                console.log(`[RAG] Fallback: chronological retrieval returned ${pastEntries.length} entries`);
+            }
+        } catch (dbError) {
+            console.error('[RAG] Retrieval failed, continuing without context:', dbError.message);
+            // If the vector index doesn't exist yet, this will fail gracefully
+            try {
+                pastEntries = await Entry.find({ userId: req.user.id })
+                    .sort({ createdAt: -1 })
+                    .limit(5)
+                    .select('content mood createdAt')
+                    .lean();
+                pastEntries = pastEntries.reverse();
+            } catch (_) { /* give up on RAG context */ }
+        }
+
+        // ─── Step 3: Fetch user persona preference ───
         let persona = 'friend';
         try {
             const prefs = await UserPreferences.findOne({ userId: req.user.id }).lean();
@@ -45,12 +96,11 @@ router.post('/', requireAuth, async (req, res, next) => {
             // Default to friend
         }
 
-        // Determine which AI provider to use
+        // ─── Step 4: Analyze with selected AI provider ───
         const aiProvider = process.env.AI_PROVIDER?.toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
         let analysis;
         console.log(`[AI Provider]: using ${aiProvider.toUpperCase()} | Persona: ${persona}`);
 
-        // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
             analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
@@ -58,7 +108,7 @@ router.post('/', requireAuth, async (req, res, next) => {
             analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
         }
 
-        // Save to MongoDB (non-blocking — don't let DB errors block the response)
+        // ─── Step 5: Save to MongoDB with embedding (non-blocking) ───
         try {
             const entry = new Entry({
                 content: content.trim(),
@@ -68,9 +118,11 @@ router.post('/', requireAuth, async (req, res, next) => {
                 cyclePhase: cyclePhase || null,
                 sleepHours: sleepHours !== undefined ? sleepHours : null,
                 stressLevel: stressLevel !== undefined ? stressLevel : null,
-                imageUrl: imageUrl || null
+                imageUrl: imageUrl || null,
+                embedding: currentEmbedding || undefined,
             });
             await entry.save();
+            console.log('[DB] Entry saved with embedding:', !!currentEmbedding);
         } catch (dbError) {
             console.error('Failed to save entry:', dbError.message);
             // Continue — analysis should still return even if DB is down
@@ -86,3 +138,4 @@ router.post('/', requireAuth, async (req, res, next) => {
 });
 
 module.exports = router;
+

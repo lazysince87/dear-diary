@@ -53,6 +53,11 @@ const entrySchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    // Vector embedding for semantic RAG (768-dim from Gemini text-embedding-004)
+    embedding: {
+        type: [Number],
+        default: undefined, // don't store empty arrays
+    },
 }, {
     timestamps: true, // createdAt & updatedAt
 });

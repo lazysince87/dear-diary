@@ -110,8 +110,10 @@ export async function fetchPattern(id) {
 /**
  * Convert text to speech via ElevenLabs (returns audio blob)
  * Falls back to browser SpeechSynthesis if API fails
+ * @param {string} text - Text to speak
+ * @param {Object} [analysis] - Optional Gemini analysis for emotion-aware voice tuning
  */
-export async function textToSpeech(text) {
+export async function textToSpeech(text, analysis = null) {
     try {
         const authHeaders = await getAuthHeaders();
 
@@ -121,7 +123,7 @@ export async function textToSpeech(text) {
                 'Content-Type': 'application/json',
                 ...authHeaders,
             },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, analysis }),
         });
 
         if (response.ok) {
