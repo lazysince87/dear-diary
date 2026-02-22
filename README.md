@@ -1,142 +1,50 @@
-# Dear Diary
+# DD: Dear Diary
 
-**A mobile-first relationship safety companion disguised as a personal journal.**
+**The journal that reads between the lines.**
 
-Dear Diary is a web application built to help users identify emotional manipulation patterns -- such as gaslighting, love bombing, D.A.R.V.O., and isolation tactics -- across all types of relationships, including romantic, familial, platonic, and professional. It presents itself as a cozy, warm journaling app so that it remains safe and inconspicuous for users in vulnerable situations.
+DD: Dear Diary is a relationship safety companion disguised as a cozy, aesthetically warm personal journal. On the surface, it’s a beautifully designed journaling app. Underneath, it uses a **Semantic RAG AI pipeline** to gently identify emotional manipulation patterns (gaslighting, love bombing, DARVO, isolation) and provides profound empathy and resources using a responsive, emotion-aware voice synthesizer.
 
 Built at WiNGHacks 2026.
 
 ---
 
-## Table of Contents
+## Inspiration
 
-- [Problem Statement](#problem-statement)
-- [Our Approach](#our-approach)
-- [Educational Mission](#educational-mission)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Deployment](#deployment)
-- [License](#license)
+Emotional abuse and relationship manipulation are often completely invisible. Unlike physical harm, they leave no visible marks, making them incredibly hard to recognize - especially for the person experiencing them. We realized that many people in unhealthy relationships (romantic, familial, or professional) don't have access to safe, private tools that help them reflect on their reality. Traditional resources like hotlines can feel like too high a barrier, or might not be safe to access openly if a partner is checking their phone.
 
----
-
-## Problem Statement
-
-Emotional abuse and manipulation are often invisible. Unlike physical harm, they leave no visible marks, making them harder to recognize -- especially for the person experiencing them. Many people in unhealthy relationships do not have access to safe, private tools that help them reflect on what they are going through. Traditional resources like hotlines or counseling may feel too high a barrier, or may not be safe to access openly.
-
-## Our Approach
-
-Dear Diary bridges that gap. On the surface, it looks and feels like a personal diary app -- warm colors, rounded corners, a comforting tone. Underneath, it uses AI-powered analysis to gently identify red flags in user-submitted journal entries and pasted conversations. The response always leads with empathy, then names any identified tactic, explains why it is harmful, and offers a reflection question to encourage self-awareness.
-
-The app is designed so that anyone looking over a user's shoulder would see nothing more than a personal journaling tool.
-
-## Educational Mission
-
-Dear Diary is built with a strong educational focus. The goal is not just to detect red flags, but to **teach users what healthy and unhealthy relationship behaviors look like** across all types of relationships:
-
-- **Pattern Library**: A curated, browsable library of manipulation tactics (gaslighting, love bombing, minimizing, D.A.R.V.O., isolation, and more) with clear definitions, real-world examples, and guidance on healthy alternatives.
-- **Contextual Learning**: When the AI identifies a pattern in a journal entry, it does not simply flag it. It provides a plain-language explanation of the tactic, why it is harmful, and how healthy communication differs -- turning every interaction into a learning moment.
-- **Reflection Prompts**: Each AI response ends with a reflection question designed to build critical thinking about relationship dynamics.
-- **Resource Hub**: A dedicated page linking to vetted external resources, hotlines, and educational material on relationship health and safety.
-
-The app serves as both a personal safety tool and an ongoing educational resource, helping users build the vocabulary and awareness needed to recognize manipulation in any relationship context.
+We created **Dear Diary** to be a relationship safety companion disguised as a cozy personal journal - a tool that feels "like a warm hug," but has the technical power to gently identify red flags, teach users about healthy boundaries, and provide support without blowing their cover.
 
 ---
 
 ## Features
 
-**Core (MVP)**
-
-- Text-based journaling with AI-powered analysis of entries and pasted conversations
-- Structured, empathetic responses that identify manipulation tactics with explanations
-- Browsable pattern library of common emotional manipulation tactics
-- Resource page with links to support organizations and educational material
-- Mobile-first, responsive design with a warm and approachable UI
-- Secure backend routing so that API keys are never exposed on the client
-
-**Stretch Goals**
-
-- Voice input and output via ElevenLabs for accessibility
-- Covert Mode toggle that instantly reskins the app to look like an unrelated application for user safety
-- Code Phrase System that silently contacts an emergency contact when a specific phrase is entered
-- Longitudinal analysis across multiple journal entries to detect patterns over time
+- **Semantic Pattern Recognition (RAG):** Users log traditional journal entries or paste conversations. Under the hood, the app analyzes the text for subtle emotional manipulation tactics.
+- **Empathetic AI Responses:** It doesn't just flag abuse like a clinical robot. It leads with validation, gently names the manipulation tactic, explains why it is harmful, and provides a reflection question.
+- **Emotion-Aware Voice Output:** Using ElevenLabs, the app speaks its responses using a custom-cloned voice of our team. The voice parameters dynamically adjust based on the user's detected distress level - sounding calm and grounding during emergencies, or warm and gentle during normal reflections.
+- **Longitudinal Memory:** The AI doesn't have localized amnesia. It remembers your past entries to identify long-term patterns of manipulation across weeks or months.
+- **Pattern Library & Resources:** A curated, browsable library of manipulation tactics with definitions, real-world examples, and a dedicated page linking to vetted external resources and hotlines.
 
 ---
 
-## Tech Stack
+## Architecture & Tech Stack
 
-### Frontend
+We built a mobile-first **React/Vite** frontend utilizing **Tailwind CSS** paired with smooth **GSAP** animations.
 
-| Technology | Purpose |
-|---|---|
-| React 19 | UI component framework |
-| Vite 7 | Build tool and development server |
-| Tailwind CSS 4 | Utility-first CSS framework for styling |
-| React Router 7 | Client-side routing and navigation |
-| Lucide React | Icon library |
+The heavy lifting happens in our **Node.js/Express** backend, which is dockerized and deployed to **Google Cloud Run** for auto-scaling. We implemented a **Semantic RAG (Retrieval-Augmented Generation)** pipeline to give our AI long-term memory:
+1. We use **Google's `text-embedding-004`** model to turn every journal entry into a 768-dimensional vector coordinate.
+2. We store these vectors in a **MongoDB Atlas** database.
+3. When a user writes a new entry, we use **Atlas `$vectorSearch`** to instantly retrieve their most semantically relevant past memories. 
+4. We inject this context into **Gemini 1.5 Flash**, allowing the LLM to detect long-term emotional abuse patterns rather than just analyzing a single event. 
 
-### Backend
+Finally, the AI's response is passed to the **ElevenLabs API** for dynamic Text-to-Speech generation before returning to the frontend.
 
-| Technology | Purpose |
-|---|---|
-| Node.js | Server runtime |
-| Express 5 | HTTP server and API routing |
-| Mongoose 9 | MongoDB object modeling and data layer |
-| Helmet | HTTP security headers |
-| CORS | Cross-origin resource sharing middleware |
-| Multer | File/audio upload handling |
-| dotenv | Environment variable management |
+### Technology Used
 
-### AI and APIs
-
-| Technology | Purpose |
-|---|---|
-| Google Gemini API | Core AI engine for analyzing journal entries and identifying manipulation patterns |
-| ElevenLabs API | Speech-to-text and text-to-speech for voice accessibility (stretch goal) |
-
-### Database
-
-| Technology | Purpose |
-|---|---|
-| MongoDB Atlas | Cloud-hosted database for storing journal entries, pattern library data, and session information |
-
-### Deployment
-
-| Technology | Purpose |
-|---|---|
-| DigitalOcean App Platform | Cloud hosting for the backend server and static frontend |
-
----
-
-## Project Structure
-
-```
-dear-diary/
-  client/                  # Frontend React application
-    src/
-      components/          # Reusable UI components
-      context/             # React context providers
-      pages/               # Page-level components
-      services/            # API service layer
-      index.css            # Global styles
-      App.jsx              # Root application component
-      main.jsx             # Application entry point
-    index.html             # HTML shell
-    vite.config.js         # Vite configuration
-    package.json
-  server/                  # Backend Node.js application
-    src/
-      middleware/           # Express middleware
-      models/              # Mongoose data models
-      routes/              # API route handlers
-      services/            # Business logic and API integrations
-    server.js              # Server entry point
-    package.json
-  README.md
-```
+* **Frontend:** React 19, Vite, Tailwind CSS 4, React Router 7, GSAP, Lucide React
+* **Backend:** Node.js, Express, Mongoose, Helmet, express-rate-limit
+* **AI & Voice:** Google Gemini API (`gemini-1.5-flash`, `text-embedding-004`), ElevenLabs API
+* **Database:** MongoDB Atlas (with Atlas Vector Search)
+* **Deployment:** Google Cloud Run (Backend), Vercel (Frontend)
 
 ---
 
@@ -148,35 +56,33 @@ dear-diary/
 - npm
 - A MongoDB Atlas cluster
 - A Google Gemini API key
-- (Optional) An ElevenLabs API key
+- An ElevenLabs API key
 
 ### Installation
 
 1. Clone the repository:
-
 ```bash
 git clone https://github.com/lazysince87/winghacks-2026.git
 cd winghacks-2026
 ```
 
-2. Install backend dependencies:
-
+2. Install backend dependencies & set up environment:
 ```bash
 cd server
 npm install
+# Copy .env.example to .env and fill in your keys
+cp .env.example .env
 ```
 
-3. Install frontend dependencies:
-
+3. Install frontend dependencies & set up environment:
 ```bash
 cd ../client
 npm install
+# Copy .env.example to .env and fill in your keys (Supabase)
+cp .env.example .env
 ```
 
-4. Set up environment variables (see below).
-
-5. Start the development servers:
-
+4. Start the development servers:
 ```bash
 # In the server directory
 npm run dev
@@ -187,26 +93,22 @@ npm run dev
 
 ---
 
-## Environment Variables
+## Security & Deployment
 
-Create a `.env` file in the `server/` directory based on `.env.example`. The following variables are required:
+The application is deployed on **Vercel** (Frontend) and **Google Cloud Run** (Backend). API keys (Gemini, ElevenLabs, MongoDB) are strictly stored as environment variables on the Cloud Run backend and are **never** exposed to the client or committed to version control. 
 
-| Variable | Description |
-|---|---|
-| `PORT` | Port for the Express server (default: 3001) |
-| `MONGODB_URI` | Connection string for MongoDB Atlas |
-| `GEMINI_API_KEY` | API key for Google Gemini |
-| `ELEVENLABS_API_KEY` | API key for ElevenLabs (optional) |
-| `CLIENT_URL` | URL of the frontend for CORS configuration |
+To protect API quotas, the backend employs strict IP-based rate limiting (using `express-rate-limit`) and a 30-second global request timeout to instantly terminate any hung proxy connections.
 
 ---
 
-## Deployment
+## What's Next
 
-The application is configured for deployment on DigitalOcean App Platform. The `.do/` directory contains the necessary deployment configuration. The backend serves the API and the frontend is deployed as a static site.
+If we continue development, our roadmap includes:
+- **Advanced UI & Interactive Elements:** Making our interface more intuitive and engaging by adding interactive 3D elements to the website.
+- **Clinical-Grade AI Refinement:** Refining our AI agent significantly with advanced prompt engineering and fine-tuning, allowing it to understand human emotions and analyze conversational nuance with the accuracy of a licensed therapist.
+- **Advanced RAG Architecture:** Exploring building a **ReAct** agent using **LangChain** and implementing **BM25** (hybrid search) for our RAG pipeline to ensure zero loss of critical user context.
+- **Covert Mode:** Allowing the app to instantly reskin itself to look like an unrelated productivity or recipe app to ensure total safety for survivors whose devices might be monitored.
 
 ---
 
-## License
-
-This project was built at WiNGHacks 2026.
+*Made with love by the DD Team*

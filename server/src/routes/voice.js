@@ -7,7 +7,7 @@ const UserPreferences = require('../models/UserPreferences');
 
 // Voice ID mapping for personas
 const PERSONA_VOICES = {
-    friend: 'jGf6Nvwr7qkFPrcLThmD',    // Stacy — warm, friendly
+    friend: 'kbdyNokGPgTLJuqCwViQ',     // Custom cloned team voice
     therapist: 'zmcVlqmyk3Jpn5AVYcAL',  // Sapphire — calm, narrative
 };
 

@@ -83,7 +83,7 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
     const { mood = null, cyclePhase = null, sleepHours = null, stressLevel = null } = moodOpts;
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
@@ -158,18 +158,11 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
 
         const result = await model.generateContent(promptParts);
         const response = result.response;
-        // Strip markdown backticks if Gemini includes them
         let text = response.text().trim();
-        if (text.startsWith('\`\`\`json')) {
-            text = text.substring(7);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
-        } else if (text.startsWith('\`\`\`')) {
-            text = text.substring(3);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
+        // Extract JSON using regex to handle extra conversational text
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            text = jsonMatch[0];
         }
 
         // Parse the JSON response
