@@ -16,7 +16,7 @@ async function getAuthHeaders() {
 /**
  * Analyze a journal entry via the Express backend → Gemini
  */
-export async function analyzeJournalEntry(content, mood = null) {
+export async function analyzeJournalEntry(content, mood = null, imageUrl = null) {
     const authHeaders = await getAuthHeaders();
 
     const response = await fetch(`${API_BASE}/analyze`, {
@@ -25,7 +25,7 @@ export async function analyzeJournalEntry(content, mood = null) {
             'Content-Type': 'application/json',
             ...authHeaders,
         },
-        body: JSON.stringify({ content, mood }),
+        body: JSON.stringify({ content, mood, imageUrl }),
     });
 
     if (!response.ok) {
@@ -34,6 +34,33 @@ export async function analyzeJournalEntry(content, mood = null) {
     }
 
     return response.json();
+}
+
+/**
+ * Upload an image to Supabase Storage
+ */
+export async function uploadJournalImage(file) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('You must be logged in to upload images');
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${session.user.id}/${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('Images')
+        .upload(filePath, file);
+
+    if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Could not upload image', uploadError.message);
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('Images')
+        .getPublicUrl(filePath);
+
+    return publicUrl;
 }
 
 /**

@@ -13,11 +13,11 @@ const { requireAuth } = require('../middleware/authMiddleware');
  */
 router.post('/', requireAuth, async (req, res, next) => {
     try {
-        const { content, mood } = req.body;
+        const { content, mood, imageUrl } = req.body;
 
-        if (!content || !content.trim()) {
+        if ((!content || !content.trim()) && !imageUrl) {
             return res.status(400).json({
-                error: 'Please share what\'s on your mind \u2014 even a few words help.'
+                error: 'Please share what\'s on your mind or attach an image \u2014 even a small piece helps.'
             });
         }
 
@@ -52,10 +52,10 @@ router.post('/', requireAuth, async (req, res, next) => {
 
         // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
-            analysis = await analyzeOllama(content.trim(), pastEntries);
+            analysis = await analyzeOllama(content.trim(), mood, pastEntries);
         } else {
-            console.log('[DEBUG] mood received:', mood);
-            analysis = await analyzeGemini(content.trim(), mood, pastEntries, persona);
+            console.log('[DEBUG] image received for analysis:', !!imageUrl);
+            analysis = await analyzeGemini(content.trim(), mood, imageUrl, pastEntries, persona);
         }
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
@@ -65,6 +65,7 @@ router.post('/', requireAuth, async (req, res, next) => {
                 analysis,
                 userId: req.user.id,
                 mood: mood || null,
+                imageUrl: imageUrl || null
             });
             await entry.save();
         } catch (dbError) {

@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import OnboardingPage from './pages/OnboardingPage';
 import SpotifyCallbackPage from './pages/SpotifyCallbackPage';
 import ProfilePage from './pages/ProfilePage';
+import Entries from './pages/EntriesPage';
 
 // Protected route wrapper — redirects to onboarding if not completed
 function ProtectedRoute({ children, skipOnboardingCheck = false }) {
@@ -62,6 +63,7 @@ function App() {
         <Route path="/patterns" element={<PatternLibraryPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/entries" element={<Entries />} />
       </Route>
     </Routes>
   );

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
 import { fetchEntries, getPreferences, getSpotifyStatus, generateMusic } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -25,6 +25,25 @@ export function AppProvider({ children }) {
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCovertMode, setIsCovertMode] = useState(false);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const data = await fetchEntries();
+        if (data && data.entries) {
+          // Normalize entries if needed (timestamp vs createdAt)
+          const normalized = data.entries.map(e => ({
+            ...e,
+            timestamp: e.timestamp || e.createdAt || e.created_at
+          }));
+          setEntries(normalized);
+        }
+      } catch (err) {
+        console.error("Failed to load history:", err);
+      }
+    };
+    loadHistory();
+  }, []);
   const [isMusicOn, setIsMusicOn] = useState(false);
   const [nowPlaying, setNowPlaying] = useState(null);
   const musicAudioRef = useRef(null);

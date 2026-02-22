@@ -1,81 +1,118 @@
 import { useState, useRef, useCallback } from "react";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff, Image as ImageIcon, X, Paperclip } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import {
-  analyzeJournalEntry,
-  createSpeechRecognition,
+    analyzeJournalEntry,
+    createSpeechRecognition,
+    uploadJournalImage,
 } from "../../services/api";
 
 const MOODS = [
-  { value: "grateful", label: "Grateful" },
-  { value: "hopeful", label: "Hopeful" },
-  { value: "confused", label: "Confused" },
-  { value: "sad", label: "Sad" },
-  { value: "anxious", label: "Anxious" },
-  { value: "angry", label: "Angry" },
-  { value: "numb", label: "Numb" },
+    { value: "grateful", label: "Grateful" },
+    { value: "hopeful", label: "Hopeful" },
+    { value: "confused", label: "Confused" },
+    { value: "sad", label: "Sad" },
+    { value: "anxious", label: "Anxious" },
+    { value: "angry", label: "Angry" },
+    { value: "numb", label: "Numb" },
 ];
 
 export default function JournalEntry({ onAnalysisComplete }) {
-  const { isLoading, setIsLoading } = useApp();
-  const [content, setContent] = useState("");
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [error, setError] = useState(null);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef(null);
+    const { isLoading, setIsLoading } = useApp();
+    const [content, setContent] = useState("");
+    const [selectedMood, setSelectedMood] = useState(null);
+    const [error, setError] = useState(null);
+    const [isListening, setIsListening] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const recognitionRef = useRef(null);
+    const fileInputRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!content.trim() || isLoading) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await analyzeJournalEntry(content.trim(), selectedMood);
-      onAnalysisComplete({
-        content: content.trim(),
-        mood: selectedMood,
-        analysis: result.analysis,
-        timestamp: new Date().toISOString(),
-      });
-      setContent("");
-      setSelectedMood(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                setError("Image must be smaller than 5MB");
+                return;
+            }
+            setSelectedImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
-  const toggleVoiceInput = useCallback(() => {
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      return;
-    }
-    setError(null);
-    const recognition = createSpeechRecognition({
-      onResult: (transcript) => setContent(transcript),
-      onInterim: (transcript) => setContent(transcript),
-      onError: (errorMsg) => {
-        setError(errorMsg);
-        setIsListening(false);
-      },
-      onEnd: () => setIsListening(false),
-    });
-    if (!recognition.supported) {
-      setError(
-        "Voice input is not supported in this browser. Please try Chrome or Edge.",
-      );
-      return;
-    }
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [isListening]);
+    const removeImage = () => {
+        setSelectedImage(null);
+        setImagePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
 
-  return (
-    <>
-      <style>{`
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!content.trim() || isLoading) return;
+        setIsLoading(true);
+        setError(null);
+        try {
+            let imageUrl = null;
+            if (selectedImage) {
+                imageUrl = await uploadJournalImage(selectedImage);
+            }
+
+            const result = await analyzeJournalEntry(
+                content.trim(),
+                selectedMood,
+                imageUrl
+            );
+            onAnalysisComplete({
+                content: content.trim(),
+                mood: selectedMood,
+                analysis: result.analysis,
+                imageUrl: imageUrl,
+                timestamp: new Date().toISOString(),
+            });
+            setContent("");
+            setSelectedMood(null);
+            removeImage();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const toggleVoiceInput = useCallback(() => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+        setError(null);
+        const recognition = createSpeechRecognition({
+            onResult: (transcript) => setContent(transcript),
+            onInterim: (transcript) => setContent(transcript),
+            onError: (errorMsg) => {
+                setError(errorMsg);
+                setIsListening(false);
+            },
+            onEnd: () => setIsListening(false),
+        });
+        if (!recognition.supported) {
+            setError(
+                "Voice input is not supported in this browser. Please try Chrome or Edge.",
+            );
+            return;
+        }
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsListening(true);
+    }, [isListening]);
+
+    return (
+        <>
+            <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
 
                 .je-book {
@@ -278,88 +315,149 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     letter-spacing: 1px;
                     margin-bottom: 8px;
                 }
+
+                .je-image-preview {
+                    position: relative;
+                    margin-bottom: 16px;
+                    border: 1px solid #e8d5c4;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    max-width: 200px;
+                }
+
+                .je-preview-img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+
+                .je-remove-img {
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    background: rgba(255,255,255,0.9);
+                    border: 1px solid #c9a0a0;
+                    border-radius: 2px;
+                    padding: 2px;
+                    cursor: pointer;
+                    color: #a67b7b;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
             `}</style>
 
-      <form onSubmit={handleSubmit}>
-        <div className="je-book">
-          <div className="je-inner">
-            <div className="je-spine">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="je-spine-dot" />
-              ))}
-            </div>
+            <form onSubmit={handleSubmit}>
+                <div className="je-book">
+                    <div className="je-inner">
+                        <div className="je-spine">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="je-spine-dot" />
+                            ))}
+                        </div>
 
-            <div className="je-content">
-              <div className="je-date">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </div>
+                        <div className="je-content">
+                            <div className="je-date">
+                                {new Date().toLocaleDateString("en-US", {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                })}
+                            </div>
 
-              <div className="je-mood-label">How are you feeling?</div>
-              <div className="je-moods">
-                {MOODS.map((mood) => (
-                  <button
-                    key={mood.value}
-                    type="button"
-                    className={`je-mood-chip ${selectedMood === mood.value ? "active" : ""}`}
-                    onClick={() =>
-                      setSelectedMood(
-                        selectedMood === mood.value ? null : mood.value,
-                      )
-                    }
-                  >
-                    {mood.label}
-                  </button>
-                ))}
-              </div>
+                            <div className="je-mood-label">How are you feeling?</div>
+                            <div className="je-moods">
+                                {MOODS.map((mood) => (
+                                    <button
+                                        key={mood.value}
+                                        type="button"
+                                        className={`je-mood-chip ${selectedMood === mood.value ? "active" : ""}`}
+                                        onClick={() =>
+                                            setSelectedMood(
+                                                selectedMood === mood.value ? null : mood.value,
+                                            )
+                                        }
+                                    >
+                                        {mood.label}
+                                    </button>
+                                ))}
+                            </div>
 
-              {isListening && (
-                <div className="je-listening-indicator">
-                  Listening... tap mic to stop
+                            {isListening && (
+                                <div className="je-listening-indicator">
+                                    Listening... tap mic to stop
+                                </div>
+                            )}
+
+                            <textarea
+                                className="je-textarea"
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                placeholder="Write about what happened..."
+                                disabled={isLoading}
+                                rows={5}
+                            />
+
+                            {imagePreview && (
+                                <div className="je-image-preview">
+                                    <img src={imagePreview} alt="Preview" className="je-preview-img" />
+                                    <button
+                                        type="button"
+                                        className="je-remove-img"
+                                        onClick={removeImage}
+                                        title="Remove image"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {error && <div className="je-error">{error}</div>}
+
+                            <div className="je-footer">
+                                <div className="je-left">
+                                    <button
+                                        type="button"
+                                        className={`je-mic ${isListening ? "listening" : ""}`}
+                                        onClick={toggleVoiceInput}
+                                        disabled={isLoading}
+                                        title={
+                                            isListening ? "Stop listening" : "Speak your thoughts"
+                                        }
+                                    >
+                                        {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+                                    </button>
+
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="je-mic"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={isLoading}
+                                        title="Attach screenshot or photo"
+                                    >
+                                        <Paperclip size={14} />
+                                    </button>
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="je-submit"
+                                    disabled={(!content.trim() && !selectedImage) || isLoading}
+                                >
+                                    {isLoading ? "Reading..." : "Reflect"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              )}
-
-              <textarea
-                className="je-textarea"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write about what happened..."
-                disabled={isLoading}
-                rows={5}
-              />
-
-              {error && <div className="je-error">{error}</div>}
-
-              <div className="je-footer">
-                <div className="je-left">
-                  <button
-                    type="button"
-                    className={`je-mic ${isListening ? "listening" : ""}`}
-                    onClick={toggleVoiceInput}
-                    disabled={isLoading}
-                    title={
-                      isListening ? "Stop listening" : "Speak your thoughts"
-                    }
-                  >
-                    {isListening ? <MicOff size={14} /> : <Mic size={14} />}
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  className="je-submit"
-                  disabled={!content.trim() || isLoading}
-                >
-                  {isLoading ? "Reading..." : "Reflect"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-    </>
-  );
+            </form>
+        </>
+    );
 }
