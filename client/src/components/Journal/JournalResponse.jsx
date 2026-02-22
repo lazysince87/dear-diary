@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Volume2, AlertTriangle, Sparkles, Music, ShieldAlert } from "lucide-react";
-import { textToSpeech, generateMusic, getSpotifyStatus, triggerEmergencySOS } from "../../services/api";
+import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
+import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
 import { useApp } from "../../context/AppContext";
+import SOSModal from "./SOSModal";
 
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
@@ -11,9 +12,7 @@ export default function JournalResponse({ entry }) {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicAudio, setMusicAudio] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const [sosSending, setSosSending] = useState(false);
-  const [sosSent, setSosSent] = useState(false);
-  const [sosError, setSosError] = useState(null);
+  const [showSOSModal, setShowSOSModal] = useState(analysis.requires_immediate_intervention || false);
 
   // Build a full narration script from all analysis sections
   const buildVoiceScript = () => {
@@ -76,19 +75,6 @@ export default function JournalResponse({ entry }) {
     hour: "numeric",
     minute: "2-digit",
   });
-
-  const handleSOS = async () => {
-    setSosSending(true);
-    setSosError(null);
-    try {
-      await triggerEmergencySOS(preferences?.displayName || '', content);
-      setSosSent(true);
-    } catch (err) {
-      setSosError(err.message);
-    } finally {
-      setSosSending(false);
-    }
-  };
 
   return (
     <>
@@ -499,35 +485,12 @@ export default function JournalResponse({ entry }) {
 
             {/* Music Suggestion — triggered by AI distress detection */}
 
-            {/* Emergency SOS — triggered by requires_immediate_intervention */}
-            {analysis.requires_immediate_intervention && (
-              <div className="jr-sos">
-                <div className="jr-sos-header">
-                  <ShieldAlert size={16} style={{ color: '#c9365a' }} />
-                  <span className="jr-sos-label">Are you safe?</span>
-                </div>
-                {sosSent ? (
-                  <div className="jr-sos-sent">
-                    Help is on the way. A message has been sent. You are not alone.
-                  </div>
-                ) : (
-                  <>
-                    <p className="jr-sos-text">
-                      What you described sounds serious, and I want to make sure you are okay.
-                      If you feel unsafe, I can silently text for help right now. No one will know it came from this app.
-                    </p>
-                    <button
-                      className="jr-sos-btn"
-                      onClick={handleSOS}
-                      disabled={sosSending}
-                    >
-                      {sosSending ? 'Sending...' : 'Yes, please text for help'}
-                    </button>
-                    {sosError && <div className="jr-sos-error">{sosError}</div>}
-                  </>
-                )}
-              </div>
-            )}
+            {/* Emergency SOS Modal — triggered by requires_immediate_intervention */}
+            <SOSModal
+              visible={showSOSModal}
+              entryContent={content}
+              onClose={() => setShowSOSModal(false)}
+            />
             {analysis.suggests_music && (
               <div style={{
                 padding: '16px',
