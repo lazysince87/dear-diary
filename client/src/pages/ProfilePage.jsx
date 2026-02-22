@@ -237,7 +237,7 @@ export default function ProfilePage() {
 
         .pf-persona-label {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 13px;
+          font-size: 16px;
           font-weight: 600;
           color: #3d2c2c;
           margin-bottom: 4px;
@@ -245,7 +245,7 @@ export default function ProfilePage() {
 
         .pf-persona-desc {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 10px;
+          font-size: 14px;
           color: #9a8282;
           line-height: 1.5;
         }
@@ -322,7 +322,7 @@ export default function ProfilePage() {
 
         .pf-email {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 11px;
+          font-size: 16px;
           color: #c9b4b4;
         }
       `}</style>
@@ -373,7 +373,7 @@ export default function ProfilePage() {
 
                 <div className="pf-section">
                     <div className="pf-label">Health Baseline</div>
-                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '13px', color: '#9a8282', marginBottom: '12px' }}>
+                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '14px', color: '#9a8282', marginBottom: '12px' }}>
                         This helps me personalize my advice around your body's rhythms
                     </p>
 

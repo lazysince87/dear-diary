@@ -235,7 +235,7 @@ export default function Header({ onLogoutClick }) {
             padding: "4px 16px",
             textAlign: "center",
             fontFamily: "'Pixelify Sans', sans-serif",
-            fontSize: "10px",
+            fontSize: "12px",
             color: "#9a8282",
             letterSpacing: "0.5px",
           }}

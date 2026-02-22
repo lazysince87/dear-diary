@@ -159,7 +159,7 @@ export default function HomePage() {
 
         .dd-section-label {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 10px;
+          font-size: 16px;
           letter-spacing: 3px;
           text-transform: uppercase;
           color: #7a5060;
@@ -205,7 +205,7 @@ export default function HomePage() {
 
         .dd-entry-date {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 10px;
+          font-size: 16px;
           color: #7a5060;
           letter-spacing: 2px;
           text-transform: uppercase;
@@ -214,7 +214,7 @@ export default function HomePage() {
 
         .dd-entry-preview {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 13px;
+          font-size: 18px;
           color: #a0788a;
           line-height: 1.6;
           overflow: hidden;

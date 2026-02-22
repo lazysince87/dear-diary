@@ -202,7 +202,7 @@ export default function EntriesPage() {
 
                 .nb-tab-date {
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 11px;
+                    font-size: 16px;
                     color: #9a8282;
                     width: 85px;
                     flex-shrink: 0;
@@ -212,7 +212,7 @@ export default function EntriesPage() {
 
                 .nb-tab-title {
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 14px;
+                    font-size: 16px;
                     color: text-text-secondary;
                     flex: 1;
                     padding-left: 15px;
@@ -264,7 +264,7 @@ export default function EntriesPage() {
 
                 .nb-label {
                     font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 10px;
+                    font-size: 16px;
                     letter-spacing: 2px;
                     text-transform: uppercase;
                     color: #c9a0a0;
