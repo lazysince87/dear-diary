@@ -442,7 +442,7 @@ export default function EntriesPage() {
                                 >
                                   <div style={{ marginBottom: "24px" }}>
                                     <span
-                                      className="nb-label"
+                                      className="nb-label mb-8 p-2 pr-2"
                                       style={{
                                         display: "flex",
                                         alignItems: "center",
@@ -451,7 +451,7 @@ export default function EntriesPage() {
                                     >
                                       <Heart size={10} /> Reflection
                                     </span>
-                                    <p style={{ fontSize: "14px" }}>
+                                    <p style={{ fontSize: "14px", paddingLeft: "12px" }}>
                                       {entry.analysis.empathy_response}
                                     </p>
                                   </div>
@@ -474,7 +474,7 @@ export default function EntriesPage() {
                                       </span>
                                       <div
                                         style={{
-                                          fontSize: "14px",
+                                          fontSize: "15px",
                                           fontWeight: 600,
                                           marginBottom: "4px",
                                         }}
@@ -483,7 +483,7 @@ export default function EntriesPage() {
                                       </div>
                                       <p
                                         style={{
-                                          fontSize: "12px",
+                                          fontSize: "15px",
                                           opacity: 0.8,
                                         }}
                                       >
@@ -500,16 +500,18 @@ export default function EntriesPage() {
                                           display: "flex",
                                           alignItems: "center",
                                           gap: "6px",
+                                          paddingLeft: "12px",
                                         }}
                                       >
                                         <Sparkles size={10} /> Guidance
                                       </span>
                                       <p
                                         style={{
-                                          fontSize: "12px",
+                                          fontSize: "15px",
                                           fontStyle: "italic",
                                           textAlign: "center",
                                           color: "#9a8282",
+                                          paddingLeft: "12px",
                                         }}
                                       >
                                         {entry.analysis.actionable_advice}

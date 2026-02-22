@@ -464,8 +464,8 @@ export default function HomePage() {
           alt="duck"
           className="dd-duck"
           style={{
-            position: "fixed",
-            right: "50px",
+            position: "fixed", 
+            right: "20px",
             bottom: "50px",
             top: "auto",
             width: "250px",
