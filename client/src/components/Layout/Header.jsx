@@ -46,7 +46,10 @@ export default function Header({ onLogoutClick }) {
         padding: "0px 0px",
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center" style={{ height: '48px' }}>
+      <div
+        className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center"
+        style={{ height: "48px" }}
+      >
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
             className="text-left text-xl font-semibold"
@@ -72,9 +75,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                  color: getNavStyle("/").color,
-                  borderBottomColor: getNavStyle("/").border,
-                }
+                    color: getNavStyle("/").color,
+                    borderBottomColor: getNavStyle("/").border,
+                  }
                 : {}
             }
           >
@@ -90,9 +93,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                  color: getNavStyle("/entries").color,
-                  borderBottomColor: getNavStyle("/entries").border,
-                }
+                    color: getNavStyle("/entries").color,
+                    borderBottomColor: getNavStyle("/entries").border,
+                  }
                 : {}
             }
           >
@@ -108,9 +111,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                  color: getNavStyle("/patterns").color,
-                  borderBottomColor: getNavStyle("/patterns").border,
-                }
+                    color: getNavStyle("/patterns").color,
+                    borderBottomColor: getNavStyle("/patterns").border,
+                  }
                 : {}
             }
           >
@@ -126,9 +129,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                  color: getNavStyle("/resources").color,
-                  borderBottomColor: getNavStyle("/resources").border,
-                }
+                    color: getNavStyle("/resources").color,
+                    borderBottomColor: getNavStyle("/resources").border,
+                  }
                 : {}
             }
           >
@@ -144,9 +147,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                  color: getNavStyle("/profile").color,
-                  borderBottomColor: getNavStyle("/profile").border,
-                }
+                    color: getNavStyle("/profile").color,
+                    borderBottomColor: getNavStyle("/profile").border,
+                  }
                 : {}
             }
           >

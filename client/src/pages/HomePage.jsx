@@ -83,7 +83,6 @@ export default function HomePage() {
           },
         });
       });
-
     }, pageRef);
 
     return () => ctx.revert();
@@ -95,15 +94,15 @@ export default function HomePage() {
       gsap.to(chars, {
         keyframes: [
           { y: 0, duration: 0 },
-          { y: -8, duration: .75, ease: "sine.inOut" },
-          { y: 0, duration: 0.75, ease: "sine.inOut" }
+          { y: -8, duration: 0.75, ease: "sine.inOut" },
+          { y: 0, duration: 0.75, ease: "sine.inOut" },
         ],
         repeat: -1,
         force3D: true, // Hardware acceleration
         stagger: {
           each: 0.2,
-          from: "start"
-        }
+          from: "start",
+        },
       });
     }
   }, []);
@@ -405,7 +404,11 @@ export default function HomePage() {
           <div className="dd-header-block">
             <h1 ref={titleRef} className="dd-title">
               {"Dear Diary".split("").map((char, i) => (
-                <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+                <span
+                  key={i}
+                  className="dd-char"
+                  style={{ display: "inline-block" }}
+                >
                   {char === " " ? "\u00A0" : char}
                 </span>
               ))}
@@ -464,7 +467,7 @@ export default function HomePage() {
           alt="duck"
           className="dd-duck"
           style={{
-            position: "fixed", 
+            position: "fixed",
             right: "20px",
             bottom: "50px",
             top: "auto",

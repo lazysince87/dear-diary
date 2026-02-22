@@ -74,7 +74,7 @@ export default function PatternLibraryPage() {
               yoyo: true,
             });
           },
-        }
+        },
       );
     }
   }, []);
@@ -228,7 +228,6 @@ export default function PatternLibraryPage() {
       `}</style>
 
       <div ref={pageRef} style={{ position: "relative" }}>
-
         {/* Draggable decorations */}
         {DECORATIONS.map((deco, i) => (
           <div
@@ -240,7 +239,12 @@ export default function PatternLibraryPage() {
             <img
               src={deco.src}
               alt="decoration"
-              style={{ width: "100%", height: "100%", pointerEvents: "none", userSelect: "none" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
               draggable={false}
             />
           </div>

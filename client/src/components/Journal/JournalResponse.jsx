@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
-import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
+import {
+  textToSpeech,
+  generateMusic,
+  getSpotifyStatus,
+} from "../../services/api";
 import { useApp } from "../../context/AppContext";
 import SOSModal from "./SOSModal";
 
@@ -12,7 +16,9 @@ export default function JournalResponse({ entry }) {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicAudio, setMusicAudio] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
-  const [showSOSModal, setShowSOSModal] = useState(analysis.requires_immediate_intervention || false);
+  const [showSOSModal, setShowSOSModal] = useState(
+    analysis.requires_immediate_intervention || false,
+  );
 
   // Build a full narration script from all analysis sections
   const buildVoiceScript = () => {
@@ -342,9 +348,16 @@ export default function JournalResponse({ entry }) {
           </div>
 
           <div className="jr-content">
-            <div className="jr-reflection" style={{ borderLeft: '3px solid #e8d5c4', background: '#fdf6f0', marginBottom: '20px' }}>
+            <div
+              className="jr-reflection"
+              style={{
+                borderLeft: "3px solid #e8d5c4",
+                background: "#fdf6f0",
+                marginBottom: "20px",
+              }}
+            >
               <div className="jr-reflection-label">What you shared</div>
-              <p className="jr-reflection-text" style={{ fontStyle: 'normal' }}>
+              <p className="jr-reflection-text" style={{ fontStyle: "normal" }}>
                 {content}
               </p>
             </div>
@@ -486,21 +499,21 @@ export default function JournalResponse({ entry }) {
                               fontWeight: "600",
                               ...(pattern.severity === "high"
                                 ? {
-                                  background: "#ffe0e0",
-                                  color: "#c9365a",
-                                  border: "1px solid #ffb3b3",
-                                }
+                                    background: "#ffe0e0",
+                                    color: "#c9365a",
+                                    border: "1px solid #ffb3b3",
+                                  }
                                 : pattern.severity === "medium"
                                   ? {
-                                    background: "#fff3e0",
-                                    color: "#b8956a",
-                                    border: "1px solid #f0dcc0",
-                                  }
+                                      background: "#fff3e0",
+                                      color: "#b8956a",
+                                      border: "1px solid #f0dcc0",
+                                    }
                                   : {
-                                    background: "#e8f5e8",
-                                    color: "#5a7a52",
-                                    border: "1px solid #c0dcc0",
-                                  }),
+                                      background: "#e8f5e8",
+                                      color: "#5a7a52",
+                                      border: "1px solid #c0dcc0",
+                                    }),
                             }}
                           >
                             {pattern.severity}
