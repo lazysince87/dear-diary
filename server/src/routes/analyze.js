@@ -54,8 +54,13 @@ router.post('/', requireAuth, async (req, res, next) => {
         if (aiProvider === 'ollama') {
             analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
+<<<<<<< HEAD
             console.log('[DEBUG] image received for analysis:', !!imageUrl, 'mood:', mood);
             analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
+=======
+            console.log('[DEBUG] mood received:', mood);
+            analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
+>>>>>>> origin/thuy/feat/ai-safety
         }
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
@@ -68,7 +73,10 @@ router.post('/', requireAuth, async (req, res, next) => {
                 cyclePhase: cyclePhase || null,
                 sleepHours: sleepHours !== undefined ? sleepHours : null,
                 stressLevel: stressLevel !== undefined ? stressLevel : null,
+<<<<<<< HEAD
                 imageUrl: imageUrl || null
+=======
+>>>>>>> origin/thuy/feat/ai-safety
             });
             await entry.save();
         } catch (dbError) {

@@ -81,7 +81,6 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
     // Handle backwards compatibility where options was just the mood string
     const moodOpts = typeof options === 'string' ? { mood: options } : options || {};
     const { mood = null, cyclePhase = null, sleepHours = null, stressLevel = null } = moodOpts;
-
     try {
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',

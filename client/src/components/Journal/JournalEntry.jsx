@@ -76,7 +76,6 @@ export default function JournalEntry({ onAnalysisComplete }) {
             const result = await analyzeJournalEntry(
                 content.trim(),
                 selectedMood,
-                selectedMood,
                 imageUrl,
                 cyclePhase,
                 sleepHours ? Number(sleepHours) : null,
@@ -363,7 +362,6 @@ export default function JournalEntry({ onAnalysisComplete }) {
                     align-items: center;
                     justify-content: center;
                 }
-
                 .je-listening-indicator {
                     font-family: 'Pixelify Sans', sans-serif;
                     font-size: 11px;
