@@ -1,123 +1,153 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../contexts/AuthContext";
 import {
-    savePreferences,
-    getSpotifyLoginUrl,
-    getSpotifyStatus,
+  savePreferences,
+  getSpotifyLoginUrl,
+  getSpotifyStatus,
 } from "../services/api";
 import boxDuckImg from "../assets/animations/box-duck.png";
 
 const PERSONAS = [
-    {
-        value: "friend",
-        label: "A Friend",
-        description: "Just someone to talk to — casual, warm, and supportive.",
-        voice: "Stacy",
-    },
-    {
-        value: "therapist",
-        label: "A Therapist",
-        description:
-            "Help me process my feelings with gentle, actionable guidance.",
-        voice: "Sapphire",
-    },
+  {
+    value: "friend",
+    label: "A Friend",
+    description: "Just someone to talk to — casual, warm, and supportive.",
+    voice: "Stacy",
+  },
+  {
+    value: "therapist",
+    label: "A Therapist",
+    description:
+      "Help me process my feelings with gentle, actionable guidance.",
+    voice: "Sapphire",
+  },
 ];
 
 export default function ProfilePage() {
-    const { preferences, loadPreferences } = useApp();
-    const { user, signOut } = useAuth();
-    const navigate = useNavigate();
+  const { preferences, loadPreferences } = useApp();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
-    const [displayName, setDisplayName] = useState("");
-    const [persona, setPersona] = useState("friend");
-    const [defaultCyclePhase, setDefaultCyclePhase] = useState(null);
-    const [averageSleepHours, setAverageSleepHours] = useState("");
-    const [averageStressLevel, setAverageStressLevel] = useState("");
-    const [saving, setSaving] = useState(false);
-    const [saved, setSaved] = useState(false);
-    const [spotifyConnected, setSpotifyConnected] = useState(false);
-    const [spotifyConnecting, setSpotifyConnecting] = useState(false);
-    const duckRef = useRef(null);
+  const [displayName, setDisplayName] = useState("");
+  const [persona, setPersona] = useState("friend");
+  const [defaultCyclePhase, setDefaultCyclePhase] = useState(null);
+  const [averageSleepHours, setAverageSleepHours] = useState("");
+  const [averageStressLevel, setAverageStressLevel] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [spotifyConnected, setSpotifyConnected] = useState(false);
+  const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+  const duckRef = useRef(null);
+  const titleRef = useRef(null);
 
-    useEffect(() => {
-        if (duckRef.current) {
-            gsap.fromTo(
-                duckRef.current,
-                { y: -800, opacity: 1 },
-                {
-                    y: 0,
-                    duration: 6,
-                    ease: "bounce.out",
-                    onComplete: () => {
-                        gsap.to(duckRef.current, {
-                            y: -10,
-                            duration: 1.8,
-                            ease: "sine.inOut",
-                            repeat: -1,
-                            yoyo: true,
-                        });
-                    },
-                },
-            );
-        }
-    }, []);
+  const titleChars = useMemo(() => {
+    return "Profile".split("").map((char, i) => (
+      <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ));
+  }, []);
 
-    useEffect(() => {
-        if (preferences) {
-            setDisplayName(preferences.displayName || "");
-            setPersona(preferences.personaPreference || "friend");
-            setDefaultCyclePhase(preferences.defaultCyclePhase || null);
-            setAverageSleepHours(preferences.averageSleepHours != null ? String(preferences.averageSleepHours) : "");
-            setAverageStressLevel(preferences.averageStressLevel != null ? String(preferences.averageStressLevel) : "");
-        }
-    }, [preferences]);
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (duckRef.current) {
+        gsap.fromTo(
+          duckRef.current,
+          { y: -800, opacity: 1 },
+          {
+            y: 0,
+            duration: 6,
+            ease: "bounce.out",
+            onComplete: () => {
+              gsap.to(duckRef.current, {
+                y: -10,
+                duration: 1.8,
+                ease: "sine.inOut",
+                repeat: -1,
+                yoyo: true,
+              });
+            },
+          },
+        );
+      }
 
-    useEffect(() => {
-        getSpotifyStatus()
-            .then((data) => setSpotifyConnected(data.connected))
-            .catch(() => { });
-    }, []);
+      if (titleRef.current) {
+        const chars = titleRef.current.querySelectorAll(".dd-char");
+        gsap.to(chars, {
+          keyframes: [
+            { y: 0, duration: 0 },
+            { y: -8, duration: 0.75, ease: "sine.inOut" },
+            { y: 0, duration: 0.75, ease: "sine.inOut" }
+          ],
+          repeat: -1,
+          force3D: true,
+          stagger: {
+            each: 0.2,
+            from: "start"
+          }
+        });
+      }
+    });
 
-    const handleSave = async () => {
-        setSaving(true);
-        setSaved(false);
-        try {
-            await savePreferences({
-                displayName: displayName.trim(),
-                personaPreference: persona,
-                defaultCyclePhase: defaultCyclePhase || null,
-                averageSleepHours: averageSleepHours ? Number(averageSleepHours) : null,
-                averageStressLevel: averageStressLevel ? Number(averageStressLevel) : null,
-            });
-            await loadPreferences();
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-        } catch (err) {
-            console.error("Failed to save:", err);
-        } finally {
-            setSaving(false);
-        }
-    };
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (preferences) {
+      setDisplayName(preferences.displayName || "");
+      setPersona(preferences.personaPreference || "friend");
+      setDefaultCyclePhase(preferences.defaultCyclePhase || null);
+      setAverageSleepHours(preferences.averageSleepHours != null ? String(preferences.averageSleepHours) : "");
+      setAverageStressLevel(preferences.averageStressLevel != null ? String(preferences.averageStressLevel) : "");
+    }
+  }, [preferences]);
+
+  useEffect(() => {
+    getSpotifyStatus()
+      .then((data) => setSpotifyConnected(data.connected))
+      .catch(() => { });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      await savePreferences({
+        displayName: displayName.trim(),
+        personaPreference: persona,
+        defaultCyclePhase: defaultCyclePhase || null,
+        averageSleepHours: averageSleepHours ? Number(averageSleepHours) : null,
+        averageStressLevel: averageStressLevel ? Number(averageStressLevel) : null,
+      });
+      await loadPreferences();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error("Failed to save:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
 
 
-    const handleConnectSpotify = async () => {
-        setSpotifyConnecting(true);
-        try {
-            const { url } = await getSpotifyLoginUrl();
-            window.location.href = url;
-        } catch (err) {
-            console.error("Spotify login failed:", err);
-            setSpotifyConnecting(false);
-        }
-    };
+  const handleConnectSpotify = async () => {
+    setSpotifyConnecting(true);
+    try {
+      const { url } = await getSpotifyLoginUrl();
+      window.location.href = url;
+    } catch (err) {
+      console.error("Spotify login failed:", err);
+      setSpotifyConnecting(false);
+    }
+  };
 
-    return (
-        <>
-            <style>{`
+  return (
+    <>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Special+Elite&display=swap');
 
         .pf-page {
@@ -130,7 +160,7 @@ export default function ProfilePage() {
           font-family: 'KiwiSoda', sans-serif;
           font-size: 50px;
           font-weight: 600;
-          color: #1a1a1a;
+          color: text-text-secondary;
           letter-spacing: 4px;
           margin-bottom: 10px;
         }
@@ -138,7 +168,7 @@ export default function ProfilePage() {
         .pf-subtitle {
           font-family: 'Special Elite', serif;
           font-size: 14px;
-          color: #a0788a;
+          color: text-text-secondary;
           line-height: 1.7;
           margin-bottom: 32px;
         }
@@ -292,114 +322,116 @@ export default function ProfilePage() {
         }
       `}</style>
 
-            <div className="pf-page">
-                <h1 className="pf-title">Profile</h1>
-                <p className="pf-subtitle">Manage your preferences and connections</p>
+      <div className="pf-page">
+        <h1 ref={titleRef} className="pf-title">
+          {titleChars}
+        </h1>
+        <p className="pf-subtitle">Manage your preferences and connections</p>
 
-                <div className="pf-section">
-                    <div className="pf-label">Display Name</div>
-                    <input
-                        className="pf-input"
-                        type="text"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="Your name..."
-                    />
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">Display Name</div>
+          <input
+            className="pf-input"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your name..."
+          />
+        </div>
 
-                <div className="pf-section">
-                    <div className="pf-label">AI Persona</div>
-                    <div className="pf-persona-grid">
-                        {PERSONAS.map((p) => (
-                            <div
-                                key={p.value}
-                                className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
-                                onClick={() => setPersona(p.value)}
-                            >
-                                <div className="pf-persona-label">{p.label}</div>
-                                <div className="pf-persona-desc">{p.description}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">AI Persona</div>
+          <div className="pf-persona-grid">
+            {PERSONAS.map((p) => (
+              <div
+                key={p.value}
+                className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
+                onClick={() => setPersona(p.value)}
+              >
+                <div className="pf-persona-label">{p.label}</div>
+                <div className="pf-persona-desc">{p.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-                <button
-                    className="pf-btn"
-                    onClick={handleSave}
-                    disabled={!displayName.trim() || saving}
-                >
-                    {saving ? "Saving..." : "Save Changes"}
-                </button>
-                {saved && <div className="pf-saved">Preferences saved</div>}
+        <button
+          className="pf-btn"
+          onClick={handleSave}
+          disabled={!displayName.trim() || saving}
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+        {saved && <div className="pf-saved">Preferences saved</div>}
 
-                <hr className="pf-divider" />
+        <hr className="pf-divider" />
 
-                <div className="pf-section">
-                    <div className="pf-label">Health Baseline</div>
-                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '11px', color: '#9a8282', marginBottom: '12px' }}>
-                        This helps me personalize my advice around your body's rhythms
-                    </p>
+        <div className="pf-section">
+          <div className="pf-label">Health Baseline</div>
+          <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '11px', color: '#9a8282', marginBottom: '12px' }}>
+            This helps me personalize my advice around your body's rhythms
+          </p>
 
-                    <div className="pf-label" style={{ marginTop: '8px' }}>Cycle Phase</div>
-                    <div className="pf-persona-grid" style={{ marginBottom: '16px' }}>
-                        {[
-                            { value: 'menstrual', label: 'Menstrual' },
-                            { value: 'follicular', label: 'Follicular' },
-                            { value: 'ovulatory', label: 'Ovulatory' },
-                            { value: 'luteal', label: 'Luteal (PMS)' },
-                        ].map((phase) => (
-                            <div
-                                key={phase.value}
-                                className={`pf-persona-card ${defaultCyclePhase === phase.value ? 'selected' : ''}`}
-                                onClick={() => setDefaultCyclePhase(defaultCyclePhase === phase.value ? null : phase.value)}
-                            >
-                                <div className="pf-persona-label">{phase.label}</div>
-                            </div>
-                        ))}
-                    </div>
+          <div className="pf-label" style={{ marginTop: '8px' }}>Cycle Phase</div>
+          <div className="pf-persona-grid" style={{ marginBottom: '16px' }}>
+            {[
+              { value: 'menstrual', label: 'Menstrual' },
+              { value: 'follicular', label: 'Follicular' },
+              { value: 'ovulatory', label: 'Ovulatory' },
+              { value: 'luteal', label: 'Luteal (PMS)' },
+            ].map((phase) => (
+              <div
+                key={phase.value}
+                className={`pf-persona-card ${defaultCyclePhase === phase.value ? 'selected' : ''}`}
+                onClick={() => setDefaultCyclePhase(defaultCyclePhase === phase.value ? null : phase.value)}
+              >
+                <div className="pf-persona-label">{phase.label}</div>
+              </div>
+            ))}
+          </div>
 
-                    <div className="pf-label">Average Sleep (hours)</div>
-                    <input
-                        className="pf-input"
-                        type="number"
-                        min="0"
-                        max="24"
-                        placeholder="e.g. 7"
-                        value={averageSleepHours}
-                        onChange={(e) => setAverageSleepHours(e.target.value)}
-                        style={{ marginBottom: '16px' }}
-                    />
+          <div className="pf-label">Average Sleep (hours)</div>
+          <input
+            className="pf-input"
+            type="number"
+            min="0"
+            max="24"
+            placeholder="e.g. 7"
+            value={averageSleepHours}
+            onChange={(e) => setAverageSleepHours(e.target.value)}
+            style={{ marginBottom: '16px' }}
+          />
 
-                    <div className="pf-label">Typical Stress Level (1-10)</div>
-                    <input
-                        className="pf-input"
-                        type="number"
-                        min="1"
-                        max="10"
-                        placeholder="e.g. 5"
-                        value={averageStressLevel}
-                        onChange={(e) => setAverageStressLevel(e.target.value)}
-                    />
-                </div>
+          <div className="pf-label">Typical Stress Level (1-10)</div>
+          <input
+            className="pf-input"
+            type="number"
+            min="1"
+            max="10"
+            placeholder="e.g. 5"
+            value={averageStressLevel}
+            onChange={(e) => setAverageStressLevel(e.target.value)}
+          />
+        </div>
 
-                <hr className="pf-divider" />
+        <hr className="pf-divider" />
 
-                <div className="pf-section">
-                    <div className="pf-label">Spotify</div>
-                    {spotifyConnected ? (
-                        <div className="pf-connected">Connected</div>
-                    ) : (
-                        <button
-                            className="pf-btn pf-btn-spotify"
-                            onClick={handleConnectSpotify}
-                            disabled={spotifyConnecting}
-                        >
-                            {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
-                        </button>
-                    )}
-                </div>
+        <div className="pf-section">
+          <div className="pf-label">Spotify</div>
+          {spotifyConnected ? (
+            <div className="pf-connected">Connected</div>
+          ) : (
+            <button
+              className="pf-btn pf-btn-spotify"
+              onClick={handleConnectSpotify}
+              disabled={spotifyConnecting}
+            >
+              {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
+            </button>
+          )}
+        </div>
 
-                <hr className="pf-divider" />
+        <hr className="pf-divider" />
 
         <div className="pf-email">Signed in as {user?.email}</div>
       </div>

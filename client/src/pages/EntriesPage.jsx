@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import gsap from "gsap";
 import { fetchEntries } from "../services/api";
 import { Calendar, Heart, AlertCircle, Search, Image as ImageIcon, Sparkles } from "lucide-react";
 
@@ -8,6 +9,41 @@ export default function EntriesPage() {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedEntry, setExpandedEntry] = useState(null);
+    const titleRef = useRef(null);
+
+    const titleChars = useMemo(() => {
+        return "Archives".split("").map((char, i) => (
+            <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+                {char === " " ? "\u00A0" : char}
+            </span>
+        ));
+    }, []);
+
+
+    useEffect(() => {
+        if (loading) return;
+
+        const ctx = gsap.context(() => {
+            if (titleRef.current) {
+                const chars = titleRef.current.querySelectorAll(".dd-char");
+                gsap.to(chars, {
+                    keyframes: [
+                        { y: 0, duration: 0 },
+                        { y: -5, duration: 0.85, ease: "sine.inOut" },
+                        { y: 0, duration: 0.85, ease: "sine.inOut" }
+                    ],
+                    repeat: -1,
+                    force3D: true,
+                    stagger: {
+                        each: 0.2,
+                        from: "start"
+                    }
+                });
+            }
+        });
+
+        return () => ctx.revert();
+    }, [loading]);
 
     useEffect(() => {
         loadEntries();
@@ -177,7 +213,7 @@ export default function EntriesPage() {
                 .nb-tab-title {
                     font-family: 'Pixelify Sans', sans-serif;
                     font-size: 14px;
-                    color: #3d2c2c;
+                    color: text-text-secondary;
                     flex: 1;
                     padding-left: 15px;
                     border-left: 1px solid #f0ddd5;
@@ -246,10 +282,10 @@ export default function EntriesPage() {
 
                 <div className="nb-content">
                     <header className="nb-header text-center">
-                        <h1 className="text-4xl font-bold mb-2 tracking-tight" style={{ fontFamily: 'KiwiSoda', fontSize: '50px', color: '#1a1a1a', letterSpacing: '4px' }}>
-                            Archives
+                        <h1 ref={titleRef} className="text-4xl font-bold mb-2 tracking-tight" style={{ fontFamily: 'KiwiSoda', color: 'text-text-secondary', fontSize: '50px', letterSpacing: '4px' }}>
+                            {titleChars}
                         </h1>
-                        <p className="text-sm font-serif" style={{ fontFamily: 'Special Elite', fontSize: '14px', color: '#a0788a', lineHeight: '1.7' }}>
+                        <p className="text-sm font-serif text-text-secondary" style={{ fontFamily: 'Special Elite', fontSize: '14px', lineHeight: '1.7' }}>
                             Your journey, preserved in ink and pixels
                         </p>
                     </header>
