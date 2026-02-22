@@ -13,10 +13,10 @@ async function connectDB() {
     try {
         console.log('Connecting to MongoDB Atlas...');
         await mongoose.connect(uri, {
-            dbName: 'rosie',
+            dbName: 'winghacks-26',
             serverSelectionTimeoutMS: 10000, // 10s timeout instead of 30s default
         });
-        console.log('Connected to MongoDB Atlas (database: rosie)');
+        console.log('Connected to MongoDB Atlas (database: dear-diary)');
     } catch (error) {
         console.error('MongoDB connection error:', error.message);
         console.error('');

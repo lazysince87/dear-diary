@@ -47,7 +47,7 @@ app.use(requestTimeout(30000)); // Kill any request after 30 seconds
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Rosie is running' });
+    res.json({ status: 'ok', message: 'Dear Diary is running' });
 });
 
 // Routes (AI routes get strict rate limits)

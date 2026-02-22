@@ -6,14 +6,14 @@ const AppContext = createContext(null);
 
 // Generate or retrieve a persistent session ID
 function getSessionId() {
-  let sessionId = localStorage.getItem("rosie_session_id");
+  let sessionId = localStorage.getItem("dear_diary_session_id");
   if (!sessionId) {
     sessionId =
       "session_" +
       Date.now() +
       "_" +
       Math.random().toString(36).substring(2, 9);
-    localStorage.setItem("rosie_session_id", sessionId);
+    localStorage.setItem("dear_diary_session_id", sessionId);
   }
   return sessionId;
 }

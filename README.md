@@ -2,7 +2,7 @@
 
 **A mobile-first relationship safety companion disguised as a personal journal.**
 
-Rosie is a web application built to help users identify emotional manipulation patterns -- such as gaslighting, love bombing, DARVO, and isolation tactics -- across all types of relationships, including romantic, familial, platonic, and professional. It presents itself as a cozy, warm journaling app so that it remains safe and inconspicuous for users in vulnerable situations.
+Dear Diary is a web application built to help users identify emotional manipulation patterns -- such as gaslighting, love bombing, DARVO, and isolation tactics -- across all types of relationships, including romantic, familial, platonic, and professional. It presents itself as a cozy, warm journaling app so that it remains safe and inconspicuous for users in vulnerable situations.
 
 Built at WiNGHacks 2026.
 
@@ -29,13 +29,13 @@ Emotional abuse and manipulation are often invisible. Unlike physical harm, they
 
 ## Our Approach
 
-Rosie bridges that gap. On the surface, it looks and feels like a personal diary app -- warm colors, rounded corners, a comforting tone. Underneath, it uses AI-powered analysis to gently identify red flags in user-submitted journal entries and pasted conversations. The response always leads with empathy, then names any identified tactic, explains why it is harmful, and offers a reflection question to encourage self-awareness.
+Dear Diary bridges that gap. On the surface, it looks and feels like a personal diary app -- warm colors, rounded corners, a comforting tone. Underneath, it uses AI-powered analysis to gently identify red flags in user-submitted journal entries and pasted conversations. The response always leads with empathy, then names any identified tactic, explains why it is harmful, and offers a reflection question to encourage self-awareness.
 
 The app is designed so that anyone looking over a user's shoulder would see nothing more than a personal journaling tool.
 
 ## Educational Mission
 
-Rosie is built with a strong educational focus. The goal is not just to detect red flags, but to **teach users what healthy and unhealthy relationship behaviors look like** across all types of relationships:
+Dear Diary is built with a strong educational focus. The goal is not just to detect red flags, but to **teach users what healthy and unhealthy relationship behaviors look like** across all types of relationships:
 
 - **Pattern Library**: A curated, browsable library of manipulation tactics (gaslighting, love bombing, minimizing, DARVO, isolation, and more) with clear definitions, real-world examples, and guidance on healthy alternatives.
 - **Contextual Learning**: When the AI identifies a pattern in a journal entry, it does not simply flag it. It provides a plain-language explanation of the tactic, why it is harmful, and how healthy communication differs -- turning every interaction into a learning moment.
@@ -114,7 +114,7 @@ The app serves as both a personal safety tool and an ongoing educational resourc
 ## Project Structure
 
 ```
-rosie/
+dear-diary/
   client/                  # Frontend React application
     src/
       components/          # Reusable UI components
@@ -155,8 +155,8 @@ rosie/
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/rosie.git
-cd rosie
+git clone https://github.com/lazysince87/winghacks-2026.git
+cd winghacks-2026
 ```
 
 2. Install backend dependencies:
