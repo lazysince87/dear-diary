@@ -30,6 +30,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
     const [imagePreview, setImagePreview] = useState(null);
     const recognitionRef = useRef(null);
     const fileInputRef = useRef(null);
+    const contentRef = useRef("");
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -89,6 +90,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
                 timestamp: new Date().toISOString(),
             });
             setContent("");
+            contentRef.current = "";
             setSelectedMood(null);
             removeImage();
             setCyclePhase(null);
@@ -108,9 +110,19 @@ export default function JournalEntry({ onAnalysisComplete }) {
             return;
         }
         setError(null);
+
+        let baseText = contentRef.current.trim();
+        if (baseText) baseText += " ";
+
         const recognition = createSpeechRecognition({
-            onResult: (transcript) => setContent(transcript),
-            onInterim: (transcript) => setContent(transcript),
+            onResult: (transcript) => {
+                baseText += transcript + " ";
+                contentRef.current = baseText;
+                setContent(baseText);
+            },
+            onInterim: (transcript) => {
+                setContent(baseText + transcript);
+            },
             onError: (errorMsg) => {
                 setError(errorMsg);
                 setIsListening(false);
@@ -127,6 +139,7 @@ export default function JournalEntry({ onAnalysisComplete }) {
         recognition.start();
         setIsListening(true);
     }, [isListening]);
+
 
     return (
         <>
@@ -473,7 +486,10 @@ export default function JournalEntry({ onAnalysisComplete }) {
                             <textarea
                                 className="je-textarea"
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
+                                onChange={(e) => {
+                                    setContent(e.target.value);
+                                    contentRef.current = e.target.value;
+                                }}
                                 placeholder="Write about what happened..."
                                 disabled={isLoading}
                                 rows={5}
