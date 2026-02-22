@@ -101,17 +101,18 @@ router.post('/', requireAuth, async (req, res, next) => {
         let analysis;
         console.log(`[AI Provider]: using ${aiProvider.toUpperCase()} | Persona: ${persona}`);
 
+        const safeContent = content ? content.trim() : '';
         if (aiProvider === 'ollama') {
-            analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
+            analysis = await analyzeOllama(safeContent, { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
             console.log('[DEBUG] image received for analysis:', !!imageUrl, 'mood:', mood);
-            analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
+            analysis = await analyzeGemini(safeContent, { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
         }
 
         // ─── Step 5: Save to MongoDB with embedding (non-blocking) ───
         try {
             const entry = new Entry({
-                content: content.trim(),
+                content: content ? content.trim() : '',
                 analysis,
                 userId: req.user.id,
                 mood: mood || null,
