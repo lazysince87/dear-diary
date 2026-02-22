@@ -16,6 +16,15 @@ const entrySchema = new mongoose.Schema({
         actionable_advice: { type: String, default: null },
         confidence: { type: Number, default: 0 },
         reflection_question: { type: String },
+        patterns_detected: [
+            {
+                name: String,
+                explanation: String,
+                severity: String
+            }
+        ],
+        suggests_music: { type: Boolean, default: false },
+        requires_immediate_intervention: { type: Boolean, default: false },
     },
     // Supabase user ID
     userId: {
