@@ -21,7 +21,7 @@ const globalLimiter = rateLimit({
  */
 const aiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 500,
+    max: 67, //for demo
     standardHeaders: true,
     legacyHeaders: false,
     message: {
