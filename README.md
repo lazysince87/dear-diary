@@ -8,25 +8,25 @@ Built at WiNGHacks 2026.
 
 ---
 
-## 📖 Inspiration
+## Inspiration
 
-Emotional abuse and relationship manipulation are often completely invisible. Unlike physical harm, they leave no visible marks, making them incredibly hard to recognize—especially for the person experiencing them. We realized that many people in unhealthy relationships (romantic, familial, or professional) don't have access to safe, private tools that help them reflect on their reality. Traditional resources like hotlines can feel like too high a barrier, or might not be safe to access openly if a partner is checking their phone.
+Emotional abuse and relationship manipulation are often completely invisible. Unlike physical harm, they leave no visible marks, making them incredibly hard to recognize - especially for the person experiencing them. We realized that many people in unhealthy relationships (romantic, familial, or professional) don't have access to safe, private tools that help them reflect on their reality. Traditional resources like hotlines can feel like too high a barrier, or might not be safe to access openly if a partner is checking their phone.
 
-We created **Dear Diary** to be a relationship safety companion disguised as a cozy personal journal—a tool that feels "like a warm hug," but has the technical power to gently identify red flags, teach users about healthy boundaries, and provide support without blowing their cover.
+We created **Dear Diary** to be a relationship safety companion disguised as a cozy personal journal - a tool that feels "like a warm hug," but has the technical power to gently identify red flags, teach users about healthy boundaries, and provide support without blowing their cover.
 
 ---
 
-## ✨ Features
+## Features
 
 - **Semantic Pattern Recognition (RAG):** Users log traditional journal entries or paste conversations. Under the hood, the app analyzes the text for subtle emotional manipulation tactics.
 - **Empathetic AI Responses:** It doesn't just flag abuse like a clinical robot. It leads with validation, gently names the manipulation tactic, explains why it is harmful, and provides a reflection question.
-- **Emotion-Aware Voice Output:** Using ElevenLabs, the app speaks its responses using a custom-cloned voice of our team. The voice parameters dynamically adjust based on the user's detected distress level—sounding calm and grounding during emergencies, or warm and gentle during normal reflections.
+- **Emotion-Aware Voice Output:** Using ElevenLabs, the app speaks its responses using a custom-cloned voice of our team. The voice parameters dynamically adjust based on the user's detected distress level - sounding calm and grounding during emergencies, or warm and gentle during normal reflections.
 - **Longitudinal Memory:** The AI doesn't have localized amnesia. It remembers your past entries to identify long-term patterns of manipulation across weeks or months.
 - **Pattern Library & Resources:** A curated, browsable library of manipulation tactics with definitions, real-world examples, and a dedicated page linking to vetted external resources and hotlines.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
 We built a mobile-first **React/Vite** frontend utilizing **Tailwind CSS** paired with smooth **GSAP** animations.
 
@@ -48,7 +48,7 @@ Finally, the AI's response is passed to the **ElevenLabs API** for dynamic Text-
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -93,7 +93,7 @@ npm run dev
 
 ---
 
-## 🛡️ Security & Deployment
+## Security & Deployment
 
 The application is deployed on **Vercel** (Frontend) and **Google Cloud Run** (Backend). API keys (Gemini, ElevenLabs, MongoDB) are strictly stored as environment variables on the Cloud Run backend and are **never** exposed to the client or committed to version control. 
 
@@ -101,7 +101,7 @@ To protect API quotas, the backend employs strict IP-based rate limiting (using 
 
 ---
 
-## 🔮 What's Next
+## What's Next
 
 If we continue development, our roadmap includes:
 - **Advanced UI & Interactive Elements:** Making our interface more intuitive and engaging by adding interactive 3D elements to the website.
@@ -111,4 +111,4 @@ If we continue development, our roadmap includes:
 
 ---
 
-*Made with ♥️（ﾉ´∀`） by the DD Team*
+*Made with love by the DD Team*
