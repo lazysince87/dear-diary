@@ -2,9 +2,9 @@
 
 **The journal that reads between the lines.**
 
-DD: Dear Diary is a relationship safety companion disguised as a cozy, aesthetically warm personal journal. On the surface, it’s a beautifully designed journaling app. Underneath, it uses a **Semantic RAG AI pipeline** to gently identify emotional manipulation patterns (gaslighting, love bombing, DARVO, isolation) and provides profound empathy and resources using a responsive, emotion-aware voice synthesizer.
+DD: Dear Diary is a relationship safety companion disguised as a cozy, aesthetically warm personal journal. On the surface, it’s a beautifully designed journaling app. Underneath, it uses a **Semantic RAG AI pipeline** to gently identify emotional manipulation patterns (gaslighting, love bombing, D.A.R.V.O., isolation) and provides profound empathy and resources using a responsive, emotion-aware voice synthesizer.
 
-Built at WiNGHacks 2026.
+Built @ WiNGHacks 2026.
 
 ---
 
@@ -111,4 +111,4 @@ If we continue development, our roadmap includes:
 
 ---
 
-*Made with love by the DD Team*
+*Made with love by the HTT (Helen, Thuy, Tiffany) Team*
