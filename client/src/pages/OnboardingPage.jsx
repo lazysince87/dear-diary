@@ -8,7 +8,7 @@ const PERSONAS = [
     value: "friend",
     label: "A Friend",
     description: "Just someone to talk to — casual, warm, and supportive.",
-    voice: "Stacy",
+    voice: "HTT",
   },
   {
     value: "therapist",
