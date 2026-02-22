@@ -1,32 +1,62 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
 import ResourceList from "../components/Resources/ResourceList";
 import heartDuckImg from "../assets/animations/heart-duck.png";
 
 export default function ResourcesPage() {
   const duckRef = useRef(null);
+  const titleRef = useRef(null);
+
+  const titleChars = useMemo(() => {
+    return "Resources".split("").map((char, i) => (
+      <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ));
+  }, []);
 
   useEffect(() => {
-    if (duckRef.current) {
-      gsap.fromTo(
-        duckRef.current,
-        { y: -800, opacity: 1 },
-        {
-          y: 0,
-          duration: 6,
-          ease: "bounce.out",
-          onComplete: () => {
-            gsap.to(duckRef.current, {
-              y: -10,
-              duration: 1.8,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-            });
+    const ctx = gsap.context(() => {
+      if (duckRef.current) {
+        gsap.fromTo(
+          duckRef.current,
+          { y: -800, opacity: 1 },
+          {
+            y: 0,
+            duration: 6,
+            ease: "bounce.out",
+            onComplete: () => {
+              gsap.to(duckRef.current, {
+                y: -10,
+                duration: 1.8,
+                ease: "sine.inOut",
+                repeat: -1,
+                yoyo: true,
+              });
+            },
           },
-        },
-      );
-    }
+        );
+      }
+
+      if (titleRef.current) {
+        const chars = titleRef.current.querySelectorAll(".dd-char");
+        gsap.to(chars, {
+          keyframes: [
+            { y: 0, duration: 0 },
+            { y: -8, duration: 0.75, ease: "sine.inOut" },
+            { y: 0, duration: 0.75, ease: "sine.inOut" }
+          ],
+          repeat: -1,
+          force3D: true,
+          stagger: {
+            each: 0.2,
+            from: "start"
+          }
+        });
+      }
+    });
+
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -44,7 +74,7 @@ export default function ResourcesPage() {
                     font-family: 'KiwiSoda', sans-serif;
                     font-size: 50px;
                     font-weight: 600;
-                    color: #1a1a1a;
+                    color: text-text-secondary;
                     letter-spacing: 4px;
                     margin-bottom: 10px;
                 }
@@ -59,7 +89,9 @@ export default function ResourcesPage() {
             `}</style>
 
       <div className="rp-page">
-        <h1 className="rp-title">Resources</h1>
+        <h1 ref={titleRef} className="rp-title">
+          {titleChars}
+        </h1>
         <p className="rp-subtitle">
           You're not alone
         </p>
