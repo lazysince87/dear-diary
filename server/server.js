@@ -12,9 +12,13 @@ const spotifyRoutes = require('./src/routes/spotify');
 const preferencesRoutes = require('./src/routes/preferences');
 const emergencyRoutes = require('./src/routes/emergency');
 const { errorHandler } = require('./src/middleware/errorHandler');
+const { globalLimiter, aiLimiter, voiceLimiter, requestTimeout } = require('./src/middleware/rateLimiter');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust Cloud Run / reverse proxy (so rate limiter uses real client IP)
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(helmet());
@@ -37,15 +41,19 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
+// Rate limiting & timeout
+app.use(globalLimiter);
+app.use(requestTimeout(30000)); // Kill any request after 30 seconds
+
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Rosie is running' });
 });
 
-// Routes
-app.use('/api/analyze', analyzeRoutes);
+// Routes (AI routes get strict rate limits)
+app.use('/api/analyze', aiLimiter, analyzeRoutes);
 app.use('/api/entries', entriesRoutes);
-app.use('/api/voice', voiceRoutes);
+app.use('/api/voice', voiceLimiter, voiceRoutes);
 app.use('/api/patterns', patternsRoutes);
 app.use('/api/spotify', spotifyRoutes);
 app.use('/api/preferences', preferencesRoutes);
