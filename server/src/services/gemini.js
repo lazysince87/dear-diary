@@ -11,7 +11,7 @@ VISUAL EVIDENCE: If an image is provided, it is likely a screenshot of a convers
 MANIPULATION TACTICS TO DETECT (but not limited to):
 - Gaslighting: Making someone doubt their reality or memory
 - Love Bombing: Overwhelming affection to gain control
-- DARVO: Deny, Attack, Reverse Victim and Offender
+- D.A.R.V.O.: Deny, Attack, Reverse Victim and Offender
 - Isolation: Cutting someone off from friends/family
 - Minimizing / Belittling: Downplaying feelings, or mocking someone while hiding behind a "joke."
 - Silent Treatment: Weaponized withdrawal of communication

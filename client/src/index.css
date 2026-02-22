@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scrollbar-gutter: stable;
+}
+
 @theme {
   --color-rose-50: #fff5f5;
   --color-rose-100: #ffe0e0;

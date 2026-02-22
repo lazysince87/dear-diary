@@ -46,7 +46,7 @@ export default function Header({ onLogoutClick }) {
         padding: "0px 0px",
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center" style={{ height: '48px' }}>
         <NavLink to="/" className="flex items-center gap-2 no-underline">
           <h1
             className="text-left text-xl font-semibold"
@@ -54,6 +54,7 @@ export default function Header({ onLogoutClick }) {
               fontFamily: "var(--font-serif)",
               color: getTitleColor(),
               transition: "color 0.3s ease",
+              minWidth: "120px",
             }}
           >
             Dear Diary
@@ -85,6 +86,14 @@ export default function Header({ onLogoutClick }) {
             to="/entries"
             className={({ isActive }) =>
               `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
+            }
+            style={({ isActive }) =>
+              isActive
+                ? {
+                  color: getNavStyle("/entries").color,
+                  borderBottomColor: getNavStyle("/entries").border,
+                }
+                : {}
             }
           >
             <History size={16} />

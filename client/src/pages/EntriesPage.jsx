@@ -249,7 +249,7 @@ export default function EntriesPage() {
                         <h1 className="text-4xl font-bold mb-2 tracking-tight" style={{ fontFamily: 'KiwiSoda', fontSize: '50px', color: '#1a1a1a', letterSpacing: '4px' }}>
                             Archives
                         </h1>
-                        <p className="text-sm font-serif" style={{ fontFamily: 'Special Elite', fontSize: '14px', color: '#a0788a', lineHeight: '1.7' }}>
+                        <p className="text-sm font-serif" style={{ fontFamily: 'Special Elite', fontSize: '16px', color: '#a0788a', lineHeight: '1.7' }}>
                             Your journey, preserved in ink and pixels
                         </p>
                     </header>

@@ -137,7 +137,7 @@ export default function ProfilePage() {
 
         .pf-subtitle {
           font-family: 'Special Elite', serif;
-          font-size: 14px;
+          font-size: 16px;
           color: #a0788a;
           line-height: 1.7;
           margin-bottom: 32px;
@@ -149,7 +149,7 @@ export default function ProfilePage() {
 
         .pf-label {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 11px;
+          font-size: 14px;
           letter-spacing: 2px;
           text-transform: uppercase;
           color: #9a8282;
@@ -171,6 +171,11 @@ export default function ProfilePage() {
 
         .pf-input:focus {
           border-color: #6a9fd8;
+        }
+
+        .pf-input::placeholder {
+          font-family: 'DM Sans', sans-serif;
+          color: #b8a0a0;
         }
 
         .pf-persona-grid {
@@ -336,7 +341,7 @@ export default function ProfilePage() {
 
                 <div className="pf-section">
                     <div className="pf-label">Health Baseline</div>
-                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '11px', color: '#9a8282', marginBottom: '12px' }}>
+                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '13px', color: '#9a8282', marginBottom: '12px' }}>
                         This helps me personalize my advice around your body's rhythms
                     </p>
 

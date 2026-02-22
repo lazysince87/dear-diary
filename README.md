@@ -2,7 +2,7 @@
 
 **A mobile-first relationship safety companion disguised as a personal journal.**
 
-Dear Diary is a web application built to help users identify emotional manipulation patterns -- such as gaslighting, love bombing, DARVO, and isolation tactics -- across all types of relationships, including romantic, familial, platonic, and professional. It presents itself as a cozy, warm journaling app so that it remains safe and inconspicuous for users in vulnerable situations.
+Dear Diary is a web application built to help users identify emotional manipulation patterns -- such as gaslighting, love bombing, D.A.R.V.O., and isolation tactics -- across all types of relationships, including romantic, familial, platonic, and professional. It presents itself as a cozy, warm journaling app so that it remains safe and inconspicuous for users in vulnerable situations.
 
 Built at WiNGHacks 2026.
 
@@ -37,7 +37,7 @@ The app is designed so that anyone looking over a user's shoulder would see noth
 
 Dear Diary is built with a strong educational focus. The goal is not just to detect red flags, but to **teach users what healthy and unhealthy relationship behaviors look like** across all types of relationships:
 
-- **Pattern Library**: A curated, browsable library of manipulation tactics (gaslighting, love bombing, minimizing, DARVO, isolation, and more) with clear definitions, real-world examples, and guidance on healthy alternatives.
+- **Pattern Library**: A curated, browsable library of manipulation tactics (gaslighting, love bombing, minimizing, D.A.R.V.O., isolation, and more) with clear definitions, real-world examples, and guidance on healthy alternatives.
 - **Contextual Learning**: When the AI identifies a pattern in a journal entry, it does not simply flag it. It provides a plain-language explanation of the tactic, why it is harmful, and how healthy communication differs -- turning every interaction into a learning moment.
 - **Reflection Prompts**: Each AI response ends with a reflection question designed to build critical thinking about relationship dynamics.
 - **Resource Hub**: A dedicated page linking to vetted external resources, hotlines, and educational material on relationship health and safety.

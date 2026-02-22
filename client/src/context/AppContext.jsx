@@ -49,10 +49,11 @@ export function AppProvider({ children }) {
   const musicAudioRef = useRef(null);
   const spotifyTracksRef = useRef(null);
   const trackIndexRef = useRef(0);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Fetch user preferences on mount
   const loadPreferences = useCallback(async () => {
+    if (authLoading) return;
     if (!user) {
       setPreferences(null);
       setPreferencesLoaded(true);
@@ -67,7 +68,7 @@ export function AppProvider({ children }) {
     } finally {
       setPreferencesLoaded(true);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   // Fetch past entries from MongoDB when the user is authenticated
   const loadEntries = useCallback(async () => {

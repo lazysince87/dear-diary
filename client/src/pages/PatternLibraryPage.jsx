@@ -71,7 +71,7 @@ export default function PatternLibraryPage() {
 
         .pl-subtitle {
           font-family: 'Special Elite', serif;
-          font-size: 14px;
+          font-size: 16px;
           color: #a0788a;
           line-height: 1.7;
           margin-bottom: 36px;

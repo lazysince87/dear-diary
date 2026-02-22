@@ -412,6 +412,17 @@ export default function JournalEntry({ onAnalysisComplete }) {
                                 })}
                             </div>
 
+                            {preferences?.displayName && (
+                                <div style={{
+                                    fontFamily: "'Pixelify Sans', sans-serif",
+                                    fontSize: "16px",
+                                    color: "#7a5060",
+                                    marginBottom: "4px",
+                                    letterSpacing: "1px",
+                                }}>
+                                    Hi, {preferences.displayName}
+                                </div>
+                            )}
                             <div className="je-mood-label">How are you feeling?</div>
                             <div className="je-moods">
                                 {MOODS.map((mood) => (
