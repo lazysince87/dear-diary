@@ -5,3 +5,5 @@ dist/
 .DS_Store
 CLAUDE.md
 *.log
+
+.env.yaml
