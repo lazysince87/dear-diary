@@ -81,7 +81,7 @@ function getVoicePreset(analysis) {
  * @returns {Buffer} Audio buffer (MP3)
  */
 async function textToSpeech(text, analysis = null, voiceId) {
-    const finalVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM';
+    const finalVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || 'kbdyNokGPgTLJuqCwViQ';
     const voiceSettings = getVoicePreset(analysis);
 
     try {
