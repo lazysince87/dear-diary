@@ -97,17 +97,10 @@ async function analyzeEntry(entryText, healthData = {}, pastEntries = [], person
         const result = await response.json();
 
         let text = result.response.trim();
-        // Sometimes LLMs still wrap JSON in markdown even when format json is requested
-        if (text.startsWith('\`\`\`json')) {
-            text = text.substring(7);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
-        } else if (text.startsWith('\`\`\`')) {
-            text = text.substring(3);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
+        // Extract JSON using regex to handle extra conversational text
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            text = jsonMatch[0];
         }
 
         // Parse the JSON response
