@@ -52,7 +52,7 @@ const PATTERNS = [
   },
   {
     id: "darvo",
-    name: "DARVO",
+    name: "D.A.R.V.O.",
     // icon: '',
     severity: "high",
     description:

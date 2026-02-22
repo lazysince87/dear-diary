@@ -153,6 +153,11 @@ export default function OnboardingPage() {
           border-color: #c9a0a0;
         }
 
+        .ob-input::placeholder {
+          font-family: 'DM Sans', sans-serif;
+          color: #b8a0a0;
+        }
+
         .ob-persona-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;

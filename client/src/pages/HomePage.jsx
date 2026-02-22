@@ -83,7 +83,6 @@ export default function HomePage() {
           },
         });
       });
-
     }, pageRef);
 
     return () => ctx.revert();
@@ -95,15 +94,15 @@ export default function HomePage() {
       gsap.to(chars, {
         keyframes: [
           { y: 0, duration: 0 },
-          { y: -8, duration: .75, ease: "sine.inOut" },
-          { y: 0, duration: 0.75, ease: "sine.inOut" }
+          { y: -8, duration: 0.75, ease: "sine.inOut" },
+          { y: 0, duration: 0.75, ease: "sine.inOut" },
         ],
         repeat: -1,
         force3D: true, // Hardware acceleration
         stagger: {
           each: 0.2,
-          from: "start"
-        }
+          from: "start",
+        },
       });
     }
   }, []);
@@ -159,7 +158,7 @@ export default function HomePage() {
 
         .dd-section-label {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 10px;
+          font-size: 16px;
           letter-spacing: 3px;
           text-transform: uppercase;
           color: #7a5060;
@@ -205,7 +204,7 @@ export default function HomePage() {
 
         .dd-entry-date {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 10px;
+          font-size: 16px;
           color: #7a5060;
           letter-spacing: 2px;
           text-transform: uppercase;
@@ -214,7 +213,7 @@ export default function HomePage() {
 
         .dd-entry-preview {
           font-family: 'Pixelify Sans', sans-serif;
-          font-size: 13px;
+          font-size: 18px;
           color: #a0788a;
           line-height: 1.6;
           overflow: hidden;
@@ -405,7 +404,11 @@ export default function HomePage() {
           <div className="dd-header-block">
             <h1 ref={titleRef} className="dd-title">
               {"Dear Diary".split("").map((char, i) => (
-                <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+                <span
+                  key={i}
+                  className="dd-char"
+                  style={{ display: "inline-block" }}
+                >
                   {char === " " ? "\u00A0" : char}
                 </span>
               ))}
@@ -465,7 +468,7 @@ export default function HomePage() {
           className="dd-duck"
           style={{
             position: "fixed",
-            right: "50px",
+            right: "20px",
             bottom: "50px",
             top: "auto",
             width: "250px",

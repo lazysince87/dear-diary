@@ -4,7 +4,7 @@ export default function PatternDetail({ pattern, onClose }) {
   if (!pattern) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-28 p-4 animate-fade-in">
       <style>{`
         @media (max-width: 768px) {
           .pattern-modal {

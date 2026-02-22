@@ -1,5 +1,17 @@
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
-import { fetchEntries, getPreferences, getSpotifyStatus, generateMusic } from "../services/api";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+import {
+  fetchEntries,
+  getPreferences,
+  getSpotifyStatus,
+  generateMusic,
+} from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
 const AppContext = createContext(null);
@@ -32,9 +44,9 @@ export function AppProvider({ children }) {
         const data = await fetchEntries();
         if (data && data.entries) {
           // Normalize entries if needed (timestamp vs createdAt)
-          const normalized = data.entries.map(e => ({
+          const normalized = data.entries.map((e) => ({
             ...e,
-            timestamp: e.timestamp || e.createdAt || e.created_at
+            timestamp: e.timestamp || e.createdAt || e.created_at,
           }));
           setEntries(normalized);
         }
@@ -49,10 +61,11 @@ export function AppProvider({ children }) {
   const musicAudioRef = useRef(null);
   const spotifyTracksRef = useRef(null);
   const trackIndexRef = useRef(0);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Fetch user preferences on mount
   const loadPreferences = useCallback(async () => {
+    if (authLoading) return;
     if (!user) {
       setPreferences(null);
       setPreferencesLoaded(true);
@@ -67,7 +80,7 @@ export function AppProvider({ children }) {
     } finally {
       setPreferencesLoaded(true);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   // Fetch past entries from MongoDB when the user is authenticated
   const loadEntries = useCallback(async () => {
@@ -126,9 +139,17 @@ export function AppProvider({ children }) {
     audio.onerror = () => {
       if (!isMusicOnRef.current) return;
       if (index + 1 < tracks.length) playSpotifyTrack(tracks, index + 1);
-      else { isMusicOnRef.current = false; setIsMusicOn(false); setNowPlaying(null); }
+      else {
+        isMusicOnRef.current = false;
+        setIsMusicOn(false);
+        setNowPlaying(null);
+      }
     };
-    audio.play().catch(() => { isMusicOnRef.current = false; setIsMusicOn(false); setNowPlaying(null); });
+    audio.play().catch(() => {
+      isMusicOnRef.current = false;
+      setIsMusicOn(false);
+      setNowPlaying(null);
+    });
     musicAudioRef.current = audio;
   }, []);
 
@@ -156,9 +177,13 @@ export function AppProvider({ children }) {
         try {
           const spotifyData = await getSpotifyStatus();
           if (spotifyData.musicTaste?.topTracks?.length > 0) {
-            const withPreviews = spotifyData.musicTaste.topTracks.filter(t => t.previewUrl);
+            const withPreviews = spotifyData.musicTaste.topTracks.filter(
+              (t) => t.previewUrl,
+            );
             if (withPreviews.length > 0) {
-              spotifyTracksRef.current = [...withPreviews].sort(() => Math.random() - 0.5);
+              spotifyTracksRef.current = [...withPreviews].sort(
+                () => Math.random() - 0.5,
+              );
             }
           }
         } catch (_) {
@@ -177,8 +202,14 @@ export function AppProvider({ children }) {
       if (result.audioUrl) {
         const audio = new Audio(result.audioUrl);
         audio.loop = true;
-        audio.onerror = () => { setIsMusicOn(false); setNowPlaying(null); };
-        audio.play().catch(() => { setIsMusicOn(false); setNowPlaying(null); });
+        audio.onerror = () => {
+          setIsMusicOn(false);
+          setNowPlaying(null);
+        };
+        audio.play().catch(() => {
+          setIsMusicOn(false);
+          setNowPlaying(null);
+        });
         musicAudioRef.current = audio;
       } else {
         setIsMusicOn(false);
@@ -227,5 +258,3 @@ export function useApp() {
   }
   return context;
 }
-
-
