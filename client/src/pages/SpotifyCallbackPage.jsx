@@ -13,7 +13,7 @@ export default function SpotifyCallbackPage() {
 
         if (error) {
             setStatus("Spotify connection was cancelled.");
-            setTimeout(() => navigate("/"), 2000);
+            setTimeout(() => window.location.href = "/", 2000);
             return;
         }
 
@@ -21,18 +21,18 @@ export default function SpotifyCallbackPage() {
             spotifyCallback(code)
                 .then(() => {
                     setStatus("Spotify connected! Redirecting...");
-                    setTimeout(() => navigate("/"), 1500);
+                    setTimeout(() => window.location.href = "/", 1500);
                 })
                 .catch((err) => {
                     console.error("Spotify callback error:", err);
                     setStatus("Failed to connect Spotify. Redirecting...");
-                    setTimeout(() => navigate("/"), 2000);
+                    setTimeout(() => window.location.href = "/", 2000);
                 });
         } else {
             setStatus("No authorization code found.");
-            setTimeout(() => navigate("/"), 2000);
+            setTimeout(() => window.location.href = "/", 2000);
         }
-    }, [searchParams, navigate]);
+    }, [searchParams]);
 
     return (
         <div

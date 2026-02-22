@@ -80,8 +80,16 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSkipSpotify = () => {
-    navigate("/");
+  const handleSkipSpotify = async () => {
+    setSpotifyConnecting(true); // Re-use this state to show loading on skip
+    try {
+      await savePreferences({ onboardingComplete: true });
+      // Force a full window reload so App.jsx re-fetches preferences and kicks us out of the onboarding loop
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Failed to skip:", err);
+      window.location.href = "/";
+    }
   };
 
   return (

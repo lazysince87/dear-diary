@@ -14,6 +14,16 @@ const SCOPES = [
     'user-library-read',
 ].join(' ');
 
+const getRedirectUri = (req) => {
+    // If specifically set to a comma separated list, grab ONLY the exact origin that requested this endpoint
+    const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+    if (origin) {
+        return `${origin}/spotify/callback`;
+    }
+    const fallbackBase = (process.env.CLIENT_URL || 'http://localhost:3000').split(',')[0].trim();
+    return `${fallbackBase}/spotify/callback`;
+};
+
 /**
  * GET /api/spotify/login
  * Redirect user to Spotify authorization page
@@ -22,7 +32,7 @@ router.get('/login', requireAuth, (req, res) => {
     const params = new URLSearchParams({
         client_id: process.env.SPOTIFY_CLIENT_ID,
         response_type: 'code',
-        redirect_uri: process.env.SPOTIFY_REDIRECT_URI || `${process.env.CLIENT_URL}/spotify/callback`,
+        redirect_uri: getRedirectUri(req),
         scope: SCOPES,
         state: req.user.id, // Pass userId through state for security
         show_dialog: true,
@@ -47,7 +57,7 @@ router.post('/callback', requireAuth, async (req, res, next) => {
         const tokenResponse = await axios.post(SPOTIFY_TOKEN_URL, new URLSearchParams({
             grant_type: 'authorization_code',
             code,
-            redirect_uri: process.env.SPOTIFY_REDIRECT_URI || `${process.env.CLIENT_URL}/spotify/callback`,
+            redirect_uri: getRedirectUri(req),
             client_id: process.env.SPOTIFY_CLIENT_ID,
             client_secret: process.env.SPOTIFY_CLIENT_SECRET,
         }), {
@@ -86,6 +96,7 @@ router.post('/callback', requireAuth, async (req, res, next) => {
                 spotifyRefreshToken: refresh_token,
                 spotifyTokenExpiresAt: new Date(Date.now() + expires_in * 1000),
                 musicTaste: { topArtists, topTracks, topGenres },
+                onboardingComplete: true, // Auto-complete onboarding since this is the final step
             },
             { upsert: true, new: true }
         );
