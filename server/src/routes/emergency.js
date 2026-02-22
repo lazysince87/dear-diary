@@ -25,11 +25,17 @@ router.post('/trigger', requireAuth, async (req, res, next) => {
         const twilio = require('twilio');
         const client = twilio(accountSid, authToken);
 
-        const { userName, context } = req.body;
+        const { userName, context, location } = req.body;
         const name = userName || 'A Dear Diary user';
-        const snippet = context ? context.substring(0, 200) : 'No additional context provided.';
+        // Keep snippet extremely short for Twilio trial limits (160 chars total including Twilio prefix)
+        const snippet = context ? context.substring(0, 30) + '...' : '';
 
-        const messageBody = `[DEAR DIARY SOS] ${name} has requested emergency help through Dear Diary. Context: "${snippet}" — Please check on them immediately.`;
+        let locationInfo = '';
+        if (location && location.lat && location.lng) {
+            locationInfo = ` Loc: maps.google.com/?q=${location.lat},${location.lng}`;
+        }
+
+        const messageBody = `[SOS] ${name} needs help!${snippet ? ` "${snippet}"` : ''}${locationInfo}`;
 
         const message = await client.messages.create({
             body: messageBody,

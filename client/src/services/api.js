@@ -300,12 +300,12 @@ export async function generateMusic(genres = []) {
 /**
  * Trigger an emergency SOS text message via Twilio
  */
-export async function triggerEmergencySOS(userName = '', context = '') {
+export async function triggerEmergencySOS(userName = '', context = '', location = null) {
     const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE}/emergency/trigger`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeaders },
-        body: JSON.stringify({ userName, context }),
+        body: JSON.stringify({ userName, context, location }),
     });
     if (!response.ok) {
         const error = await response.json().catch(() => ({}));
