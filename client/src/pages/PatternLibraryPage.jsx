@@ -1,9 +1,21 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
+import { Draggable } from "gsap/all";
 import PatternCard from "../components/PatternLibrary/PatternCard";
 import PatternDetail from "../components/PatternLibrary/PatternDetail";
 import { fetchPatterns } from "../services/api";
 import waveDuckImg from "../assets/animations/wave-duck.png";
+import glassImg from "../assets/animations/glass.png";
+import bulbImg from "../assets/animations/bulb.png";
+import bookImg from "../assets/animations/book.png";
+
+gsap.registerPlugin(Draggable);
+
+const DECORATIONS = [
+  { id: 1, src: bulbImg, x: "95%", y: "15%" },
+  { id: 2, src: glassImg, x: "80%", y: "5%" },
+  { id: 3, src: bookImg, x: "85%", y: "20%" },
+];
 
 export default function PatternLibraryPage() {
   const [patterns, setPatterns] = useState([]);
@@ -11,6 +23,8 @@ export default function PatternLibraryPage() {
   const [loading, setLoading] = useState(true);
   const duckRef = useRef(null);
   const titleRef = useRef(null);
+  const decoRefs = useRef([]);
+  const pageRef = useRef(null);
 
   const titleChars = useMemo(() => {
     return "Pattern Library".split("").map((char, i) => (
@@ -20,6 +34,7 @@ export default function PatternLibraryPage() {
     ));
   }, []);
 
+  // Title animation after loading
   useEffect(() => {
     if (loading) return;
     const ctx = gsap.context(() => {
@@ -29,20 +44,18 @@ export default function PatternLibraryPage() {
           keyframes: [
             { y: 0, duration: 0 },
             { y: -8, duration: 0.75, ease: "sine.inOut" },
-            { y: 0, duration: 0.75, ease: "sine.inOut" }
+            { y: 0, duration: 0.75, ease: "sine.inOut" },
           ],
           repeat: -1,
           force3D: true,
-          stagger: {
-            each: 0.2,
-            from: "start"
-          }
+          stagger: { each: 0.2, from: "start" },
         });
       }
     });
     return () => ctx.revert();
   }, [loading]);
 
+  // Duck
   useEffect(() => {
     if (duckRef.current) {
       gsap.fromTo(
@@ -61,9 +74,50 @@ export default function PatternLibraryPage() {
               yoyo: true,
             });
           },
-        },
+        }
       );
     }
+  }, []);
+
+  // Decorations float + draggable
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      decoRefs.current.forEach((deco, i) => {
+        if (!deco) return;
+
+        const floatAnim = gsap.to(deco, {
+          y: "+=14",
+          x: "+=6",
+          rotation: gsap.utils.random(-10, 10),
+          duration: gsap.utils.random(2.2, 3.2),
+          ease: "power1.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.3,
+        });
+
+        Draggable.create(deco, {
+          type: "x,y",
+          edgeResistance: 0.65,
+          onDragStart() {
+            floatAnim.kill();
+            gsap.to(deco, { scale: 1.15, duration: 0.15 });
+          },
+          onRelease() {
+            gsap.to(deco, { scale: 1, duration: 0.2 });
+            gsap.to(deco, {
+              y: "+=12",
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        });
+      });
+    }, pageRef);
+
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
@@ -90,13 +144,15 @@ export default function PatternLibraryPage() {
           max-width: 640px;
           margin: 0 auto;
           padding: 48px 20px 80px;
+          position: relative;
+          z-index: 10;
         }
 
         .pl-title {
           font-family: 'KiwiSoda', sans-serif;
           font-size: 50px;
           font-weight: 600;
-          color: text-text-secondary;
+          color: #6b5454;
           letter-spacing: 4px;
           margin-bottom: 10px;
         }
@@ -121,55 +177,118 @@ export default function PatternLibraryPage() {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
         }
+
+        .pl-deco {
+          position: absolute;
+          width: 80px;
+          height: 80px;
+          cursor: grab;
+          z-index: 5;
+          user-select: none;
+        }
+
+        @media (max-width: 768px) {
+          .pl-deco {
+            width: 28px !important;
+            height: 28px !important;
+            opacity: 0.7;
+            position: fixed !important;
+          }
+          .pl-deco:nth-child(1) {
+            left: 10px !important;
+            top: auto !important;
+            bottom: 20px !important;
+          }
+          .pl-deco:nth-child(2) {
+            left: auto !important;
+            right: 10px !important;
+            top: auto !important;
+            bottom: 60px !important;
+          }
+          .pl-deco:nth-child(3) {
+            left: 50% !important;
+            top: auto !important;
+            bottom: 30px !important;
+          }
+          .dd-duck {
+            position: relative !important;
+            left: auto !important;
+            bottom: auto !important;
+            width: 120px !important;
+            display: block;
+            margin: 20px auto 0;
+          }
+        }
       `}</style>
 
-      <div className="pl-page">
-        <h1 ref={titleRef} className="pl-title">
-          {titleChars}
-        </h1>
-        <p className="pl-subtitle">
-          Understanding common manipulation tactics can help you recognize
-          patterns in your own experiences
-        </p>
+      <div ref={pageRef} style={{ position: "relative" }}>
 
-        {loading ? (
-          <div>
-            <div className="pl-shimmer" />
-            <div className="pl-shimmer" />
-            <div className="pl-shimmer" />
+        {/* Draggable decorations */}
+        {DECORATIONS.map((deco, i) => (
+          <div
+            key={deco.id}
+            ref={(el) => (decoRefs.current[i] = el)}
+            className="pl-deco"
+            style={{ left: deco.x, top: deco.y }}
+          >
+            <img
+              src={deco.src}
+              alt="decoration"
+              style={{ width: "100%", height: "100%", pointerEvents: "none", userSelect: "none" }}
+              draggable={false}
+            />
           </div>
-        ) : (
-          <div>
-            {patterns.map((pattern, i) => (
-              <div key={pattern.id || i}>
-                <PatternCard pattern={pattern} onClick={setSelectedPattern} />
-              </div>
-            ))}
-          </div>
-        )}
+        ))}
 
-        {selectedPattern && (
-          <PatternDetail
-            pattern={selectedPattern}
-            onClose={() => setSelectedPattern(null)}
-          />
-        )}
+        <div className="pl-page">
+          <h1 ref={titleRef} className="pl-title">
+            {titleChars}
+          </h1>
+          <p className="pl-subtitle">
+            Understanding common manipulation tactics can help you recognize
+            patterns in your own experiences
+          </p>
+
+          {loading ? (
+            <div>
+              <div className="pl-shimmer" />
+              <div className="pl-shimmer" />
+              <div className="pl-shimmer" />
+            </div>
+          ) : (
+            <div>
+              {patterns.map((pattern, i) => (
+                <div key={pattern.id || i}>
+                  <PatternCard pattern={pattern} onClick={setSelectedPattern} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedPattern && (
+            <PatternDetail
+              pattern={selectedPattern}
+              onClose={() => setSelectedPattern(null)}
+            />
+          )}
+        </div>
+
+        <img
+          ref={duckRef}
+          src={waveDuckImg}
+          alt="wave duck"
+          className="dd-duck"
+          style={{
+            position: "fixed",
+            left: "180px",
+            bottom: "50px",
+            top: "auto",
+            width: "200px",
+            zIndex: 50,
+            pointerEvents: "none",
+          }}
+        />
       </div>
-      <img
-        ref={duckRef}
-        src={waveDuckImg}
-        alt="wave duck"
-        className="page-duck"
-        style={{
-          position: "fixed",
-          left: "180px",
-          bottom: "50px",
-          top: "auto",
-          width: "200px",
-          zIndex: 50,
-          pointerEvents: "none",
-        }}
-      />
     </>
   );
 }

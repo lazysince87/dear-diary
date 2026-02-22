@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
+import { Draggable } from "gsap/all";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -9,13 +10,24 @@ import {
   getSpotifyStatus,
 } from "../services/api";
 import boxDuckImg from "../assets/animations/box-duck.png";
+import music1Img from "../assets/animations/music1.png";
+import music2Img from "../assets/animations/music2.png";
+import music3Img from "../assets/animations/music3.png";
+
+gsap.registerPlugin(Draggable);
+
+const MUSIC_NOTES = [
+  { id: 1, src: music1Img, x: "12%", y: "10%" },
+  { id: 2, src: music2Img, x: "80%", y: "15%" },
+  { id: 3, src: music3Img, x: "88%", y: "25%" },
+];
 
 const PERSONAS = [
   {
     value: "friend",
     label: "A Friend",
     description: "Just someone to talk to — casual, warm, and supportive.",
-    voice: "Stacy",
+    voice: "HTT",
   },
   {
     value: "therapist",
@@ -42,6 +54,8 @@ export default function ProfilePage() {
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
   const duckRef = useRef(null);
   const titleRef = useRef(null);
+  const noteRefs = useRef([]);
+  const pageRef = useRef(null);
 
   const titleChars = useMemo(() => {
     return "Profile".split("").map((char, i) => (
@@ -80,17 +94,54 @@ export default function ProfilePage() {
           keyframes: [
             { y: 0, duration: 0 },
             { y: -8, duration: 0.75, ease: "sine.inOut" },
-            { y: 0, duration: 0.75, ease: "sine.inOut" }
+            { y: 0, duration: 0.75, ease: "sine.inOut" },
           ],
           repeat: -1,
           force3D: true,
-          stagger: {
-            each: 0.2,
-            from: "start"
-          }
+          stagger: { each: 0.2, from: "start" },
         });
       }
     });
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      noteRefs.current.forEach((note, i) => {
+        if (!note) return;
+
+        const floatAnim = gsap.to(note, {
+          y: "+=14",
+          x: "+=6",
+          rotation: gsap.utils.random(-10, 10),
+          duration: gsap.utils.random(2.2, 3.2),
+          ease: "power1.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: i * 0.3,
+        });
+
+        Draggable.create(note, {
+          type: "x,y",
+          edgeResistance: 0.65,
+          onDragStart() {
+            floatAnim.kill();
+            gsap.to(note, { scale: 1.15, duration: 0.15 });
+          },
+          onRelease() {
+            gsap.to(note, { scale: 1, duration: 0.2 });
+            gsap.to(note, {
+              y: "+=12",
+              duration: 1.8,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+            });
+          },
+        });
+      });
+    }, pageRef);
 
     return () => ctx.revert();
   }, []);
@@ -100,15 +151,23 @@ export default function ProfilePage() {
       setDisplayName(preferences.displayName || "");
       setPersona(preferences.personaPreference || "friend");
       setDefaultCyclePhase(preferences.defaultCyclePhase || null);
-      setAverageSleepHours(preferences.averageSleepHours != null ? String(preferences.averageSleepHours) : "");
-      setAverageStressLevel(preferences.averageStressLevel != null ? String(preferences.averageStressLevel) : "");
+      setAverageSleepHours(
+        preferences.averageSleepHours != null
+          ? String(preferences.averageSleepHours)
+          : "",
+      );
+      setAverageStressLevel(
+        preferences.averageStressLevel != null
+          ? String(preferences.averageStressLevel)
+          : "",
+      );
     }
   }, [preferences]);
 
   useEffect(() => {
     getSpotifyStatus()
       .then((data) => setSpotifyConnected(data.connected))
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const handleSave = async () => {
@@ -120,7 +179,9 @@ export default function ProfilePage() {
         personaPreference: persona,
         defaultCyclePhase: defaultCyclePhase || null,
         averageSleepHours: averageSleepHours ? Number(averageSleepHours) : null,
-        averageStressLevel: averageStressLevel ? Number(averageStressLevel) : null,
+        averageStressLevel: averageStressLevel
+          ? Number(averageStressLevel)
+          : null,
       });
       await loadPreferences();
       setSaved(true);
@@ -131,8 +192,6 @@ export default function ProfilePage() {
       setSaving(false);
     }
   };
-
-
 
   const handleConnectSpotify = async () => {
     setSpotifyConnecting(true);
@@ -154,13 +213,15 @@ export default function ProfilePage() {
           max-width: 600px;
           margin: 0 auto;
           padding: 48px 20px 80px;
+          position: relative;
+          z-index: 10;
         }
 
         .pf-title {
           font-family: 'KiwiSoda', sans-serif;
           font-size: 50px;
           font-weight: 600;
-          color: text-text-secondary;
+          color: #6b5454;
           letter-spacing: 4px;
           margin-bottom: 10px;
         }
@@ -250,15 +311,6 @@ export default function ProfilePage() {
           line-height: 1.5;
         }
 
-        .pf-persona-voice {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 9px;
-          color: #6a9fd8;
-          margin-top: 6px;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-        }
-
         .pf-btn {
           width: 100%;
           padding: 12px;
@@ -325,136 +377,214 @@ export default function ProfilePage() {
           font-size: 16px;
           color: #c9b4b4;
         }
+
+        .pf-note {
+          position: absolute;
+          width: 80px;
+          height: 80px;
+          cursor: grab;
+          z-index: 99;
+          user-select: none;
+        }
+
+        @media (max-width: 768px) {
+          .pf-note {
+            width: 28px !important;
+            height: 28px !important;
+            opacity: 0.7;
+          }
+          .pf-note:nth-child(1) {
+            left: 10px !important;
+            top: auto !important;
+            bottom: 20px !important;
+          }
+          .pf-note:nth-child(2) {
+            left: auto !important;
+            right: 10px !important;
+            top: auto !important;
+            bottom: 60px !important;
+          }
+          .pf-note:nth-child(3) {
+            left: 50% !important;
+            top: auto !important;
+            bottom: 30px !important;
+          }
+          .dd-duck {
+            position: relative !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 120px !important;
+            display: block;
+            margin: 20px auto 0;
+          }
+        }
       `}</style>
 
-      <div className="pf-page">
-        <h1 ref={titleRef} className="pf-title">
-          {titleChars}
-        </h1>
-        <p className="pf-subtitle">Manage your preferences and connections</p>
-
-        <div className="pf-section">
-          <div className="pf-label">Display Name</div>
-          <input
-            className="pf-input"
-            type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Your name..."
-          />
-        </div>
-
-        <div className="pf-section">
-          <div className="pf-label">AI Persona</div>
-          <div className="pf-persona-grid">
-            {PERSONAS.map((p) => (
-              <div
-                key={p.value}
-                className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
-                onClick={() => setPersona(p.value)}
-              >
-                <div className="pf-persona-label">{p.label}</div>
-                <div className="pf-persona-desc">{p.description}</div>
-              </div>
-            ))}
+      <div ref={pageRef} style={{ position: "relative" }}>
+        {MUSIC_NOTES.map((note, i) => (
+          <div
+            key={note.id}
+            ref={(el) => (noteRefs.current[i] = el)}
+            className="pf-note"
+            style={{ left: note.x, top: note.y }}
+          >
+            <img
+              src={note.src}
+              alt="music note"
+              style={{
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+              draggable={false}
+            />
           </div>
-        </div>
+        ))}
 
-        <button
-          className="pf-btn"
-          onClick={handleSave}
-          disabled={!displayName.trim() || saving}
-        >
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
-        {saved && <div className="pf-saved">Preferences saved</div>}
+        <div className="pf-page">
+          <h1 ref={titleRef} className="pf-title">
+            {titleChars}
+          </h1>
+          <p className="pf-subtitle">Manage your preferences and connections</p>
 
-        <hr className="pf-divider" />
-
-                <div className="pf-section">
-                    <div className="pf-label">Health Baseline</div>
-                    <p style={{ fontFamily: "'Pixelify Sans', sans-serif", fontSize: '14px', color: '#9a8282', marginBottom: '12px' }}>
-                        This helps me personalize my advice around your body's rhythms
-                    </p>
-
-          <div className="pf-label" style={{ marginTop: '8px' }}>Cycle Phase</div>
-          <div className="pf-persona-grid" style={{ marginBottom: '16px' }}>
-            {[
-              { value: 'menstrual', label: 'Menstrual' },
-              { value: 'follicular', label: 'Follicular' },
-              { value: 'ovulatory', label: 'Ovulatory' },
-              { value: 'luteal', label: 'Luteal (PMS)' },
-            ].map((phase) => (
-              <div
-                key={phase.value}
-                className={`pf-persona-card ${defaultCyclePhase === phase.value ? 'selected' : ''}`}
-                onClick={() => setDefaultCyclePhase(defaultCyclePhase === phase.value ? null : phase.value)}
-              >
-                <div className="pf-persona-label">{phase.label}</div>
-              </div>
-            ))}
+          <div className="pf-section">
+            <div className="pf-label">Display Name</div>
+            <input
+              className="pf-input"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your name..."
+            />
           </div>
 
-          <div className="pf-label">Average Sleep (hours)</div>
-          <input
-            className="pf-input"
-            type="number"
-            min="0"
-            max="24"
-            placeholder="e.g. 7"
-            value={averageSleepHours}
-            onChange={(e) => setAverageSleepHours(e.target.value)}
-            style={{ marginBottom: '16px' }}
-          />
+          <div className="pf-section">
+            <div className="pf-label">AI Persona</div>
+            <div className="pf-persona-grid">
+              {PERSONAS.map((p) => (
+                <div
+                  key={p.value}
+                  className={`pf-persona-card ${persona === p.value ? "selected" : ""}`}
+                  onClick={() => setPersona(p.value)}
+                >
+                  <div className="pf-persona-label">{p.label}</div>
+                  <div className="pf-persona-desc">{p.description}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          <div className="pf-label">Typical Stress Level (1-10)</div>
-          <input
-            className="pf-input"
-            type="number"
-            min="1"
-            max="10"
-            placeholder="e.g. 5"
-            value={averageStressLevel}
-            onChange={(e) => setAverageStressLevel(e.target.value)}
-          />
-        </div>
+          <button
+            className="pf-btn"
+            onClick={handleSave}
+            disabled={!displayName.trim() || saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+          {saved && <div className="pf-saved">Preferences saved</div>}
 
-        <hr className="pf-divider" />
+          <hr className="pf-divider" />
 
-        <div className="pf-section">
-          <div className="pf-label">Spotify</div>
-          {spotifyConnected ? (
-            <div className="pf-connected">Connected</div>
-          ) : (
-            <button
-              className="pf-btn pf-btn-spotify"
-              onClick={handleConnectSpotify}
-              disabled={spotifyConnecting}
+          <div className="pf-section">
+            <div className="pf-label">Health Baseline</div>
+            <p
+              style={{
+                fontFamily: "'Pixelify Sans', sans-serif",
+                fontSize: "14px",
+                color: "#9a8282",
+                marginBottom: "12px",
+              }}
             >
-              {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
-            </button>
-          )}
+              This helps me personalize my advice around your body's rhythms
+            </p>
+
+            <div className="pf-label" style={{ marginTop: "8px" }}>
+              Cycle Phase
+            </div>
+            <div className="pf-persona-grid" style={{ marginBottom: "16px" }}>
+              {[
+                { value: "menstrual", label: "Menstrual" },
+                { value: "follicular", label: "Follicular" },
+                { value: "ovulatory", label: "Ovulatory" },
+                { value: "luteal", label: "Luteal (PMS)" },
+              ].map((phase) => (
+                <div
+                  key={phase.value}
+                  className={`pf-persona-card ${defaultCyclePhase === phase.value ? "selected" : ""}`}
+                  onClick={() =>
+                    setDefaultCyclePhase(
+                      defaultCyclePhase === phase.value ? null : phase.value,
+                    )
+                  }
+                >
+                  <div className="pf-persona-label">{phase.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pf-label">Average Sleep (hours)</div>
+            <input
+              className="pf-input"
+              type="number"
+              min="0"
+              max="24"
+              placeholder="e.g. 7"
+              value={averageSleepHours}
+              onChange={(e) => setAverageSleepHours(e.target.value)}
+              style={{ marginBottom: "16px" }}
+            />
+
+            <div className="pf-label">Typical Stress Level (1-10)</div>
+            <input
+              className="pf-input"
+              type="number"
+              min="1"
+              max="10"
+              placeholder="e.g. 5"
+              value={averageStressLevel}
+              onChange={(e) => setAverageStressLevel(e.target.value)}
+            />
+          </div>
+
+          <hr className="pf-divider" />
+
+          <div className="pf-section">
+            <div className="pf-label">Spotify</div>
+            {spotifyConnected ? (
+              <div className="pf-connected">Connected</div>
+            ) : (
+              <button
+                className="pf-btn pf-btn-spotify"
+                onClick={handleConnectSpotify}
+                disabled={spotifyConnecting}
+              >
+                {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
+              </button>
+            )}
+          </div>
+
+          <hr className="pf-divider" />
+
+          <div className="pf-email">Signed in as {user?.email}</div>
         </div>
 
-        <hr className="pf-divider" />
-
-        <div className="pf-email">Signed in as {user?.email}</div>
+        <img
+          ref={duckRef}
+          src={boxDuckImg}
+          alt="box duck"
+          className="dd-duck"
+          style={{
+            position: "fixed",
+            right: "30px",
+            bottom: "50px",
+            top: "auto",
+            width: "230px",
+            zIndex: 50,
+            pointerEvents: "none",
+          }}
+        />
       </div>
-      <img
-        ref={duckRef}
-        src={boxDuckImg}
-        alt="box duck"
-        className="page-duck"
-        style={{
-          position: "fixed",
-          right: "30px",
-          bottom: "50px",
-          top: "auto",
-          width: "230px",
-          zIndex: 50,
-          pointerEvents: "none",
-        }}
-      />
     </>
   );
 }
