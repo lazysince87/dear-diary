@@ -152,10 +152,15 @@ export default function HomePage() {
           cursor: pointer;
           border: 1px solid #4a2535;
           transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .dd-entry-card:hover {
           border-color: #c9748a;
+          background: rgba(253, 246, 240, 0.4);
+          transform: translateY(-2px) scale(1.015);
+          box-shadow: 0 4px 12px rgba(74, 37, 53, 0.08);
+          z-index: 10;
           background: rgba(253, 246, 240, 0.4);
           transform: translateY(-2px) scale(1.015);
           box-shadow: 0 4px 12px rgba(74, 37, 53, 0.08);
@@ -244,6 +249,50 @@ export default function HomePage() {
           .dd-page {
             padding: 20px 10px 20px;
           }
+        }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
+        }
+        .dd-entry-image {
+          margin-top: 10px;
+          border-radius: 4px;
+          border: 1px solid #4a2535;
+          max-width: 150px;
+          height: auto;
+          display: block;
+        }
+
+        .dd-entry-mood {
+          display: inline-block;
+          margin-top: 8px;
+          margin-right: 8px;
+          font-family: 'Pixelify Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border: 1px solid #7a5060;
+          color: #7a5060;
+          opacity: 0.8;
         }
         .dd-entry-image {
           margin-top: 10px;
