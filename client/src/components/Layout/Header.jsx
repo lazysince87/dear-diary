@@ -7,6 +7,7 @@ import {
   LogOut,
   User,
   Music,
+  History,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -68,14 +69,24 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                    color: getNavStyle("/").color,
-                    borderBottomColor: getNavStyle("/").border,
-                  }
+                  color: getNavStyle("/").color,
+                  borderBottomColor: getNavStyle("/").border,
+                }
                 : {}
             }
           >
             <BookHeart size={16} />
-            <span className="hidden sm:inline">Journal</span>
+            <span className="hidden sm:inline">Write</span>
+          </NavLink>
+
+          <NavLink
+            to="/entries"
+            className={({ isActive }) =>
+              `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
+            }
+          >
+            <History size={16} />
+            <span className="hidden sm:inline">Entries</span>
           </NavLink>
 
           <NavLink
@@ -86,14 +97,14 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                    color: getNavStyle("/patterns").color,
-                    borderBottomColor: getNavStyle("/patterns").border,
-                  }
+                  color: getNavStyle("/patterns").color,
+                  borderBottomColor: getNavStyle("/patterns").border,
+                }
                 : {}
             }
           >
             <Library size={16} />
-            <span className="hidden sm:inline">Patterns</span>
+            <span className="hidden sm:inline">Learn</span>
           </NavLink>
 
           <NavLink
@@ -104,9 +115,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                    color: getNavStyle("/resources").color,
-                    borderBottomColor: getNavStyle("/resources").border,
-                  }
+                  color: getNavStyle("/resources").color,
+                  borderBottomColor: getNavStyle("/resources").border,
+                }
                 : {}
             }
           >
@@ -122,9 +133,9 @@ export default function Header({ onLogoutClick }) {
             style={({ isActive }) =>
               isActive
                 ? {
-                    color: getNavStyle("/profile").color,
-                    borderBottomColor: getNavStyle("/profile").border,
-                  }
+                  color: getNavStyle("/profile").color,
+                  borderBottomColor: getNavStyle("/profile").border,
+                }
                 : {}
             }
           >

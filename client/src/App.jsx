@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { useApp } from './context/AppContext';
 import Layout from './components/Layout/Layout';
@@ -9,12 +9,12 @@ import LoginPage from './pages/LoginPage';
 import OnboardingPage from './pages/OnboardingPage';
 import SpotifyCallbackPage from './pages/SpotifyCallbackPage';
 import ProfilePage from './pages/ProfilePage';
+import Entries from './pages/EntriesPage';
 
 // Protected route wrapper — redirects to onboarding if not completed
-function ProtectedRoute({ children, skipOnboardingCheck = false }) {
+function ProtectedRoute({ children, skipOnboardingCheck = false, redirectIfOnboarded = false }) {
   const { user, loading } = useAuth();
   const { preferences, preferencesLoaded } = useApp();
-  const location = useLocation();
 
   if (loading || !preferencesLoaded) {
     return (
@@ -30,6 +30,11 @@ function ProtectedRoute({ children, skipOnboardingCheck = false }) {
     return <Navigate to="/login" replace />;
   }
 
+  // If user already completed onboarding, redirect away from the onboarding page
+  if (redirectIfOnboarded && preferences?.onboardingComplete) {
+    return <Navigate to="/" replace />;
+  }
+
   // Auto-redirect to onboarding if not completed (skip for onboarding/callback routes)
   if (!skipOnboardingCheck && (!preferences || !preferences.onboardingComplete)) {
     return <Navigate to="/onboarding" replace />;
@@ -43,7 +48,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/onboarding" element={
-        <ProtectedRoute skipOnboardingCheck={true}>
+        <ProtectedRoute skipOnboardingCheck={true} redirectIfOnboarded={true}>
           <OnboardingPage />
         </ProtectedRoute>
       } />
@@ -62,6 +67,7 @@ function App() {
         <Route path="/patterns" element={<PatternLibraryPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/entries" element={<Entries />} />
       </Route>
     </Routes>
   );

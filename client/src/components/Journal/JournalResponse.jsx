@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { Volume2, AlertTriangle, Sparkles, Music } from "lucide-react";
-import {
-  textToSpeech,
-  generateMusic,
-  getSpotifyStatus,
-} from "../../services/api";
+import { textToSpeech, generateMusic, getSpotifyStatus } from "../../services/api";
+import { useApp } from "../../context/AppContext";
+import SOSModal from "./SOSModal";
 
 export default function JournalResponse({ entry }) {
   const { analysis, content, timestamp } = entry;
+  const { preferences } = useApp();
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [musicAudio, setMusicAudio] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
+  const [showSOSModal, setShowSOSModal] = useState(analysis.requires_immediate_intervention || false);
 
   // Build a full narration script from all analysis sections
   const buildVoiceScript = () => {
@@ -260,6 +260,77 @@ export default function JournalResponse({ entry }) {
                     background: #fdf6f0;
                     border-radius: 2px;
                 }
+
+                .jr-sos {
+                    border: 2px solid #c9365a;
+                    border-left: 4px solid #c9365a;
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    background: #fff0f3;
+                    border-radius: 2px;
+                }
+
+                .jr-sos-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 10px;
+                }
+
+                .jr-sos-label {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    color: #c9365a;
+                }
+
+                .jr-sos-text {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 13px;
+                    color: #6b5454;
+                    line-height: 1.7;
+                    margin-bottom: 12px;
+                }
+
+                .jr-sos-btn {
+                    background: #c9365a;
+                    border: none;
+                    color: #fff;
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    padding: 10px 20px;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    transition: background 0.15s;
+                }
+
+                .jr-sos-btn:hover:not(:disabled) {
+                    background: #a82848;
+                }
+
+                .jr-sos-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .jr-sos-sent {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 12px;
+                    color: #1DB954;
+                    letter-spacing: 1px;
+                    margin-top: 8px;
+                }
+
+                .jr-sos-error {
+                    font-family: 'Pixelify Sans', sans-serif;
+                    font-size: 11px;
+                    color: #c9365a;
+                    margin-top: 8px;
+                }
             `}</style>
 
       <div className="jr-wrap">
@@ -271,6 +342,13 @@ export default function JournalResponse({ entry }) {
           </div>
 
           <div className="jr-content">
+            <div className="jr-reflection" style={{ borderLeft: '3px solid #e8d5c4', background: '#fdf6f0', marginBottom: '20px' }}>
+              <div className="jr-reflection-label">What you shared</div>
+              <p className="jr-reflection-text" style={{ fontStyle: 'normal' }}>
+                {content}
+              </p>
+            </div>
+
             <div className="jr-header">
               <span className="jr-label">A reflection for you</span>
               <div
@@ -408,21 +486,21 @@ export default function JournalResponse({ entry }) {
                               fontWeight: "600",
                               ...(pattern.severity === "high"
                                 ? {
-                                    background: "#ffe0e0",
-                                    color: "#c9365a",
-                                    border: "1px solid #ffb3b3",
-                                  }
+                                  background: "#ffe0e0",
+                                  color: "#c9365a",
+                                  border: "1px solid #ffb3b3",
+                                }
                                 : pattern.severity === "medium"
                                   ? {
-                                      background: "#fff3e0",
-                                      color: "#b8956a",
-                                      border: "1px solid #f0dcc0",
-                                    }
+                                    background: "#fff3e0",
+                                    color: "#b8956a",
+                                    border: "1px solid #f0dcc0",
+                                  }
                                   : {
-                                      background: "#e8f5e8",
-                                      color: "#5a7a52",
-                                      border: "1px solid #c0dcc0",
-                                    }),
+                                    background: "#e8f5e8",
+                                    color: "#5a7a52",
+                                    border: "1px solid #c0dcc0",
+                                  }),
                             }}
                           >
                             {pattern.severity}
@@ -453,6 +531,13 @@ export default function JournalResponse({ entry }) {
             </div>
 
             {/* Music Suggestion — triggered by AI distress detection */}
+
+            {/* Emergency SOS Modal — triggered by requires_immediate_intervention */}
+            <SOSModal
+              visible={showSOSModal}
+              entryContent={content}
+              onClose={() => setShowSOSModal(false)}
+            />
             {analysis.suggests_music && (
               <div
                 style={{
