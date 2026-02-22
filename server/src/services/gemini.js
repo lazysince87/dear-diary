@@ -83,7 +83,7 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
     const { mood = null, cyclePhase = null, sleepHours = null, stressLevel = null } = moodOpts;
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.7,
                 topP: 0.9,
