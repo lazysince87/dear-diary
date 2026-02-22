@@ -188,6 +188,12 @@ export default function PatternLibraryPage() {
         }
 
         @media (max-width: 768px) {
+          .pl-title {
+            font-size: 38px;
+            letter-spacing: 2px;
+            white-space: nowrap;
+          }
+
           .pl-deco {
             width: 28px !important;
             height: 28px !important;

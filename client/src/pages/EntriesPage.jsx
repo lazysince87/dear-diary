@@ -357,8 +357,39 @@ export default function EntriesPage() {
 
         @media (max-width: 768px) {
           .ep-deco {
-            display: none;
+            position: fixed !important;
+            width: 40px !important;
+            height: 40px !important;
+            top: auto !important;
+            opacity: 0.75;
+            pointer-events: none;
+            z-index: 6;
           }
+
+          .ep-deco:nth-child(1) {
+            left: 10px !important;
+            bottom: 24px !important;
+          }
+
+          .ep-deco:nth-child(2) {
+            right: 10px !important;
+            left: auto !important;
+            bottom: 64px !important;
+          }
+
+          .ep-deco:nth-child(3) {
+            right: 56px !important;
+            left: auto !important;
+            bottom: 20px !important;
+          }
+
+          .ep-deco:nth-child(4) {
+            left: 52% !important;
+            right: auto !important;
+            bottom: 16px !important;
+            transform: translateX(-50%);
+          }
+
           .ep-duck {
             position: relative !important;
             left: auto !important;
