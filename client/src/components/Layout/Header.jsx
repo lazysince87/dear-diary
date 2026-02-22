@@ -7,6 +7,7 @@ import {
   LogOut,
   User,
   Music,
+  History,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../contexts/AuthContext";
