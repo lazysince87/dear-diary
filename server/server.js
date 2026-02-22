@@ -28,6 +28,12 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
     .split(',')
     .map(o => o.trim());
 
+// Explicitly allow production vercel domain
+const prodOrigin = 'https://deardiary-flame.vercel.app';
+if (!allowedOrigins.includes(prodOrigin)) {
+    allowedOrigins.push(prodOrigin);
+}
+
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, curl, etc.)
@@ -71,13 +77,11 @@ const startServer = async () => {
         });
     } catch (error) {
         console.error('Failed to start server:', error);
-        // Start without DB in development for faster iteration
-        if (process.env.NODE_ENV === 'development') {
-            console.log('Starting without MongoDB — some features unavailable');
-            app.listen(PORT, () => {
-                console.log(`Dear Diary server running on port ${PORT} (no DB)`);
-            });
-        }
+        // Start without DB so Cloud Run doesn't fail deployment (returns 500s instead of crashing)
+        console.log('Starting without MongoDB — some features unavailable');
+        app.listen(PORT, () => {
+            console.log(`Dear Diary server running on port ${PORT} (no DB)`);
+        });
     }
 };
 
