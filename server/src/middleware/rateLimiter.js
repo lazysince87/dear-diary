@@ -20,8 +20,8 @@ const globalLimiter = rateLimit({
  * 10 requests per 15 minutes per IP.
  */
 const aiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: process.env.NODE_ENV === 'development' ? 67 : 10,
+    windowMs: 15 * 60 * 1000,
+    max: 500,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
