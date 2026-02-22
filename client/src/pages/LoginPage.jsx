@@ -61,10 +61,7 @@ export default function LoginPage() {
       <div
         className="min-h-screen flex items-center justify-center p-4"
         style={{
-          backgroundImage: `url(${cloudsImg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          background: "#f5d5dd",
         }}
       >
         <style>{`
@@ -72,7 +69,7 @@ export default function LoginPage() {
                     .lp-book {
                         background: #fffaf7;
                         border: 1px solid #e8d5c4;
-                        border-radius: 2px;
+                        border-radius: 16px;
                         box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
                         max-width: 450px;
                         width: 100%;
@@ -81,8 +78,9 @@ export default function LoginPage() {
                     .lp-inner { display: flex; }
                     .lp-spine {
                         width: 28px;
-                        background: #e0c4c4;
+                        background: #fcf6f9;
                         border-right: 1px solid #d4b096;
+                        border-radius: 16px 0 0 16px;
                         flex-shrink: 0;
                         display: flex;
                         flex-direction: column;
@@ -152,10 +150,7 @@ export default function LoginPage() {
     <div
       className="min-h-screen flex items-center justify-center p-4"
       style={{
-        backgroundImage: `url(${cloudsImg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        background: "#f5d5dd",
       }}
     >
       <style>{`
@@ -164,7 +159,7 @@ export default function LoginPage() {
                 .lp-book {
                     background: #fffaf7;
                     border: 1px solid #e8d5c4;
-                    border-radius: 2px;
+                    border-radius: 16px;
                     box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
                     max-width: 450px;
                     width: 100%;
@@ -177,8 +172,9 @@ export default function LoginPage() {
 
                 .lp-spine {
                     width: 28px;
-                    background: #e0c4c4;
+                    background: #fcf6f9;
                     border-right: 1px solid #d4b096;
+                    border-radius: 16px 0 0 16px;
                     flex-shrink: 0;
                     display: flex;
                     flex-direction: column;
@@ -366,32 +362,12 @@ export default function LoginPage() {
           </div>
 
           <div className="lp-content">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate("/")}
-              className="flex items-center gap-1.5 text-text-muted hover:text-text-secondary transition-colors mb-6"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "11px",
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-              }}
-            >
-              <ArrowLeft size={14} />
-              <span>Return</span>
-            </button>
-
             {/* Header */}
             <div className="text-center">
               <div className="text-5xl mb-4 animate-float"></div>
               <h1 className="lp-title">
                 {isSignUp ? "New Diary" : "Open Diary"}
               </h1>
-              <p className="lp-subtitle">
-                {isSignUp
-                  ? "Create your safe space"
-                  : "Welcome back to your diary"}
-              </p>
             </div>
 
             {/* Error Message */}

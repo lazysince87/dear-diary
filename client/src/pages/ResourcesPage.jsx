@@ -72,6 +72,7 @@ export default function ResourcesPage() {
         ref={duckRef}
         src={heartDuckImg}
         alt="heart duck"
+        className="page-duck"
         style={{
           position: "fixed",
           right: "35px",

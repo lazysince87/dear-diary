@@ -127,7 +127,7 @@ export default function HomePage() {
 
         .dd-header-block {
           padding-left: 0;
-          margin-bottom: 14px;
+          margin-bottom: 6px;
         }
 
         .dd-divider {
@@ -240,6 +240,10 @@ export default function HomePage() {
           }
           .dd-page {
             padding: 20px 10px 20px;
+          }
+          .dd-title {
+            font-size: 32px;
+            white-space: nowrap;
           }
         }
       `}</style>

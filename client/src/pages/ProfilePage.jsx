@@ -344,6 +344,7 @@ export default function ProfilePage() {
         ref={duckRef}
         src={boxDuckImg}
         alt="box duck"
+        className="page-duck"
         style={{
           position: "fixed",
           right: "30px",

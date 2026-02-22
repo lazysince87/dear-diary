@@ -126,6 +126,7 @@ export default function PatternLibraryPage() {
         ref={duckRef}
         src={waveDuckImg}
         alt="wave duck"
+        className="page-duck"
         style={{
           position: "fixed",
           left: "67px",
