@@ -61,12 +61,11 @@ export default function PatternLibraryPage() {
         }
 
         .pl-title {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 28px;
+          font-family: 'KiwiSoda', sans-serif;
+          font-size: 50px;
           font-weight: 600;
           color: #1a1a1a;
-          letter-spacing: 3px;
-          text-transform: uppercase;
+          letter-spacing: 4px;
           margin-bottom: 10px;
         }
 
@@ -126,9 +125,10 @@ export default function PatternLibraryPage() {
         ref={duckRef}
         src={waveDuckImg}
         alt="wave duck"
+        className="page-duck"
         style={{
           position: "fixed",
-          left: "67px",
+          left: "180px",
           bottom: "50px",
           top: "auto",
           width: "200px",

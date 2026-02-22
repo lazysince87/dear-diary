@@ -5,6 +5,14 @@ export default function PatternDetail({ pattern, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fade-in">
+      <style>{`
+        @media (max-width: 768px) {
+          .pattern-modal {
+            max-height: 55vh !important;
+            margin-top: 10px;
+          }
+        }
+      `}</style>
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-text-primary/20 backdrop-blur-sm"
@@ -13,11 +21,11 @@ export default function PatternDetail({ pattern, onClose }) {
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-lg max-h-[75vh] overflow-y-auto p-6 md:p-8 animate-slide-up"
+        className="pattern-modal relative w-full max-w-lg max-h-[75vh] overflow-y-auto p-6 md:p-8 animate-slide-up"
         style={{
           background: "#fffaf7",
-          border: "1px solid #e8d5c4",
-          boxShadow: "6px 6px 0 #e0c4c4",
+          border: "1px solid #4a7c59",
+          boxShadow: "6px 6px 0 #c4dcc4",
           borderRadius: "16px",
           scrollbarColor: "#4a7c59 #e8f5e8",
           scrollbarWidth: "thin",

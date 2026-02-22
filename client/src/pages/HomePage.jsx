@@ -10,9 +10,9 @@ import starImg from "../assets/animations/star.png";
 gsap.registerPlugin(Draggable);
 
 const STAR_POSITIONS = [
-  { id: 1, x: "12%", y: "20%" },
-  { id: 2, x: "80%", y: "15%" },
-  { id: 3, x: "88%", y: "25%" },
+  { id: 1, x: "12%", y: "10%" },
+  { id: 2, x: "80%", y: "5%" },
+  { id: 3, x: "88%", y: "20%" },
 ];
 
 export default function HomePage() {
@@ -110,7 +110,7 @@ export default function HomePage() {
 
         .dd-title {
           font-family: 'KiwiSoda', sans-serif;
-          font-size: 50px;
+          font-size: 64px;
           color: white;
           letter-spacing: 4px;
           text-transform: uppercase;
@@ -127,7 +127,7 @@ export default function HomePage() {
 
         .dd-header-block {
           padding-left: 0;
-          margin-bottom: 14px;
+          margin-bottom: 6px;
         }
 
         .dd-divider {
@@ -249,6 +249,10 @@ export default function HomePage() {
           .dd-page {
             padding: 20px 10px 20px;
           }
+          .dd-title {
+            font-size: 32px;
+            white-space: nowrap;
+          }
         }
         .dd-entry-image {
           margin-top: 10px;
@@ -353,7 +357,7 @@ export default function HomePage() {
             ref={(el) => (starRefs.current[i] = el)}
             className="dd-star"
             style={{
-              position: "fixed",
+              position: "absolute",
               left: pos.x,
               top: pos.y,
               width: "48px",

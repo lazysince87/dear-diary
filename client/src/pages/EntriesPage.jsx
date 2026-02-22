@@ -61,43 +61,39 @@ export default function EntriesPage() {
     return (
         <div className="max-w-4xl mx-auto pb-20 pt-10 px-4">
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Special+Elite&display=swap');
 
                 .nb-container {
                     background: #fffaf7;
                     border: 1px solid #e8d5c4;
-                    box-shadow: 4px 4px 0 #e0c4c4, 8px 8px 0 rgba(201,160,160,0.1);
+                    border-radius: 16px;
+                    box-shadow: 3px 3px 0 #e0c4c4, 6px 6px 0 rgba(201,160,160,0.2);
                     min-height: 80vh;
                     display: flex;
                     position: relative;
                     margin: 0 auto;
+                    overflow: hidden;
                 }
 
                 .nb-spine {
-                    width: 30px;
-                    background-color: #fcf6f9;
-                    /* Create repeating ring effect with CSS */
-                    background-image: 
-                        linear-gradient(to bottom, #fff 0%, #fff 40%, transparent 40%, transparent 100%),
-                        linear-gradient(to right, #c4a8d4 0%, #c4a8d4 100%);
-                    background-size: 15px 12px, 2px 100%;
-                    background-position: center 20px, 100% 0;
-                    background-repeat: repeat-y, no-repeat;
+                    width: 28px;
+                    background: #fcf6f9;
+                    border-right: 1px solid #d4b096;
+                    border-radius: 16px 0 0 16px;
                     flex-shrink: 0;
-                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 16px 0;
+                    gap: 10px;
                 }
 
-                .nb-spine::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    height: 100%;
-                    width: 15px;
-                    background-image: url("data:image/svg+xml,%3Csvg width='15' height='25' viewBox='0 0 15 25' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='2' y='8' width='11' height='6' rx='3' fill='white' stroke='%23c4a8d4' stroke-width='1'/%3E%3C/svg%3E");
-                    background-repeat: repeat-y;
-                    background-position: center 20px;
+                .nb-spine-dot {
+                    width: 6px;
+                    height: 6px;
+                    background: #fffaf7;
+                    border: 1px solid #c9a0a0;
+                    border-radius: 1px;
                 }
 
                 .nb-content {
@@ -242,15 +238,19 @@ export default function EntriesPage() {
             `}</style>
 
             <div className="nb-container">
-                <div className="nb-spine" />
+                <div className="nb-spine">
+                    {[...Array(12)].map((_, i) => (
+                        <div key={i} className="nb-spine-dot" />
+                    ))}
+                </div>
 
                 <div className="nb-content">
                     <header className="nb-header text-center">
-                        <h1 className="text-4xl font-bold mb-2 uppercase tracking-tight" style={{ fontFamily: 'Pixelify Sans', color: '#4a2535' }}>
+                        <h1 className="text-4xl font-bold mb-2 tracking-tight" style={{ fontFamily: 'KiwiSoda', fontSize: '50px', color: '#1a1a1a', letterSpacing: '4px' }}>
                             Archives
                         </h1>
-                        <p className="text-text-muted text-sm font-serif italic" style={{ fontFamily: 'Pixelify Sans' }}>
-                            Your journey, preserved in ink and pixels.
+                        <p className="text-sm font-serif" style={{ fontFamily: 'Special Elite', fontSize: '14px', color: '#a0788a', lineHeight: '1.7' }}>
+                            Your journey, preserved in ink and pixels
                         </p>
                     </header>
 

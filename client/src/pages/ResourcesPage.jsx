@@ -32,7 +32,7 @@ export default function ResourcesPage() {
   return (
     <>
       <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Special+Elite&display=swap');
 
                 .rp-page {
                     max-width: 640px;
@@ -41,18 +41,17 @@ export default function ResourcesPage() {
                 }
 
                 .rp-title {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 28px;
+                    font-family: 'KiwiSoda', sans-serif;
+                    font-size: 50px;
                     font-weight: 600;
                     color: #1a1a1a;
-                    letter-spacing: 3px;
-                    text-transform: uppercase;
+                    letter-spacing: 4px;
                     margin-bottom: 10px;
                 }
 
                 .rp-subtitle {
-                    font-family: 'Pixelify Sans', sans-serif;
-                    font-size: 13px;
+                    font-family: 'Special Elite', serif;
+                    font-size: 14px;
                     color: #a0788a;
                     line-height: 1.7;
                     margin-bottom: 36px;
@@ -60,18 +59,17 @@ export default function ResourcesPage() {
             `}</style>
 
       <div className="rp-page">
-        <h1 className="rp-title">You're Not Alone</h1>
-        {/* <p className="rp-subtitle">
-          If anything you've written about resonates with these resources,
-          please know that help is available. Reaching out is brave, and you
-          deserve support.
-        </p> */}
+        <h1 className="rp-title">Resources</h1>
+        <p className="rp-subtitle">
+          You're not alone
+        </p>
         <ResourceList />
       </div>
       <img
         ref={duckRef}
         src={heartDuckImg}
         alt="heart duck"
+        className="page-duck"
         style={{
           position: "fixed",
           right: "35px",

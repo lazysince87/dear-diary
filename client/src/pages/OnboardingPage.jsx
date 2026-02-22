@@ -13,7 +13,8 @@ const PERSONAS = [
   {
     value: "therapist",
     label: "A Therapist",
-    description: "Help me process my feelings with gentle, actionable guidance.",
+    description:
+      "Help me process my feelings with gentle, actionable guidance.",
     voice: "Sapphire",
   },
 ];
@@ -40,7 +41,10 @@ export default function OnboardingPage() {
     if (!displayName.trim() || !persona) return;
     setSaving(true);
     try {
-      await savePreferences({ displayName: displayName.trim(), personaPreference: persona });
+      await savePreferences({
+        displayName: displayName.trim(),
+        personaPreference: persona,
+      });
       setStep(2);
     } catch (err) {
       console.error("Failed to save preferences:", err);
@@ -91,7 +95,7 @@ export default function OnboardingPage() {
           align-items: center;
           justify-content: center;
           padding: 24px;
-          background: #1a0e12;
+          background: #f5d5dd;
         }
 
         .ob-card {
@@ -279,7 +283,9 @@ export default function OnboardingPage() {
           {step === 1 && (
             <>
               <h1 className="ob-title">Welcome to Dear Diary</h1>
-              <p className="ob-subtitle">let's set things up so i can be the best companion for you</p>
+              <p className="ob-subtitle">
+                let's set things up so i can be the best companion for you
+              </p>
 
               <div className="ob-label">What should I call you?</div>
               <input
@@ -380,7 +386,8 @@ export default function OnboardingPage() {
             <>
               <h1 className="ob-title">Connect Your Music</h1>
               <p className="ob-subtitle">
-                link your spotify so I can play your favorite songs when you need comfort
+                link your spotify so I can play your favorite songs when you
+                need comfort
               </p>
 
               <button
@@ -392,7 +399,10 @@ export default function OnboardingPage() {
                 {spotifyConnecting ? "Connecting..." : "Connect Spotify"}
               </button>
 
-              <button className="ob-btn ob-btn-skip" onClick={handleSkipSpotify}>
+              <button
+                className="ob-btn ob-btn-skip"
+                onClick={handleSkipSpotify}
+              >
                 Skip for now
               </button>
             </>

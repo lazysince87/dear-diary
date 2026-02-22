@@ -30,8 +30,8 @@
   --color-text-secondary: #6b5454;
   --color-text-muted: #9a8282;
 
-  --font-sans: 'DM Sans', 'Inter', system-ui, sans-serif;
-  --font-serif: 'Pixelify Sans', sans-serif;
+  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
+  --font-serif: "Pixelify Sans", sans-serif;
 }
 
 @layer base {
@@ -109,7 +109,6 @@
 }
 
 @keyframes pulse-soft {
-
   0%,
   100% {
     opacity: 1;
@@ -121,7 +120,6 @@
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -247,10 +245,12 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg,
-      var(--color-cream) 25%,
-      var(--color-cream-dark) 50%,
-      var(--color-cream) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-cream) 25%,
+    var(--color-cream-dark) 50%,
+    var(--color-cream) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 0.5rem;
@@ -290,7 +290,9 @@
   line-height: 1.8;
   color: var(--color-text-primary);
   resize: vertical;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
   outline: none;
 }
 
@@ -332,9 +334,29 @@
     min-height: 140px;
     padding: 1rem;
   }
+
+  .nav-link {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .nav-link.active {
+    border-bottom: none;
+  }
+
+  /* Mobile ducks for patterns/resources/profile */
+  .page-duck {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 120px !important;
+    display: block;
+    margin: 20px auto 0;
+  }
 }
 
 @font-face {
-  font-family: 'KiwiSoda';
-  src: url('./assets/fonts/KiwiSoda.ttf') format('truetype');
+  font-family: "KiwiSoda";
+  src: url("./assets/fonts/KiwiSoda.ttf") format("truetype");
 }
