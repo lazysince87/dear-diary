@@ -87,17 +87,6 @@ export default function Header({ onLogoutClick }) {
           >
             <History size={16} />
             <span className="hidden sm:inline">Entries</span>
-            <span className="hidden sm:inline">Write</span>
-          </NavLink>
-
-          <NavLink
-            to="/entries"
-            className={({ isActive }) =>
-              `nav-link flex items-center gap-1.5 ${isActive ? "active" : ""}`
-            }
-          >
-            <History size={16} />
-            <span className="hidden sm:inline">Entries</span>
           </NavLink>
 
           <NavLink
@@ -115,7 +104,6 @@ export default function Header({ onLogoutClick }) {
             }
           >
             <Library size={16} />
-            <span className="hidden sm:inline">Learn</span>
             <span className="hidden sm:inline">Learn</span>
           </NavLink>
 
