@@ -21,6 +21,7 @@ export default function HomePage() {
   const duckRef = useRef(null);
   const starRefs = useRef([]);
   const pageRef = useRef(null);
+  const titleRef = useRef(null);
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   useEffect(() => {
@@ -82,9 +83,29 @@ export default function HomePage() {
           },
         });
       });
+
     }, pageRef);
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (titleRef.current) {
+      const chars = titleRef.current.querySelectorAll(".dd-char");
+      gsap.to(chars, {
+        keyframes: [
+          { y: 0, duration: 0 },
+          { y: -8, duration: .75, ease: "sine.inOut" },
+          { y: 0, duration: 0.75, ease: "sine.inOut" }
+        ],
+        repeat: -1,
+        force3D: true, // Hardware acceleration
+        stagger: {
+          each: 0.2,
+          from: "start"
+        }
+      });
+    }
   }, []);
 
   const handleAnalysisComplete = (entry) => {
@@ -382,7 +403,13 @@ export default function HomePage() {
         ))}
         <div className="dd-page max-w-full">
           <div className="dd-header-block">
-            <h1 className="dd-title">Dear Diary</h1>
+            <h1 ref={titleRef} className="dd-title">
+              {"Dear Diary".split("").map((char, i) => (
+                <span key={i} className="dd-char" style={{ display: "inline-block" }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
+            </h1>
             {!latestEntry && entries.length === 0 && (
               <p className="dd-subtitle">
                 Your safe space to reflect and understand your relationships.
