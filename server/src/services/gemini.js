@@ -156,20 +156,12 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
             }
         }
 
-        const result = await model.generateContent(promptParts);
         const response = result.response;
-        // Strip markdown backticks if Gemini includes them
         let text = response.text().trim();
-        if (text.startsWith('\`\`\`json')) {
-            text = text.substring(7);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
-        } else if (text.startsWith('\`\`\`')) {
-            text = text.substring(3);
-            if (text.endsWith('\`\`\`')) {
-                text = text.substring(0, text.length - 3);
-            }
+        // Extract JSON using regex to handle extra conversational text
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            text = jsonMatch[0];
         }
 
         // Parse the JSON response
