@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
-import { Draggable } from "gsap/draggable";
+import { Draggable } from "gsap/all";
 import JournalEntry from "../components/Journal/JournalEntry";
 import JournalResponse from "../components/Journal/JournalResponse";
 import { useApp } from "../context/AppContext";

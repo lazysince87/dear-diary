@@ -43,7 +43,7 @@ export default function JournalResponse({ entry }) {
 
     try {
       const voiceScript = buildVoiceScript();
-      const result = await textToSpeech(voiceScript);
+      const result = await textToSpeech(voiceScript, analysis);
 
       if (result.usedFallback) {
         // Browser TTS already played and finished

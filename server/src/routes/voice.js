@@ -15,11 +15,11 @@ const PERSONA_VOICES = {
  * POST /api/voice/tts
  * Convert analysis text to speech via ElevenLabs
  * Falls back to client-side Web Speech API if this fails
- * Body: { text: string, voiceId?: string }
+ * Body: { text: string, voiceId?: string, analysis?: object }
  */
 router.post('/tts', requireAuth, async (req, res, next) => {
     try {
-        const { text, voiceId: clientVoiceId } = req.body;
+        const { text, voiceId: clientVoiceId, analysis } = req.body;
 
         if (!text || !text.trim()) {
             return res.status(400).json({ error: 'Text is required for speech synthesis' });
@@ -45,7 +45,7 @@ router.post('/tts', requireAuth, async (req, res, next) => {
             }
         }
 
-        const audioBuffer = await textToSpeech(text.trim(), voiceId);
+        const audioBuffer = await textToSpeech(text.trim(), analysis || null, voiceId);
 
         res.set({
             'Content-Type': 'audio/mpeg',
@@ -104,7 +104,7 @@ router.post('/music', requireAuth, async (req, res, next) => {
             // Fallback: Generate a soothing spoken meditation via TTS
             const meditationScript = `Take a deep breath in... and slowly let it out. You are safe. You are valued. Whatever you are feeling right now is completely valid. Let yourself feel it, and know that it will pass. You are stronger than you think.`;
             const voiceId = PERSONA_VOICES[persona] || PERSONA_VOICES.friend;
-            audioBuffer = await textToSpeech(meditationScript, voiceId);
+            audioBuffer = await textToSpeech(meditationScript, null, voiceId);
         }
 
         res.set({

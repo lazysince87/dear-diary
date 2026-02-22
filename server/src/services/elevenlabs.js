@@ -3,13 +3,86 @@ const axios = require('axios');
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
 
 /**
- * Convert text to speech using ElevenLabs API
+ * Emotion-aware voice presets.
+ * Each preset tunes ElevenLabs voice_settings for the emotional context.
+ *
+ * - stability ↑ = calmer, more consistent delivery
+ * - similarity_boost ↑ = closer to original voice (warmer)
+ * - style ↑ = more expressive / dramatic delivery
+ */
+const VOICE_PRESETS = {
+    // Immediate danger — calm, steady, authoritative
+    emergency: {
+        stability: 0.95,
+        similarity_boost: 0.60,
+        style: 0.10,
+        use_speaker_boost: true,
+    },
+    // High severity manipulation detected — serious, empathetic
+    high_severity: {
+        stability: 0.80,
+        similarity_boost: 0.80,
+        style: 0.35,
+        use_speaker_boost: true,
+    },
+    // Sadness / anxiety — warm, gentle, slightly variable for empathy
+    comforting: {
+        stability: 0.55,
+        similarity_boost: 0.85,
+        style: 0.45,
+        use_speaker_boost: true,
+    },
+    // Neutral / positive — friendly, natural
+    neutral: {
+        stability: 0.75,
+        similarity_boost: 0.75,
+        style: 0.30,
+        use_speaker_boost: true,
+    },
+};
+
+/**
+ * Choose the right voice preset based on the Gemini analysis result.
+ * @param {Object} analysis - The structured analysis from Gemini
+ * @returns {Object} ElevenLabs voice_settings
+ */
+function getVoicePreset(analysis) {
+    if (!analysis) return VOICE_PRESETS.neutral;
+
+    // Highest priority: immediate intervention
+    if (analysis.requires_immediate_intervention) {
+        console.log('[ElevenLabs] Using EMERGENCY voice preset');
+        return VOICE_PRESETS.emergency;
+    }
+
+    // Check pattern severity
+    const patterns = analysis.patterns_detected || [];
+    const hasHighSeverity = patterns.some(p => p.severity === 'high');
+    if (hasHighSeverity || analysis.confidence >= 0.8) {
+        console.log('[ElevenLabs] Using HIGH_SEVERITY voice preset');
+        return VOICE_PRESETS.high_severity;
+    }
+
+    // If music is suggested, user is likely distressed — use comforting
+    if (analysis.suggests_music) {
+        console.log('[ElevenLabs] Using COMFORTING voice preset');
+        return VOICE_PRESETS.comforting;
+    }
+
+    console.log('[ElevenLabs] Using NEUTRAL voice preset');
+    return VOICE_PRESETS.neutral;
+}
+
+/**
+ * Convert text to speech using ElevenLabs API with emotion-aware voice settings.
  * @param {string} text - Text to convert to speech
+ * @param {Object} [analysis] - Optional Gemini analysis result for emotion-aware tuning
  * @param {string} [voiceId] - Optional ElevenLabs voice ID (defaults to env var)
  * @returns {Buffer} Audio buffer (MP3)
  */
-async function textToSpeech(text, voiceId) {
+async function textToSpeech(text, analysis = null, voiceId) {
     const finalVoiceId = voiceId || process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM';
+    const voiceSettings = getVoicePreset(analysis);
 
     try {
         const response = await axios({
@@ -23,12 +96,7 @@ async function textToSpeech(text, voiceId) {
             data: {
                 text,
                 model_id: 'eleven_multilingual_v2',
-                voice_settings: {
-                    stability: 0.75,       // Higher = more consistent, calmer
-                    similarity_boost: 0.75,
-                    style: 0.3,            // Subtle emotional expression
-                    use_speaker_boost: true,
-                },
+                voice_settings: voiceSettings,
             },
             responseType: 'arraybuffer',
             timeout: 15000, // 15s timeout
@@ -62,4 +130,5 @@ async function textToSpeech(text, voiceId) {
     }
 }
 
-module.exports = { textToSpeech };
+module.exports = { textToSpeech, getVoicePreset, VOICE_PRESETS };
+
