@@ -22,6 +22,7 @@ export default function Header({ onLogoutClick }) {
     if (location.pathname === "/patterns") return "#4a7c59";
     if (location.pathname === "/resources") return "#7b5ea7";
     if (location.pathname === "/profile") return "#6a9fd8";
+    if (location.pathname === "/entries") return "#b8956a";
     return "#c9748a";
   };
 
@@ -31,6 +32,7 @@ export default function Header({ onLogoutClick }) {
       "/patterns": { color: "#4a7c59", border: "#4a7c59" },
       "/resources": { color: "#7b5ea7", border: "#7b5ea7" },
       "/profile": { color: "#6a9fd8", border: "#6a9fd8" },
+      "/entries": { color: "#b8956a", border: "#b8956a" },
     };
     return colors[path] || colors["/"];
   };

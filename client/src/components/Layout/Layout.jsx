@@ -7,6 +7,8 @@ import cloudsImg from "../../assets/backgrounds/clouds.png";
 import greenCloudsImg from "../../assets/backgrounds/green-clouds.png";
 import purpleCloudsImg from "../../assets/backgrounds/purple-clouds.png";
 import blueCloudsImg from "../../assets/backgrounds/blue-clouds.png";
+import tanCloudsImg from "../../assets/backgrounds/tan-clouds.png";
+import pencilImg from "../../assets/animations/pencil.png";
 
 export default function Layout() {
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
@@ -18,6 +20,7 @@ export default function Layout() {
     if (location.pathname === "/patterns") return greenCloudsImg;
     if (location.pathname === "/resources") return purpleCloudsImg;
     if (location.pathname === "/profile") return blueCloudsImg;
+    if (location.pathname === "/entries") return tanCloudsImg;
     return cloudsImg;
   };
 
@@ -43,6 +46,22 @@ export default function Layout() {
       <div className="bg-decoration bg-decoration-1" />
       <div className="bg-decoration bg-decoration-2" />
       <div className="bg-decoration bg-decoration-3" />
+
+      <img
+        src={pencilImg}
+        alt="pencil decoration"
+        style={{
+          position: "absolute",
+          top: "35px",
+          left: "20px",
+          width: "230px",
+          zIndex: 100,
+          pointerEvents: "none",
+          transform: "rotate(-5deg)",
+          opacity: 1,
+        }}
+        className="hidden md:block"
+      />
 
       <Header onLogoutClick={() => setShowConfirmLogout(true)} />
 

@@ -118,7 +118,7 @@ export default function ProfilePage() {
     return (
         <>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Special+Elite&display=swap');
 
         .pf-page {
           max-width: 600px;
@@ -127,17 +127,19 @@ export default function ProfilePage() {
         }
 
         .pf-title {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 24px;
+          font-family: 'KiwiSoda', sans-serif;
+          font-size: 50px;
           font-weight: 600;
-          color: #3d2c2c;
-          margin-bottom: 6px;
+          color: #1a1a1a;
+          letter-spacing: 4px;
+          margin-bottom: 10px;
         }
 
         .pf-subtitle {
-          font-family: 'Pixelify Sans', sans-serif;
-          font-size: 12px;
-          color: #9a8282;
+          font-family: 'Special Elite', serif;
+          font-size: 14px;
+          color: #a0788a;
+          line-height: 1.7;
           margin-bottom: 32px;
         }
 
