@@ -1,6 +1,8 @@
 import { supabase } from '../lib/supabase';
 
-const API_BASE = '/api';
+// In dev: Vite proxy handles /api → localhost:5000
+// In prod: VITE_API_URL points to the Cloud Run backend
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * Get the current auth token for API requests
