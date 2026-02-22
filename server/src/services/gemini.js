@@ -156,6 +156,7 @@ async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntrie
             }
         }
 
+        const result = await model.generateContent(promptParts);
         const response = result.response;
         let text = response.text().trim();
         // Extract JSON using regex to handle extra conversational text
