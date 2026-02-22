@@ -33,9 +33,9 @@ const entrySchema = new mongoose.Schema({
         index: true,
     },
     mood: {
-        type: String,
+        type: [String],
         enum: ['grateful', 'confused', 'sad', 'anxious', 'hopeful', 'angry', 'numb', null],
-        default: null,
+        default: [],
     },
     // Menstrual cycle phase (optional)
     cyclePhase: {

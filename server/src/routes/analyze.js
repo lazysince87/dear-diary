@@ -18,18 +18,19 @@ router.post('/', requireAuth, async (req, res, next) => {
     try {
         const { content, mood, imageUrl, cyclePhase, sleepHours, stressLevel } = req.body;
 
-        if ((!content || !content.trim()) && !imageUrl) {
+        const safeContent = content ? content.trim() : '';
+
+        if (!safeContent && !imageUrl) {
             return res.status(400).json({
                 error: 'Please share what\'s on your mind or attach an image \u2014 even a small piece helps.'
             });
         }
 
         // ─── Step 1: Generate embedding for the current entry (non-blocking) ───
-        const textForEmbedding = content?.trim() || '';
         let currentEmbedding = null;
         try {
-            if (textForEmbedding) {
-                currentEmbedding = await generateEmbedding(textForEmbedding);
+            if (safeContent) {
+                currentEmbedding = await generateEmbedding(safeContent);
                 console.log('[RAG] Generated embedding for current entry:', currentEmbedding ? `${currentEmbedding.length}-dim vector` : 'null');
             }
         } catch (embError) {
@@ -101,7 +102,6 @@ router.post('/', requireAuth, async (req, res, next) => {
         let analysis;
         console.log(`[AI Provider]: using ${aiProvider.toUpperCase()} | Persona: ${persona}`);
 
-        const safeContent = content ? content.trim() : '';
         if (aiProvider === 'ollama') {
             analysis = await analyzeOllama(safeContent, { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
@@ -112,10 +112,10 @@ router.post('/', requireAuth, async (req, res, next) => {
         // ─── Step 5: Save to MongoDB with embedding (non-blocking) ───
         try {
             const entry = new Entry({
-                content: content ? content.trim() : '',
+                content: safeContent,
                 analysis,
                 userId: req.user.id,
-                mood: mood || null,
+                mood: Array.isArray(mood) ? mood : [],
                 cyclePhase: cyclePhase || null,
                 sleepHours: sleepHours !== undefined ? sleepHours : null,
                 stressLevel: stressLevel !== undefined ? stressLevel : null,
