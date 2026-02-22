@@ -43,7 +43,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Rate limiting & timeout
 app.use(globalLimiter);
-app.use(requestTimeout(30000)); // Kill any request after 30 seconds
+app.use(requestTimeout(120000)); // Kill any request after 120 seconds to allow slow local LLMs
 
 // Health check
 app.get('/api/health', (req, res) => {
