@@ -11,32 +11,32 @@ const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
  * - style ↑ = more expressive / dramatic delivery
  */
 const VOICE_PRESETS = {
-    // Immediate danger — calm, steady, authoritative
+    // Immediate danger — calm, steady, authoritative (but not robotic)
     emergency: {
-        stability: 0.95,
-        similarity_boost: 0.60,
-        style: 0.10,
+        stability: 0.65,
+        similarity_boost: 0.75,
+        style: 0.35,
         use_speaker_boost: true,
     },
     // High severity manipulation detected — serious, empathetic
     high_severity: {
-        stability: 0.80,
+        stability: 0.60,
         similarity_boost: 0.80,
-        style: 0.35,
+        style: 0.45,
         use_speaker_boost: true,
     },
     // Sadness / anxiety — warm, gentle, slightly variable for empathy
     comforting: {
-        stability: 0.55,
+        stability: 0.45,
         similarity_boost: 0.85,
-        style: 0.45,
+        style: 0.55,
         use_speaker_boost: true,
     },
     // Neutral / positive — friendly, natural
     neutral: {
-        stability: 0.75,
+        stability: 0.50,
         similarity_boost: 0.75,
-        style: 0.30,
+        style: 0.40,
         use_speaker_boost: true,
     },
 };
@@ -99,7 +99,7 @@ async function textToSpeech(text, analysis = null, voiceId) {
                 voice_settings: voiceSettings,
             },
             responseType: 'arraybuffer',
-            timeout: 15000, // 15s timeout
+            timeout: 45000, // Increased to 45s for long journal read-outs
         });
 
         return Buffer.from(response.data);
