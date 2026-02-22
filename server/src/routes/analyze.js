@@ -13,7 +13,7 @@ const { requireAuth } = require('../middleware/authMiddleware');
  */
 router.post('/', requireAuth, async (req, res, next) => {
     try {
-        const { content, mood, imageUrl } = req.body;
+        const { content, mood, imageUrl, cyclePhase, sleepHours, stressLevel } = req.body;
 
         if ((!content || !content.trim()) && !imageUrl) {
             return res.status(400).json({
@@ -52,10 +52,10 @@ router.post('/', requireAuth, async (req, res, next) => {
 
         // Analyze with selected AI provider
         if (aiProvider === 'ollama') {
-            analysis = await analyzeOllama(content.trim(), mood, pastEntries);
+            analysis = await analyzeOllama(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, pastEntries, persona);
         } else {
-            console.log('[DEBUG] image received for analysis:', !!imageUrl);
-            analysis = await analyzeGemini(content.trim(), mood, imageUrl, pastEntries, persona);
+            console.log('[DEBUG] image received for analysis:', !!imageUrl, 'mood:', mood);
+            analysis = await analyzeGemini(content.trim(), { mood, cyclePhase, sleepHours, stressLevel }, imageUrl, pastEntries, persona);
         }
 
         // Save to MongoDB (non-blocking — don't let DB errors block the response)
@@ -65,6 +65,9 @@ router.post('/', requireAuth, async (req, res, next) => {
                 analysis,
                 userId: req.user.id,
                 mood: mood || null,
+                cyclePhase: cyclePhase || null,
+                sleepHours: sleepHours !== undefined ? sleepHours : null,
+                stressLevel: stressLevel !== undefined ? stressLevel : null,
                 imageUrl: imageUrl || null
             });
             await entry.save();

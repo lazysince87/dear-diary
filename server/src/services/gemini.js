@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const SYSTEM_PROMPT = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
+const SYSTEM_PROMPT_BASE = `You are Diary, a gentle, highly empathetic, and insightful therapeutic companion embedded within a cozy journaling app.
 
 Your job: Analyze the user's journal entry, pasted conversation, OR attached screenshots/images for emotional manipulation patterns. Provide deep emotional validation and offer genuine, actionable therapeutic advice.
 
@@ -34,6 +34,11 @@ CRITICAL THERAPEUTIC RULES:
    - "high": Serious, deliberate manipulation that could be harmful
 7. MUSIC SUGGESTION — Be AGGRESSIVE about setting "suggests_music" to true. Set it to true if the user expresses ANY of: sadness, anxiety, stress, frustration, loneliness, anger, confusion, overwhelm, hopelessness, fear, exhaustion, or general negativity. Essentially, if the entry is not purely positive/neutral, set suggests_music to true. When you do, weave it naturally into your empathy_response, like: "I think some of your favorite music might help you feel a little more grounded right now."
 8. NEVER use placeholder brackets like [insert X] or [person's name] anywhere in your response. You have the user's actual story — reference it directly. Every piece of advice should feel personally written for them, not templated.
+9. JOKES VS. MANIPULATION: Carefully distinguish between casual banter/sarcasm between friends and actual emotional abuse.
+   - A joke or sarcasm is mutual, lacks a power imbalance, and the user's tone indicates they are not genuinely distressed or confused by it.
+   - Actual Gaslighting/Manipulation relies on an intent to control, a power imbalance, and results in the user feeling "crazy", fearful, or deeply distressed.
+   - IF the user indicates they are fine with the interaction (e.g., "lol", "we always joke like this", "my bestie"), you MUST set "tactic_identified" to false. Do not pathologize normal banter.
+10. IMMEDIATE INTERVENTION: Set "requires_immediate_intervention" to true ONLY if the user describes active physical violence, expresses extreme fear for their physical safety, or uses urgent phrases like "I NEED HELP", "HE'S GOING TO HURT ME", "I'M BEING ABUSED RIGHT NOW", or if you detect a longitudinal pattern of escalating severe abuse across their past entries. This is a high-stakes flag; do NOT set it lightly for emotional distress alone—only for situations where physical safety appears to be at risk.
 
 You MUST respond ONLY with valid JSON matching this exact schema:
 {
@@ -51,7 +56,8 @@ You MUST respond ONLY with valid JSON matching this exact schema:
       "severity": "low" | "medium" | "high"
     }
   ],
-  "suggests_music": true/false
+  "suggests_music": true/false,
+  "requires_immediate_intervention": true/false
 }
 
 Note: patterns_detected should be an empty array [] if no patterns are found. Include ALL patterns you detect, not just the primary one.
@@ -66,10 +72,15 @@ const PERSONA_INSTRUCTIONS = {
 /**
  * Analyze a journal entry for manipulation patterns using Gemini
  * @param {string} entryText - The journal entry or conversation to analyze
+ * @param {Object|string} options - Options object (or legacy mood string) containing mood, cyclePhase, sleepHours, stressLevel
  * @param {Array} pastEntries - Previous journal entries for longitudinal context (RAG)
+ * @param {string} persona - The therapeutic persona to use
  * @returns {Object} Structured analysis response
  */
-async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries = [], persona = 'friend') {
+async function analyzeEntry(entryText, options = {}, imageUrl = null, pastEntries = [], persona = 'friend') {
+    // Handle backwards compatibility where options was just the mood string
+    const moodOpts = typeof options === 'string' ? { mood: options } : options || {};
+    const { mood = null, cyclePhase = null, sleepHours = null, stressLevel = null } = moodOpts;
     try {
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
@@ -94,12 +105,32 @@ async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries
         const personaInstruction = PERSONA_INSTRUCTIONS[persona] || PERSONA_INSTRUCTIONS.friend;
         const SYSTEM_PROMPT = SYSTEM_PROMPT_BASE + personaInstruction;
 
-        let prompt = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE:\n"""\n${entryText}\n"""`;
-
         let promptText = `${SYSTEM_PROMPT}${contextBlock}\n\nJOURNAL ENTRY TO ANALYZE NOW:\n"""\n${entryText || "[Note: The user provided an image/screenshot for analysis without additional text.]"}\n"""`;
 
         if (mood) {
             promptText += `\n\nIMPORTANT — The user explicitly selected "${mood}" as their current mood before writing this entry. You MUST acknowledge this mood in your empathy_response. If their words seem to contradict their selected mood, gently explore that contrast. Always trust and center the mood they selected.`;
+        }
+
+        let healthContext = [];
+        if (cyclePhase) {
+            healthContext.push(`The user is currently in her ${cyclePhase.toUpperCase()} phase. Hormonal fluctuations can affect emotional resilience, perception, and susceptibility to manipulation (e.g. heightening sensitivity or self-doubt during luteal/menstrual phases). Validate her feelings while gently reminding her to give herself grace during this hormonal window if appropriate.`);
+        }
+        if (sleepHours !== null && sleepHours !== undefined) {
+            healthContext.push(`The user reported sleeping ${sleepHours} hours last night.`);
+            if (sleepHours < 6) {
+                healthContext.push(`This indicates sleep deprivation. Gentle reminder: It's harder to defend reality against gaslighting when sleep-deprived. Note this in your advice to prioritize rest.`);
+            }
+        }
+        if (stressLevel !== null && stressLevel !== undefined) {
+            healthContext.push(`The user reported a current stress level of ${stressLevel}/10.`);
+        }
+
+        if (healthContext.length > 0) {
+            promptText += `\n\nCONTEXTUAL HEALTH DATA:\n${healthContext.join('\n')}\nPlease factor this physiological context into your empathy response and actionable advice if relevant.`;
+        }
+
+        if (pastEntries && pastEntries.length > 0) {
+            promptText += `\n\nVULNERABILITY WINDOW INSIGHTS: Since you have the user's past entries above and their current health data, look for correlations. For example, if a partner frequently uses minimizing language when the user is sleep-deprived or in their luteal phase, point this out as a "Vulnerability Window" insight. Abusive partners sometimes subconsciously escalate when they sense vulnerability.`;
         }
 
         if (imageUrl) {
@@ -116,7 +147,7 @@ async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries
                 promptParts.push({
                     inlineData: {
                         data: Buffer.from(buffer).toString("base64"),
-                        mimeType: "image/jpeg"
+                        mimeType: "image/jpeg" // assume jpeg or similar for generative ai; gemini is flexible
                     }
                 });
             } catch (imgErr) {
@@ -155,6 +186,7 @@ async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries
             reflection_question: analysis.reflection_question || "How did writing this out make you feel?",
             patterns_detected: Array.isArray(analysis.patterns_detected) ? analysis.patterns_detected : [],
             suggests_music: Boolean(analysis.suggests_music),
+            requires_immediate_intervention: Boolean(analysis.requires_immediate_intervention),
         };
 
         return validated;
@@ -176,4 +208,4 @@ async function analyzeEntry(entryText, mood = null, imageUrl = null, pastEntries
     }
 }
 
-module.exports = { analyzeEntry };
+module.exports = { analyzeEntry, SYSTEM_PROMPT_BASE, PERSONA_INSTRUCTIONS };

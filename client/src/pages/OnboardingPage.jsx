@@ -23,6 +23,9 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
   const [persona, setPersona] = useState(null);
+  const [defaultCyclePhase, setDefaultCyclePhase] = useState(null);
+  const [averageSleepHours, setAverageSleepHours] = useState("");
+  const [averageStressLevel, setAverageStressLevel] = useState("");
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [spotifyConnecting, setSpotifyConnecting] = useState(false);
@@ -41,6 +44,22 @@ export default function OnboardingPage() {
       setStep(2);
     } catch (err) {
       console.error("Failed to save preferences:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleHealthContinue = async () => {
+    setSaving(true);
+    try {
+      await savePreferences({
+        defaultCyclePhase: defaultCyclePhase || null,
+        averageSleepHours: averageSleepHours ? Number(averageSleepHours) : null,
+        averageStressLevel: averageStressLevel ? Number(averageStressLevel) : null,
+      });
+      setStep(3);
+    } catch (err) {
+      console.error("Failed to save health preferences:", err);
     } finally {
       setSaving(false);
     }
@@ -255,7 +274,7 @@ export default function OnboardingPage() {
 
       <div className="ob-page">
         <div className="ob-card">
-          <div className="ob-step-indicator">Step {step} of 2</div>
+          <div className="ob-step-indicator">Step {step} of 3</div>
 
           {step === 1 && (
             <>
@@ -297,6 +316,67 @@ export default function OnboardingPage() {
           )}
 
           {step === 2 && (
+            <>
+              <h1 className="ob-title">Your Health Baseline</h1>
+              <p className="ob-subtitle">
+                optional: help me understand your body so i can give you better, more personalized support
+              </p>
+
+              <div className="ob-label">Current Cycle Phase</div>
+              <div className="ob-persona-grid" style={{ gridTemplateColumns: '1fr 1fr', marginBottom: '16px' }}>
+                {[
+                  { value: 'menstrual', label: 'Menstrual' },
+                  { value: 'follicular', label: 'Follicular' },
+                  { value: 'ovulatory', label: 'Ovulatory' },
+                  { value: 'luteal', label: 'Luteal (PMS)' },
+                ].map((phase) => (
+                  <div
+                    key={phase.value}
+                    className={`ob-persona-card ${defaultCyclePhase === phase.value ? 'selected' : ''}`}
+                    onClick={() => setDefaultCyclePhase(defaultCyclePhase === phase.value ? null : phase.value)}
+                  >
+                    <div className="ob-persona-label">{phase.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="ob-label">Average Sleep (hours/night)</div>
+              <input
+                className="ob-input"
+                type="number"
+                min="0"
+                max="24"
+                placeholder="e.g. 7"
+                value={averageSleepHours}
+                onChange={(e) => setAverageSleepHours(e.target.value)}
+              />
+
+              <div className="ob-label">Typical Stress Level (1-10)</div>
+              <input
+                className="ob-input"
+                type="number"
+                min="1"
+                max="10"
+                placeholder="e.g. 5"
+                value={averageStressLevel}
+                onChange={(e) => setAverageStressLevel(e.target.value)}
+              />
+
+              <button
+                className="ob-btn"
+                onClick={handleHealthContinue}
+                disabled={saving}
+                style={{ marginBottom: '12px' }}
+              >
+                {saving ? 'Saving...' : 'Continue'}
+              </button>
+              <button className="ob-btn ob-btn-skip" onClick={() => setStep(3)}>
+                Skip for now
+              </button>
+            </>
+          )}
+
+          {step === 3 && (
             <>
               <h1 className="ob-title">Connect Your Music</h1>
               <p className="ob-subtitle">
