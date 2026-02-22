@@ -4,6 +4,8 @@
 
 DD: Dear Diary is a relationship safety companion disguised as a cozy, aesthetically warm personal journal. On the surface, it’s a beautifully designed journaling app. Underneath, it uses a **Semantic RAG AI pipeline** to gently identify emotional manipulation patterns (gaslighting, love bombing, D.A.R.V.O., isolation) and provides profound empathy and resources using a responsive, emotion-aware voice synthesizer.
 
+**Devpost Link (with demo video)**: https://devpost.com/software/dd-dear-diary
+
 Built @ WiNGHacks 2026.
 
 ---
